@@ -16,6 +16,8 @@ namespace DivAcerManagerMax
     {
         private readonly DAMXClient _client;
         private DAMXSettings _settings;
+        private PowerSourceDetection _powerDetection;
+        
         private bool _isManualFanControl;
         private int _cpuFanSpeed = 50;
         private int _gpuFanSpeed = 70;
@@ -112,6 +114,28 @@ namespace DivAcerManagerMax
             _balancedProfileButton = this.FindControl<RadioButton>("BalancedProfileButton");
             _performanceProfileButton = this.FindControl<RadioButton>("PerformanceProfileButton");
             _turboProfileButton = this.FindControl<RadioButton>("TurboProfileButton");
+            
+            // Find the power status toggle switch by name
+            var powerToggleSwitch = this.FindControl<ToggleSwitch>("PluggedInToggleSwitch");
+        
+            if (powerToggleSwitch != null)
+            {
+                // Initialize power source detection
+                _powerDetection = new PowerSourceDetection(powerToggleSwitch);
+            
+                // Make sure UI elements are properly updated when the toggle changes
+                powerToggleSwitch.PropertyChanged += (s, args) => 
+                {
+                    if (args.Property.Name == "IsChecked")
+                    {
+                        UpdateUIBasedOnPowerSource();
+                    }
+                };
+            
+                // Initial UI update
+                UpdateUIBasedOnPowerSource();
+            }
+            
             
             // Fan control controls
             _manualFanSpeedRadioButton = this.FindControl<RadioButton>("ManualFanSpeedRadioButton");
@@ -218,6 +242,31 @@ namespace DivAcerManagerMax
             _lcdOverrideCheckBox.Click += LcdOverrideCheckBox_Click;
             _bootAnimAndSoundCheckBox.Click += BootSoundCheckBox_Click;
             
+        }
+        
+        private void UpdateUIBasedOnPowerSource()
+        {
+            var powerToggleSwitch = this.FindControl<ToggleSwitch>("PluggedInToggleSwitch");
+        
+            // Update visibility of profile options based on power source
+            var isPluggedIn = powerToggleSwitch?.IsChecked ?? false;
+        
+            // Find radio buttons
+            var lowPowerButton = this.FindControl<RadioButton>("LowPowerProfileButton");
+            var quietButton = this.FindControl<RadioButton>("QuietProfileButton");
+            var balancedButton = this.FindControl<RadioButton>("BalancedProfileButton");
+            var performanceButton = this.FindControl<RadioButton>("PerformanceProfileButton");
+            var turboButton = this.FindControl<RadioButton>("TurboProfileButton");
+            
+            // If the currently selected profile is now invisible, select the balanced profile
+            if (balancedButton != null &&
+                ((lowPowerButton != null && lowPowerButton.IsChecked == true && !lowPowerButton.IsVisible) ||
+                 (quietButton != null && quietButton.IsChecked == true && !quietButton.IsVisible) ||
+                 (performanceButton != null && performanceButton.IsChecked == true && !performanceButton.IsVisible) ||
+                 (turboButton != null && turboButton.IsChecked == true && !turboButton.IsVisible)))
+            {
+                balancedButton.IsChecked = true;
+            }
         }
 
         private async void InitializeAsync()
