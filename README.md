@@ -7,12 +7,14 @@ This Project is under active development not fully functional
 A build will be released soon for open testing
 
 **Todo:**
-- Hide Turbo Mode on non Supported devices
 - Implement Keyboard Lighting Color Pickers
-
 - Update button redirecting to the github releases page
+- Include the Linuwu Drivers in the package itself
+- Create a Installation Script
 
 **Done:**
+- Display the Performance Profiles acc to laptops capability
+- Hide Turbo Mode on non-supported devices
 - Retriving System Info and Displaying it
 - Advanced Daemon
 - Basic Gui
