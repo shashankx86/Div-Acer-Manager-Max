@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DivAcerManagerMax")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+db4dc33cc87ff85663983db4333cfbde1d6b1cf9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e2071c99243588a09e94a06d25039dbe3dcf56dc")]
 [assembly: System.Reflection.AssemblyProductAttribute("DivAcerManagerMax")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DivAcerManagerMax")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

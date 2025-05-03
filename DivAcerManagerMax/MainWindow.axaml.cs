@@ -16,6 +16,7 @@ namespace DivAcerManagerMax
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        private bool devMode = false;
         private readonly DAMXClient _client;
         private DAMXSettings _settings;
         private PowerSourceDetection _powerDetection;
@@ -40,6 +41,7 @@ namespace DivAcerManagerMax
         private RadioButton _balancedProfileButton;
         private RadioButton _performanceProfileButton;
         private RadioButton _turboProfileButton;
+        private ToggleSwitch _powerToggleSwitch;
         
         private RadioButton _manualFanSpeedRadioButton;
         private Slider _cpuFanSlider;
@@ -121,15 +123,15 @@ namespace DivAcerManagerMax
             _turboProfileButton = this.FindControl<RadioButton>("TurboProfileButton");
             
             // Find the power status toggle switch by name
-            var powerToggleSwitch = this.FindControl<ToggleSwitch>("PluggedInToggleSwitch");
+            _powerToggleSwitch = this.FindControl<ToggleSwitch>("PluggedInToggleSwitch");
         
-            if (powerToggleSwitch != null)
+            if (_powerToggleSwitch != null)
             {
                 // Initialize power source detection
-                _powerDetection = new PowerSourceDetection(powerToggleSwitch);
+                _powerDetection = new PowerSourceDetection(_powerToggleSwitch);
             
                 // Make sure UI elements are properly updated when the toggle changes
-                powerToggleSwitch.PropertyChanged += (s, args) => 
+                _powerToggleSwitch.PropertyChanged += (s, args) => 
                 {
                     if (args.Property.Name == "IsChecked")
                     {
@@ -257,7 +259,7 @@ namespace DivAcerManagerMax
         }
         
         // Method to update UI visibility based on available features
-private void UpdateUIElementVisibility(bool ForceAllFeatures)
+private void UpdateUIElementVisibility()
 {
     if (_settings == null) return;
 
@@ -273,10 +275,10 @@ private void UpdateUIElementVisibility(bool ForceAllFeatures)
     
     // Show/hide features based on availability
     if (thermalProfilePanel != null)
-        thermalProfilePanel.IsVisible = _client.IsFeatureAvailable("thermal_profile") || ForceAllFeatures;
+        thermalProfilePanel.IsVisible = _client.IsFeatureAvailable("thermal_profile") || devMode;
     
     if (fanControlPanel != null)
-        fanControlPanel.IsVisible = _client.IsFeatureAvailable("fan_speed") || ForceAllFeatures;
+        fanControlPanel.IsVisible = _client.IsFeatureAvailable("fan_speed") || devMode;
     
     if (batteryTab != null)
     {
@@ -289,10 +291,10 @@ private void UpdateUIElementVisibility(bool ForceAllFeatures)
         var limiterControls = this.FindControl<Border>("LimiterControls");
         
         if (calibrationControls != null)
-            calibrationControls.IsVisible = _client.IsFeatureAvailable("battery_calibration") || ForceAllFeatures;
+            calibrationControls.IsVisible = _client.IsFeatureAvailable("battery_calibration") || devMode;
             
         if (limiterControls != null)
-            limiterControls.IsVisible = _client.IsFeatureAvailable("battery_limiter") || ForceAllFeatures;
+            limiterControls.IsVisible = _client.IsFeatureAvailable("battery_limiter") || devMode;
     }
     
     // Handle keyboard lighting features
@@ -303,13 +305,13 @@ private void UpdateUIElementVisibility(bool ForceAllFeatures)
     keyboardLightingTab.IsVisible = hasKeyboardFeatures;
                               
     if (zoneColorControlPanel != null)
-        keyboardLightingTab.IsVisible = _client.IsFeatureAvailable("per_zone_mode") || ForceAllFeatures;
+        keyboardLightingTab.IsVisible = _client.IsFeatureAvailable("per_zone_mode") || devMode;
         
     if (keyboardEffectsPanel != null)
-        keyboardEffectsPanel.IsVisible = _client.IsFeatureAvailable("four_zone_mode") || ForceAllFeatures;
+        keyboardEffectsPanel.IsVisible = _client.IsFeatureAvailable("four_zone_mode") || devMode;
     
     if (usbChargingPanel != null)
-        usbChargingPanel.IsVisible = _client.IsFeatureAvailable("usb_charging") || ForceAllFeatures;
+        usbChargingPanel.IsVisible = _client.IsFeatureAvailable("usb_charging") || devMode;
     
     // Handle system settings
     if (systemSettingsTab != null)
@@ -325,13 +327,13 @@ private void UpdateUIElementVisibility(bool ForceAllFeatures)
         var bootSoundControls = this.FindControl<Border>("BootSoundControls");
         
         if (backlightControls != null)
-            backlightControls.IsVisible = _client.IsFeatureAvailable("backlight_timeout")|| ForceAllFeatures;
+            backlightControls.IsVisible = _client.IsFeatureAvailable("backlight_timeout")|| devMode;
             
         if (lcdControls != null)
-            lcdControls.IsVisible = _client.IsFeatureAvailable("lcd_override")|| ForceAllFeatures;
+            lcdControls.IsVisible = _client.IsFeatureAvailable("lcd_override")|| devMode;
             
         if (bootSoundControls != null)
-            bootSoundControls.IsVisible = _client.IsFeatureAvailable("boot_animation_sound")|| ForceAllFeatures;
+            bootSoundControls.IsVisible = _client.IsFeatureAvailable("boot_animation_sound")|| devMode;
     }
 }
         
@@ -342,6 +344,15 @@ private void UpdateUIElementVisibility(bool ForceAllFeatures)
             // Update visibility of profile options based on power source
             var isPluggedIn = powerToggleSwitch?.IsChecked ?? false;
             
+            //To Hide the thermal buttons not required
+            _lowPowerProfileButton.IsVisible = _lowPowerProfileButton.IsEnabled && _powerToggleSwitch.IsChecked == false;
+            Console.WriteLine("Switch Enabled: " + _lowPowerProfileButton.IsEnabled);
+            Console.WriteLine("Power: " + _powerToggleSwitch.IsChecked);
+
+            _quietProfileButton.IsVisible = _quietProfileButton.IsEnabled && isPluggedIn;
+            _balancedProfileButton.IsVisible = _balancedProfileButton.IsEnabled;
+            _performanceProfileButton.IsVisible = _performanceProfileButton.IsEnabled && isPluggedIn;
+            _turboProfileButton.IsVisible =  _turboProfileButton.IsEnabled && isPluggedIn;
             
             // If the currently selected profile is now invisible, select the balanced profile
             if (_balancedProfileButton != null &&
@@ -352,6 +363,9 @@ private void UpdateUIElementVisibility(bool ForceAllFeatures)
             {
                 _balancedProfileButton.IsChecked = true;
             }
+            
+          
+            
         }
 
         private async void InitializeAsync()
@@ -401,30 +415,99 @@ private void UpdateUIElementVisibility(bool ForceAllFeatures)
             }
         }
         
-     private void ApplySettingsToUI()
+   private void ApplySettingsToUI()
 {
     if (_settings == null) return;
-        
     
-    // Apply thermal profile (with null check)
-    if (_settings.ThermalProfile?.Current != null)
+    // Apply thermal profile settings
+    if (_settings.ThermalProfile != null)
     {
-        switch (_settings.ThermalProfile.Current.ToLower())
+        // First hide all profile buttons
+        _lowPowerProfileButton.IsVisible = false;
+        _quietProfileButton.IsVisible = false;
+        _balancedProfileButton.IsVisible = false;
+        _performanceProfileButton.IsVisible = false;
+        _turboProfileButton.IsVisible = false;
+
+        _lowPowerProfileButton.IsEnabled = false;
+        _quietProfileButton.IsEnabled = false;
+        _balancedProfileButton.IsEnabled = false;
+        _performanceProfileButton.IsEnabled = false;
+        _turboProfileButton.IsEnabled = false;
+        
+        // Show only available profiles
+        foreach (var profile in _settings.ThermalProfile.Available)
         {
-            case "quiet":
-                _quietProfileButton.IsChecked = true;
-                _manualFanSpeedRadioButton.IsEnabled = false;
-                _autoFanSpeedRadioButton.IsChecked = true;
-                break;
-            case "balanced":
-                _balancedProfileButton.IsChecked = true;
-                break;
-            case "balanced-performance":
-                _performanceProfileButton.IsChecked = true;
-                break;
-            case "performance":
-                _turboProfileButton.IsChecked = true;
-                break;
+            switch (profile.ToLower())
+            {
+                case "low-power":
+                    (_lowPowerProfileButton.IsEnabled) = true;
+                    if (_powerToggleSwitch.IsChecked == false)
+                    {
+                        (_lowPowerProfileButton.IsVisible) = true;
+                    }
+                    break;
+                case "quiet":
+                    _quietProfileButton.IsVisible = true;
+                    _quietProfileButton.IsEnabled = true;
+                    
+                    break;
+                case "balanced":
+                    _balancedProfileButton.IsVisible = true;
+                    _balancedProfileButton.IsEnabled = true;
+                    break;
+                case "balanced-performance":
+                    _performanceProfileButton.IsVisible = true;
+                    _performanceProfileButton.IsEnabled = true;
+                    break;
+                case "performance":
+                    _turboProfileButton.IsVisible = true;
+                    _turboProfileButton.IsEnabled = true;
+                    break;
+            }
+        }
+
+        if (devMode)
+        {
+            _lowPowerProfileButton.IsVisible = devMode;
+            _quietProfileButton.IsVisible = devMode;
+            _balancedProfileButton.IsVisible = devMode;
+            _performanceProfileButton.IsVisible = devMode;
+            _turboProfileButton.IsVisible = devMode;
+
+            _lowPowerProfileButton.IsEnabled = devMode;
+            _quietProfileButton.IsEnabled = devMode;
+            _balancedProfileButton.IsEnabled = devMode;
+            _performanceProfileButton.IsEnabled = devMode;
+            _turboProfileButton.IsEnabled = devMode;
+        }
+
+        // Set the current active profile
+        if (!string.IsNullOrEmpty(_settings.ThermalProfile.Current))
+        {
+            switch (_settings.ThermalProfile.Current.ToLower())
+            {
+                case "low-power":
+                    _lowPowerProfileButton.IsChecked = true;
+                    _thermalProfileInfoText.Text = "Prioritizes energy efficiency, reduces performance to extend battery life.";
+                    break;
+                case "quiet":
+                    _quietProfileButton.IsChecked = true;
+                    _thermalProfileInfoText.Text = "Minimizes noise, prioritizes low power and cooling.";
+                    break;
+                case "balanced":
+                    _balancedProfileButton.IsChecked = true;
+                    _thermalProfileInfoText.Text = "Optimal mix of performance and noise for everyday tasks.";
+                    break;
+                case "balanced-performance":
+                    _performanceProfileButton.IsChecked = true;
+                    _thermalProfileInfoText.Text = "Maximizes speed for demanding workloads, higher fan noise";
+                    break;
+                case "performance":
+                    _turboProfileButton.IsChecked = true;
+                    _thermalProfileInfoText.Text = "Unleashes peak power for extreme tasks, loudest fans.";
+                    break;
+            }
         }
     }
 
@@ -508,7 +591,7 @@ private void UpdateUIElementVisibility(bool ForceAllFeatures)
     _modelNameText.Text = GetLinuxLaptopModel();
     
     // Update UI visibility based on available features
-    UpdateUIElementVisibility(false);
+    UpdateUIElementVisibility();
 }
      
 private string GetLinuxLaptopModel()
@@ -888,7 +971,8 @@ private string GetLinuxLaptopModel()
 
         private void DeveloperMode_OnClick(object? sender, RoutedEventArgs e)
         {
-            UpdateUIElementVisibility(true);
+            devMode = true;
+            ApplySettingsToUI();
         }
     }
 }

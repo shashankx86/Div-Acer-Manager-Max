@@ -8,10 +8,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="946eaab8-0dd2-4963-b8be-4ed6ac03a9a6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/indexLayout.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DAMM-Daemon/DAMM-Daemon.py" beforeDir="false" afterPath="$PROJECT_DIR$/DAMM-Daemon/DAMM-Daemon.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/DAMXClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/DAMXClient.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/bin/Debug/net9.0/DivAcerManagerMax.dll" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/bin/Debug/net9.0/DivAcerManagerMax.dll" afterDir="false" />
@@ -27,7 +24,6 @@
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/ref/DivAcerManagerMax.dll" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/ref/DivAcerManagerMax.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/refint/Avalonia/DivAcerManagerMax.dll" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/refint/Avalonia/DivAcerManagerMax.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/refint/DivAcerManagerMax.dll" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/refint/DivAcerManagerMax.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/obj/rider.project.model.nuget.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -133,7 +129,7 @@
       <workItem from="1746255466797" duration="1137000" />
       <workItem from="1746256788318" duration="71000" />
       <workItem from="1746256889947" duration="2994000" />
-      <workItem from="1746267029912" duration="2994000" />
+      <workItem from="1746267029912" duration="7382000" />
     </task>
     <servers />
   </component>

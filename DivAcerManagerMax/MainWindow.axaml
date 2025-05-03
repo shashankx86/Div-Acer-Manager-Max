@@ -49,7 +49,7 @@
               <!-- Header row with switch -->
               <Grid ColumnDefinitions="*,Auto" Margin="0 0 0 10">
                   <TextBlock Text="Performance Profiles" Classes="SubHeader" VerticalAlignment="Center"/>
-                  <ToggleSwitch x:Name="PluggedInToggleSwitch" Grid.Column="1" VerticalAlignment="Center" IsChecked="True" IsHitTestVisible="False">
+                  <ToggleSwitch x:Name="PluggedInToggleSwitch" Grid.Column="1" VerticalAlignment="Center" IsChecked="True" IsHitTestVisible="True">
                       <ToggleSwitch.OffContent>
                           <material:MaterialIcon Kind="BatteryOutline" Width="24" Height="24"/>
                       </ToggleSwitch.OffContent>
