@@ -244,7 +244,6 @@ namespace DivAcerManagerMax
             
         }
         
-<<<<<<< HEAD
         // Method to update UI visibility based on available features
 private void UpdateUIElementVisibility()
 {
@@ -324,15 +323,12 @@ private void UpdateUIElementVisibility()
     }
 }
         
-=======
->>>>>>> origin/main
         private void UpdateUIBasedOnPowerSource()
         {
             var powerToggleSwitch = this.FindControl<ToggleSwitch>("PluggedInToggleSwitch");
         
             // Update visibility of profile options based on power source
             var isPluggedIn = powerToggleSwitch?.IsChecked ?? false;
-<<<<<<< HEAD
             
             
             // If the currently selected profile is now invisible, select the balanced profile
@@ -343,24 +339,6 @@ private void UpdateUIElementVisibility()
                  (_turboProfileButton != null && _turboProfileButton.IsChecked == true && !_turboProfileButton.IsVisible)))
             {
                 _balancedProfileButton.IsChecked = true;
-=======
-        
-            // Find radio buttons
-            var lowPowerButton = this.FindControl<RadioButton>("LowPowerProfileButton");
-            var quietButton = this.FindControl<RadioButton>("QuietProfileButton");
-            var balancedButton = this.FindControl<RadioButton>("BalancedProfileButton");
-            var performanceButton = this.FindControl<RadioButton>("PerformanceProfileButton");
-            var turboButton = this.FindControl<RadioButton>("TurboProfileButton");
-            
-            // If the currently selected profile is now invisible, select the balanced profile
-            if (balancedButton != null &&
-                ((lowPowerButton != null && lowPowerButton.IsChecked == true && !lowPowerButton.IsVisible) ||
-                 (quietButton != null && quietButton.IsChecked == true && !quietButton.IsVisible) ||
-                 (performanceButton != null && performanceButton.IsChecked == true && !performanceButton.IsVisible) ||
-                 (turboButton != null && turboButton.IsChecked == true && !turboButton.IsVisible)))
-            {
-                balancedButton.IsChecked = true;
->>>>>>> origin/main
             }
         }
 
