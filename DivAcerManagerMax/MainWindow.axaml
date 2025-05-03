@@ -6,6 +6,7 @@
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="650"
         x:Class="DivAcerManagerMax.MainWindow"
         Title="DAMX"
+        Icon="iconTransparent.png"
         WindowStartupLocation="CenterScreen"
         Background="#0e0e11"
 
@@ -19,23 +20,25 @@
     
     
     <!-- App Header -->
-    <Border Grid.Row="0"  Padding="20 10" CornerRadius="20">
+        <Image Source="closeupTransparent.png" Height="40" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Bottom"></Image>
+    <Border Grid.Row="0"  Padding="0 20 0 0" CornerRadius="20">
       
-      <StackPanel HorizontalAlignment="Right" Margin="5" Orientation="Horizontal">
+      <StackPanel HorizontalAlignment="Right" Margin="0" Orientation="Horizontal">
 
-        <TextBlock Text="Div Acer Manager Max" FontSize="22" FontWeight="Bold" 
-                   LetterSpacing="4" VerticalAlignment="Center" 
-                   HorizontalAlignment="Left" Margin="0"
+        <TextBlock Text="Div Acer Manager Max" FontSize="26" FontWeight="Bold" 
+                   LetterSpacing="4" VerticalAlignment="Bottom" 
+                   HorizontalAlignment="Right" Margin="0 0 20 0"
                    FontFamily="{StaticResource OxaniumBoldFont}">
           <TextBlock.Foreground>
             
             
-            <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-              <GradientStop Offset="0" Color="#65bdf5"/>
-              <GradientStop Offset="1" Color="#4093f1"/>
+            <LinearGradientBrush StartPoint="0%,0%"  EndPoint="0%, 100%">
+              <GradientStop Offset="0" Color="#72bff4"/>
+              <GradientStop Offset="1" Color="#3678c3"/>
             </LinearGradientBrush>
           </TextBlock.Foreground>
         </TextBlock>
+        
  </StackPanel>
     </Border>
     
@@ -432,16 +435,23 @@
   </Grid>
 
     <!-- Overlay Grid (on separate layer) -->
-    <Grid x:Name="DaemonErrorGrid" Panel.ZIndex="2" Background="Transparent" IsHitTestVisible="True" IsVisible="False">
-      <Border Background="#0e0e11" 
-              BorderBrush="#4093f1" 
-              BorderThickness="2"
+    <Grid x:Name="DaemonErrorGrid" Panel.ZIndex="100" Background="Transparent" IsHitTestVisible="True" IsVisible="True">
+      <Border 
+              BorderBrush="#333236" 
+              BorderThickness="3"
               CornerRadius="20"
               Padding="30"
               Width="400"
-              Height="300"
+              Height="250"
               HorizontalAlignment="Center"
               VerticalAlignment="Center">
+              <Border.Background>
+                      <LinearGradientBrush StartPoint="0%,0%"  EndPoint="0%, 100%">
+                        <GradientStop Offset="0" Color="#18181b"/>
+                        <GradientStop Offset="1" Color="#242429"/>
+                      </LinearGradientBrush>
+              </Border.Background>
+  
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20">
           <!-- Material Icon -->
           <material:MaterialIcon Kind="CloudOff" Foreground="#FF5A5F" Width="48" Height="48" HorizontalAlignment="Center"/>
