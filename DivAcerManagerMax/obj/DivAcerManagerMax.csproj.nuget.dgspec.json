@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/div/RiderProjects/DivAcerManagerMax/DivAcerManagerMax/DivAcerManagerMax.csproj": {}
+    "/home/div/RiderProjects/Div-Acer-Manager-Max/DivAcerManagerMax/DivAcerManagerMax.csproj": {}
   },
   "projects": {
-    "/home/div/RiderProjects/DivAcerManagerMax/DivAcerManagerMax/DivAcerManagerMax.csproj": {
+    "/home/div/RiderProjects/Div-Acer-Manager-Max/DivAcerManagerMax/DivAcerManagerMax.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/div/RiderProjects/DivAcerManagerMax/DivAcerManagerMax/DivAcerManagerMax.csproj",
+        "projectUniqueName": "/home/div/RiderProjects/Div-Acer-Manager-Max/DivAcerManagerMax/DivAcerManagerMax.csproj",
         "projectName": "DivAcerManagerMax",
-        "projectPath": "/home/div/RiderProjects/DivAcerManagerMax/DivAcerManagerMax/DivAcerManagerMax.csproj",
+        "projectPath": "/home/div/RiderProjects/Div-Acer-Manager-Max/DivAcerManagerMax/DivAcerManagerMax.csproj",
         "packagesPath": "/home/div/.nuget/packages/",
-        "outputPath": "/home/div/RiderProjects/DivAcerManagerMax/DivAcerManagerMax/obj/",
+        "outputPath": "/home/div/RiderProjects/Div-Acer-Manager-Max/DivAcerManagerMax/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/div/.nuget/NuGet/NuGet.Config"
