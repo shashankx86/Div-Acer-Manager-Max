@@ -1,0 +1,27 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="DivAcerManagerMax.App"
+             RequestedThemeVariant="Dark">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+             <Application.Resources>
+                 <!-- Oxanium Regular -->
+                 <FontFamily x:Key="OxaniumFont">avares://DivAcerManagerMax/Assets/Fonts/Oxanium.ttf#Oxanium</FontFamily>
+
+                 <!-- Oxanium Bold (same internal name) -->
+                 <FontFamily x:Key="OxaniumBoldFont">avares://DivAcerManagerMax/Assets/Fonts/Oxanium-Bold.ttf#Oxanium</FontFamily>
+
+                 <!-- Open Sans Regular -->
+                 <FontFamily x:Key="OpenSansFont">avares://DivAcerManagerMax/Assets/Fonts/OpenSans.ttf#Open Sans</FontFamily>
+
+                 <!-- Open Sans SemiBold -->
+                 <FontFamily x:Key="OpenSansSemiBoldFont">avares://DivAcerManagerMax/Assets/Fonts/OpenSans-SemiBold.ttf#Open Sans SemiBold</FontFamily>
+             </Application.Resources>
+             
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://Material.Icons.Avalonia/MaterialIconStyles.axaml" />
+    </Application.Styles>
+             
+      
+</Application>
