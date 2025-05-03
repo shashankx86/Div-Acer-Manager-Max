@@ -436,6 +436,8 @@ namespace DivAcerManagerMax
                 _thermalProfileInfoText.Text = "Unleashes peak power for extreme tasks, loudest fans.";
             }
             
+            await Task.Delay(1000);
+            LoadSettingsAsync();
         }
 
         // Fan Control Handlers
