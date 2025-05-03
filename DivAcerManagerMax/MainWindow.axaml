@@ -12,21 +12,24 @@
         Width="1000" Height="700"
         MinWidth="900" MinHeight="480">
   
-
+  <Grid>
   
-
   <Grid RowDefinitions="Auto,*">
+   
+    
+    
     <!-- App Header -->
     <Border Grid.Row="0"  Padding="20 10" CornerRadius="20">
+      
       <StackPanel HorizontalAlignment="Right" Margin="5" Orientation="Horizontal">
-
-          
 
         <TextBlock Text="Div Acer Manager Max" FontSize="22" FontWeight="Bold" 
                    LetterSpacing="4" VerticalAlignment="Center" 
                    HorizontalAlignment="Left" Margin="0"
                    FontFamily="{StaticResource OxaniumBoldFont}">
           <TextBlock.Foreground>
+            
+            
             <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
               <GradientStop Offset="0" Color="#65bdf5"/>
               <GradientStop Offset="1" Color="#4093f1"/>
@@ -35,6 +38,7 @@
         </TextBlock>
  </StackPanel>
     </Border>
+    
     
     <!-- Main Content -->
     <TabControl Grid.Row="1" Margin="10,0,10,10" CornerRadius="20" Background="#18181b" BorderBrush="#18181b" BorderThickness="5" TabStripPlacement="Left" >
@@ -426,4 +430,39 @@
       </TabItem>
     </TabControl>
   </Grid>
+
+    <!-- Overlay Grid (on separate layer) -->
+    <Grid x:Name="DaemonErrorGrid" Panel.ZIndex="2" Background="Transparent" IsHitTestVisible="True" IsVisible="False">
+      <Border Background="#0e0e11" 
+              BorderBrush="#4093f1" 
+              BorderThickness="2"
+              CornerRadius="20"
+              Padding="30"
+              Width="400"
+              Height="300"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20">
+          <!-- Material Icon -->
+          <material:MaterialIcon Kind="CloudOff" Foreground="#FF5A5F" Width="48" Height="48" HorizontalAlignment="Center"/>
+
+          <!-- Message -->
+          <TextBlock Text="Daemon not connected"
+                     Foreground="White"
+                     FontSize="18"
+                     HorizontalAlignment="Center"/>
+
+          <!-- Retry Button -->
+          <Button Content="Retry"
+                  Width="100"
+                  HorizontalAlignment="Center"
+                  HorizontalContentAlignment="Center"
+                  Click="RetryConnectionButton_OnClick"/>
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    
+  </Grid>
+  
 </Window>

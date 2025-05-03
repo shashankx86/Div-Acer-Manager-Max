@@ -87,6 +87,8 @@ namespace DivAcerManagerMax
         private TextBlock  _thermalProfileInfoText;
 
         private TextBlock _modelNameText ,_laptopTypeText, _daemonVersionText, _kernelInfoText, _supportedFeaturesTextBlock;
+
+        private Grid _daemonErrorGrid;
         
 
         public MainWindow()
@@ -200,6 +202,9 @@ namespace DivAcerManagerMax
             _supportedFeaturesTextBlock = this.FindControl<TextBlock>("SupportedFeaturesTextBlock");
             _daemonVersionText = this.FindControl<TextBlock>("DaemonVersionText");
             _kernelInfoText = this.FindControl<TextBlock>("KernelInfoText");
+            
+            //Error Message
+            _daemonErrorGrid = this.FindControl<Grid>("DaemonErrorGrid");
         }
 
         private void InitializeComponent()
@@ -376,15 +381,19 @@ private void UpdateUIElementVisibility()
                 if (_isConnected)
                 {
                     await LoadSettingsAsync();
+                    _daemonErrorGrid.IsVisible = false;
+
                 }
                 else
                 {
                     await ShowErrorDialogAsync("Failed to connect to DAMX daemon. Make sure the service is running.");
+                    _daemonErrorGrid.IsVisible = true;
                 }
             }
             catch (Exception ex)
             {
                 await ShowErrorDialogAsync($"Error initializing: {ex.Message}");
+                _daemonErrorGrid.IsVisible = true;
             }
         }
 
@@ -973,6 +982,11 @@ private string GetLinuxLaptopModel()
         {
             devMode = true;
             ApplySettingsToUI();
+        }
+
+        private void RetryConnectionButton_OnClick(object? sender, RoutedEventArgs e)
+        {
+            InitializeAsync();
         }
     }
 }

@@ -35,24 +35,43 @@ namespace DivAcerManagerMax
         /// Connect to the DAMX-Daemon Unix socket
         /// </summary>
         /// <returns>True if connection successful, false otherwise</returns>
+        private async Task<bool> ValidateConnection()
+        {
+            if (!_isConnected) return false;
+    
+            try
+            {
+                // Send a simple ping command to verify connection
+                var response = await SendCommandAsync("ping");
+                return response.RootElement.GetProperty("success").GetBoolean();
+            }
+            catch
+            {
+                _isConnected = false;
+                return false;
+            }
+        }
+
+// Modify ConnectAsync to include validation
         public async Task<bool> ConnectAsync()
         {
             try
             {
-                if (_isConnected)
+                if (_isConnected && await ValidateConnection())
                 {
                     return true;
                 }
 
+                _socket?.Dispose();
                 _socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
                 var endpoint = new UnixDomainSocketEndPoint(SocketPath);
-                
+        
                 await _socket.ConnectAsync(endpoint);
                 _isConnected = true;
-                
+        
                 // Get available features upon connection
                 await RefreshAvailableFeaturesAsync();
-                
+        
                 return true;
             }
             catch (Exception ex)
@@ -121,7 +140,15 @@ namespace DivAcerManagerMax
         /// <param name="command">Command name</param>
         /// <param name="parameters">Optional parameters</param>
         /// <returns>Response from daemon as a JsonDocument</returns>
-        public async Task<JsonDocument> SendCommandAsync(string command, Dictionary<string, object> parameters = null)
+     private const int MaxRetryAttempts = 3;
+private const int RetryDelayMs = 500;
+
+public async Task<JsonDocument> SendCommandAsync(string command, Dictionary<string, object> parameters = null)
+{
+    int attempt = 0;
+    while (attempt < MaxRetryAttempts)
+    {
+        try
         {
             if (!_isConnected)
             {
@@ -141,32 +168,43 @@ namespace DivAcerManagerMax
             var requestJson = JsonSerializer.Serialize(request);
             var requestBytes = Encoding.UTF8.GetBytes(requestJson);
 
-            try
-            {
-                // Send request
-                await _socket.SendAsync(requestBytes, SocketFlags.None);
+            // Send request
+            await _socket.SendAsync(requestBytes, SocketFlags.None);
 
-                // Receive response
-                var buffer = new byte[4096];
-                var received = await _socket.ReceiveAsync(buffer, SocketFlags.None);
-                
-                if (received > 0)
-                {
-                    var responseJson = Encoding.UTF8.GetString(buffer, 0, received);
-                    return JsonDocument.Parse(responseJson);
-                }
-                else
-                {
-                    throw new IOException("No data received from daemon");
-                }
-            }
-            catch (Exception ex)
+            // Receive response
+            var buffer = new byte[4096];
+            var received = await _socket.ReceiveAsync(buffer, SocketFlags.None);
+            
+            if (received > 0)
             {
-                Console.WriteLine($"Error communicating with daemon: {ex.Message}");
-                _isConnected = false;
-                throw;
+                var responseJson = Encoding.UTF8.GetString(buffer, 0, received);
+                return JsonDocument.Parse(responseJson);
             }
+            
+            // If we got here, we received 0 bytes - connection was closed
+            _isConnected = false;
+            attempt++;
+            await Task.Delay(RetryDelayMs);
         }
+        catch (SocketException ex) when (ex.SocketErrorCode == SocketError.ConnectionReset || 
+                                        ex.SocketErrorCode == SocketError.Shutdown ||
+                                        ex.SocketErrorCode == SocketError.ConnectionAborted)
+        {
+            // Connection was reset - try to reconnect
+            _isConnected = false;
+            attempt++;
+            await Task.Delay(RetryDelayMs);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error communicating with daemon: {ex.Message}");
+            _isConnected = false;
+            throw;
+        }
+    }
+    
+    throw new IOException($"Failed to communicate with daemon after {MaxRetryAttempts} attempts");
+}
 
         /// <summary>
         /// Get all settings from the DAMX-Daemon
@@ -439,10 +477,25 @@ namespace DivAcerManagerMax
             return response.RootElement.GetProperty("success").GetBoolean();
         }
 
+        private bool _disposed = false;
+
         public void Dispose()
         {
-            Disconnect();
-            _socket?.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+    
+            if (disposing)
+            {
+                Disconnect();
+                _socket?.Dispose();
+            }
+    
+            _disposed = true;
         }
     }
 
