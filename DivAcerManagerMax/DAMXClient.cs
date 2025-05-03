@@ -452,60 +452,60 @@ namespace DivAcerManagerMax
     public class DAMXSettings
     {
         [JsonPropertyName("laptop_type")]
-        public string LaptopType { get; set; }
+        public string LaptopType { get; set; } = "UNKNOWN";
 
         [JsonPropertyName("has_four_zone_kb")]
-        public bool HasFourZoneKb { get; set; }
-        
+        public bool HasFourZoneKb { get; set; } = false;
+    
         [JsonPropertyName("available_features")]
-        public List<string> AvailableFeatures { get; set; }
+        public List<string> AvailableFeatures { get; set; } = new List<string>();
 
         [JsonPropertyName("thermal_profile")]
-        public ThermalProfileSettings ThermalProfile { get; set; }
+        public ThermalProfileSettings ThermalProfile { get; set; } = new ThermalProfileSettings();
 
         [JsonPropertyName("backlight_timeout")]
-        public string BacklightTimeout { get; set; }
+        public string BacklightTimeout { get; set; } = "0";
 
         [JsonPropertyName("battery_calibration")]
-        public string BatteryCalibration { get; set; }
+        public string BatteryCalibration { get; set; } = "0";
 
         [JsonPropertyName("battery_limiter")]
-        public string BatteryLimiter { get; set; }
+        public string BatteryLimiter { get; set; } = "0";
 
         [JsonPropertyName("boot_animation_sound")]
-        public string BootAnimationSound { get; set; }
+        public string BootAnimationSound { get; set; } = "0";
 
         [JsonPropertyName("fan_speed")]
-        public FanSpeedSettings FanSpeed { get; set; }
+        public FanSpeedSettings FanSpeed { get; set; } = new FanSpeedSettings();
 
         [JsonPropertyName("lcd_override")]
-        public string LcdOverride { get; set; }
+        public string LcdOverride { get; set; } = "0";
 
         [JsonPropertyName("usb_charging")]
-        public string UsbCharging { get; set; }
+        public string UsbCharging { get; set; } = "0";
 
         [JsonPropertyName("per_zone_mode")]
-        public string PerZoneMode { get; set; }
+        public string PerZoneMode { get; set; } = "";
 
         [JsonPropertyName("four_zone_mode")]
-        public string FourZoneMode { get; set; }
+        public string FourZoneMode { get; set; } = "";
     }
 
     public class ThermalProfileSettings
     {
         [JsonPropertyName("current")]
-        public string Current { get; set; }
+        public string Current { get; set; } = "balanced";
 
         [JsonPropertyName("available")]
-        public List<string> Available { get; set; }
+        public List<string> Available { get; set; } = new List<string>();
     }
 
     public class FanSpeedSettings
     {
         [JsonPropertyName("cpu")]
-        public string Cpu { get; set; }
+        public string Cpu { get; set; } = "0";
 
         [JsonPropertyName("gpu")]
-        public string Gpu { get; set; }
+        public string Gpu { get; set; } = "0";
     }
 }

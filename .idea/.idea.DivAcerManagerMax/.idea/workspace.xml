@@ -9,10 +9,22 @@
   <component name="ChangeListManager">
     <list default="true" id="946eaab8-0dd2-4963-b8be-4ed6ac03a9a6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/DAMXClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/DAMXClient.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/bin/Debug/net9.0/DivAcerManagerMax.dll" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/bin/Debug/net9.0/DivAcerManagerMax.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/bin/Debug/net9.0/DivAcerManagerMax.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/bin/Debug/net9.0/DivAcerManagerMax.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/Avalonia/DivAcerManagerMax.dll" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/Avalonia/DivAcerManagerMax.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/Avalonia/DivAcerManagerMax.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/Avalonia/DivAcerManagerMax.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/Avalonia/resources" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/Avalonia/resources" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/DivAcerManagerMax.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/DivAcerManagerMax.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/DivAcerManagerMax.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/DivAcerManagerMax.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/DivAcerManagerMax.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/DivAcerManagerMax.csproj.FileListAbsolute.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/obj/rider.project.model.nuget.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/DivAcerManagerMax.dll" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/DivAcerManagerMax.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/DivAcerManagerMax.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/DivAcerManagerMax.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/DivAcerManagerMax.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/DivAcerManagerMax.sourcelink.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/ref/DivAcerManagerMax.dll" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/ref/DivAcerManagerMax.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/refint/Avalonia/DivAcerManagerMax.dll" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/refint/Avalonia/DivAcerManagerMax.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/refint/DivAcerManagerMax.dll" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/obj/Debug/net9.0/refint/DivAcerManagerMax.dll" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,7 +38,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="SWEA" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
@@ -87,6 +99,7 @@
       <workItem from="1746255188730" duration="271000" />
       <workItem from="1746255466797" duration="1137000" />
       <workItem from="1746256788318" duration="71000" />
+      <workItem from="1746256889947" duration="2680000" />
     </task>
     <servers />
   </component>

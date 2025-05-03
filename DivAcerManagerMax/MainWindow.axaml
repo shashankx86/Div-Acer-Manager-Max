@@ -224,6 +224,8 @@
         <ScrollViewer>
           <StackPanel Margin="10,0,20,0">
             <TextBlock Text="Keyboard Lighting" Classes="SectionHeader"/>
+            <TextBlock Text="This Section is non functional. Only for visualising layout. Will be done later"  Foreground="#FFA500"   Margin="0 0 0 10"/>
+
             <!-- Zone Color Control -->
             <Border Classes="Card" x:Name="ZoneColorControlPanel">
               <StackPanel>
@@ -412,7 +414,10 @@
                   <TextBlock Grid.Row="3" Grid.Column="1" Text="linuwu_sense 1.0.5" Margin="0 5 0 0"/>
                 </Grid>
                 
+                <StackPanel Orientation="Horizontal" Spacing="12">
                 <Button x:Name="UpdatesButton" Content="Check for Updates" Margin="0 15 0 0"/>
+                <Button x:Name="DeveloperMode" Content="Developer Mode" Margin="0 15 0 0" Click="DeveloperMode_OnClick"/>
+                </StackPanel>
               </StackPanel>
             </Border>
           </StackPanel>

@@ -245,42 +245,42 @@ namespace DivAcerManagerMax
         }
         
         // Method to update UI visibility based on available features
-private void UpdateUIElementVisibility()
+private void UpdateUIElementVisibility(bool ForceAllFeatures)
 {
     if (_settings == null) return;
 
     // Get references to feature-specific panels/containers
-    var thermalProfilePanel = this.FindControl<Panel>("ThermalProfilePanel");
-    var fanControlPanel = this.FindControl<Panel>("FanControlPanel");
-    var batteryPanel = this.FindControl<Panel>("BatteryPanel");
-    var usbChargingPanel = this.FindControl<Panel>("UsbChargingPanel");
-    var keyboardLightingPanel = this.FindControl<Panel>("KeyboardLightingPanel");
-    var zoneColorControlPanel = this.FindControl<Panel>("ZoneColorControlPanel");
-    var keyboardEffectsPanel = this.FindControl<Panel>("KeyboardEffectsPanel");
-    var systemSettingsPanel = this.FindControl<Panel>("SystemSettingsPanel");
+    var thermalProfilePanel = this.FindControl<Border>("ThermalProfilePanel");
+    var fanControlPanel = this.FindControl<Border>("FanControlPanel");
+    var batteryTab = this.FindControl<TabItem>("BatteryPanel");
+    var usbChargingPanel = this.FindControl<Border>("UsbChargingPanel");
+    var keyboardLightingTab = this.FindControl<TabItem>("KeyboardLightingPanel");
+    var zoneColorControlPanel = this.FindControl<Border>("ZoneColorControlPanel");
+    var keyboardEffectsPanel = this.FindControl<Border>("KeyboardEffectsPanel");
+    var systemSettingsTab = this.FindControl<TabItem>("SystemSettingsPanel");
     
     // Show/hide features based on availability
     if (thermalProfilePanel != null)
-        thermalProfilePanel.IsVisible = _client.IsFeatureAvailable("thermal_profile");
+        thermalProfilePanel.IsVisible = _client.IsFeatureAvailable("thermal_profile") || ForceAllFeatures;
     
     if (fanControlPanel != null)
-        fanControlPanel.IsVisible = _client.IsFeatureAvailable("fan_speed");
+        fanControlPanel.IsVisible = _client.IsFeatureAvailable("fan_speed") || ForceAllFeatures;
     
-    if (batteryPanel != null)
+    if (batteryTab != null)
     {
         bool hasBatteryFeatures = _client.IsFeatureAvailable("battery_calibration") || 
                                  _client.IsFeatureAvailable("battery_limiter");
-        batteryPanel.IsVisible = hasBatteryFeatures;
+        batteryTab.IsVisible = hasBatteryFeatures;
         
         // Further fine-tuning of battery panel elements
-        var calibrationControls = this.FindControl<Panel>("CalibrationControls");
-        var limiterControls = this.FindControl<Panel>("LimiterControls");
+        var calibrationControls = this.FindControl<Border>("CalibrationControls");
+        var limiterControls = this.FindControl<Border>("LimiterControls");
         
         if (calibrationControls != null)
-            calibrationControls.IsVisible = _client.IsFeatureAvailable("battery_calibration");
+            calibrationControls.IsVisible = _client.IsFeatureAvailable("battery_calibration") || ForceAllFeatures;
             
         if (limiterControls != null)
-            limiterControls.IsVisible = _client.IsFeatureAvailable("battery_limiter");
+            limiterControls.IsVisible = _client.IsFeatureAvailable("battery_limiter") || ForceAllFeatures;
     }
     
     // Handle keyboard lighting features
@@ -288,38 +288,38 @@ private void UpdateUIElementVisibility()
                               _client.IsFeatureAvailable("per_zone_mode") || 
                               _client.IsFeatureAvailable("four_zone_mode");
     
-    keyboardLightingPanel.IsVisible = hasKeyboardFeatures;
+    keyboardLightingTab.IsVisible = hasKeyboardFeatures;
                               
-    if (keyboardLightingPanel != null)
-        keyboardLightingPanel.IsVisible = _client.IsFeatureAvailable("per_zone_mode");
+    if (zoneColorControlPanel != null)
+        keyboardLightingTab.IsVisible = _client.IsFeatureAvailable("per_zone_mode") || ForceAllFeatures;
         
     if (keyboardEffectsPanel != null)
-        keyboardEffectsPanel.IsVisible = _client.IsFeatureAvailable("four_zone_mode");
+        keyboardEffectsPanel.IsVisible = _client.IsFeatureAvailable("four_zone_mode") || ForceAllFeatures;
     
     if (usbChargingPanel != null)
-        usbChargingPanel.IsVisible = _client.IsFeatureAvailable("usb_charging");
+        usbChargingPanel.IsVisible = _client.IsFeatureAvailable("usb_charging") || ForceAllFeatures;
     
     // Handle system settings
-    if (systemSettingsPanel != null)
+    if (systemSettingsTab != null)
     {
         bool hasSystemSettings =
                                 _client.IsFeatureAvailable("lcd_override") ||
                                 _client.IsFeatureAvailable("boot_animation_sound");
-        systemSettingsPanel.IsVisible = hasSystemSettings;
+        
         
         // Further fine-tuning of system settings elements
-        var backlightControls = this.FindControl<Panel>("BacklightTimeoutControls");
-        var lcdControls = this.FindControl<Panel>("LcdOverrideControls");
-        var bootSoundControls = this.FindControl<Panel>("BootSoundControls");
+        var backlightControls = this.FindControl<Border>("BacklightTimeoutControls");
+        var lcdControls = this.FindControl<Border>("LcdOverrideControls");
+        var bootSoundControls = this.FindControl<Border>("BootSoundControls");
         
         if (backlightControls != null)
-            backlightControls.IsVisible = _client.IsFeatureAvailable("backlight_timeout");
+            backlightControls.IsVisible = _client.IsFeatureAvailable("backlight_timeout")|| ForceAllFeatures;
             
         if (lcdControls != null)
-            lcdControls.IsVisible = _client.IsFeatureAvailable("lcd_override");
+            lcdControls.IsVisible = _client.IsFeatureAvailable("lcd_override")|| ForceAllFeatures;
             
         if (bootSoundControls != null)
-            bootSoundControls.IsVisible = _client.IsFeatureAvailable("boot_animation_sound");
+            bootSoundControls.IsVisible = _client.IsFeatureAvailable("boot_animation_sound")|| ForceAllFeatures;
     }
 }
         
@@ -368,13 +368,11 @@ private void UpdateUIElementVisibility()
             {
                 Console.WriteLine("Loading settings...");
                 _settings = await _client.GetAllSettingsAsync();
-                Console.WriteLine($"Settings received: {_settings != null}");
         
                 if (_settings == null)
                 {
-                    Console.WriteLine("Settings object is null");
-                    await ShowErrorDialogAsync("Received null settings from daemon");
-                    return;
+                    Console.WriteLine("Settings object is null - creating default settings");
+                    _settings = new DAMXSettings();
                 }
 
                 Console.WriteLine("Applying settings to UI...");
@@ -384,61 +382,67 @@ private void UpdateUIElementVisibility()
             {
                 Console.WriteLine($"Exception in LoadSettingsAsync: {ex}");
                 await ShowErrorDialogAsync($"Error loading settings: {ex.Message}");
+        
+                // Create default settings if loading fails
+                _settings = new DAMXSettings();
+                ApplySettingsToUI();
             }
         }
         
-      private void ApplySettingsToUI()
+     private void ApplySettingsToUI()
 {
-    // Apply thermal profile
-    switch (_settings.ThermalProfile.Current.ToLower())
+    if (_settings == null) return;
+
+    // Apply thermal profile (with null check)
+    if (_settings.ThermalProfile?.Current != null)
     {
-        case "quiet":
-            _quietProfileButton.IsChecked = true;
-            // Disable manual fan controls in Silent Mode
-            _manualFanSpeedRadioButton.IsEnabled = false;
-            _autoFanSpeedRadioButton.IsChecked = true;
-            break;
-        case "balanced":
-            _balancedProfileButton.IsChecked = true;
-            break;
-        case "balanced-performance":
-            _performanceProfileButton.IsChecked = true;
-            break;
-        case "performance":
-            _turboProfileButton.IsChecked = true;
-            break;
+        switch (_settings.ThermalProfile.Current.ToLower())
+        {
+            case "quiet":
+                _quietProfileButton.IsChecked = true;
+                _manualFanSpeedRadioButton.IsEnabled = false;
+                _autoFanSpeedRadioButton.IsChecked = true;
+                break;
+            case "balanced":
+                _balancedProfileButton.IsChecked = true;
+                break;
+            case "balanced-performance":
+                _performanceProfileButton.IsChecked = true;
+                break;
+            case "performance":
+                _turboProfileButton.IsChecked = true;
+                break;
+        }
     }
 
-    // Apply backlight timeout setting
-    bool backlightTimeoutEnabled = _settings.BacklightTimeout.ToLower() == "enabled";
+    // Apply backlight timeout setting (with null check)
+    Console.Write( _settings.BacklightTimeout.ToLower());
+    bool backlightTimeoutEnabled = (_settings.BacklightTimeout ?? "0").Equals("1", StringComparison.OrdinalIgnoreCase);
     _backlightTimeoutCheckBox.IsChecked = backlightTimeoutEnabled;
 
-    // Apply battery settings
-    bool batteryLimiterEnabled = _settings.BatteryLimiter.Equals("1", StringComparison.OrdinalIgnoreCase);
+    // Apply battery settings (with null checks)
+    bool batteryLimiterEnabled = (_settings.BatteryLimiter ?? "0").Equals("1", StringComparison.OrdinalIgnoreCase);
     _batteryLimitCheckBox.IsChecked = batteryLimiterEnabled;
 
-    // Apply battery calibration status
-    bool isCalibrating = _settings.BatteryCalibration.Equals("1", StringComparison.OrdinalIgnoreCase);
+    // Apply battery calibration status (with null check)
+    bool isCalibrating = (_settings.BatteryCalibration ?? "0").Equals("1", StringComparison.OrdinalIgnoreCase);
     IsCalibrating = isCalibrating;
     _startCalibrationButton.IsEnabled = !isCalibrating;
     _stopCalibrationButton.IsEnabled = isCalibrating;
     _calibrationStatusTextBlock.Text = isCalibrating ? "Status: Calibrating" : "Status: Not calibrating";
 
-    // Apply boot animation sound setting
-    bool bootSoundEnabled = _settings.BootAnimationSound.ToLower() == "enabled";
+    // Apply boot animation sound setting (with null check)
+    bool bootSoundEnabled = (_settings.BootAnimationSound ?? "0").Equals("1", StringComparison.OrdinalIgnoreCase);
     _bootAnimAndSoundCheckBox.IsChecked = bootSoundEnabled;
 
-    // Apply LCD override setting
-    bool lcdOverrideEnabled = _settings.LcdOverride.ToLower() == "enabled";
+    // Apply LCD override setting (with null check)
+    bool lcdOverrideEnabled = (_settings.LcdOverride ?? "0").Equals("1", StringComparison.OrdinalIgnoreCase);
     _lcdOverrideCheckBox.IsChecked = lcdOverrideEnabled;
 
-    // Apply USB charging level
+    // Apply USB charging level (with null check)
     int usbChargingIndex = 0;
-    switch (_settings.UsbCharging)
+    switch (_settings.UsbCharging ?? "0")
     {
-        case "disabled":
-            usbChargingIndex = 0;
-            break;
         case "10":
             usbChargingIndex = 1;
             break;
@@ -451,23 +455,22 @@ private void UpdateUIElementVisibility()
     }
     _usbChargingComboBox.SelectedIndex = usbChargingIndex;
 
-    // Apply fan speeds
-    if (int.TryParse(_settings.FanSpeed.Cpu, out int cpuSpeed))
+    // Apply fan speeds (with null checks)
+    if (int.TryParse(_settings.FanSpeed?.Cpu ?? "0", out int cpuSpeed))
     {
-        Console.WriteLine("CPU Speed: " + cpuSpeed);
         _cpuFanSpeed = cpuSpeed;
         _cpuFanSlider.Value = cpuSpeed;
         _cpuFanTextBlock.Text = $"{cpuSpeed}%";
     }
 
-    if (int.TryParse(_settings.FanSpeed.Gpu, out int gpuSpeed))
+    if (int.TryParse(_settings.FanSpeed?.Gpu ?? "0", out int gpuSpeed))
     {
         _gpuFanSpeed = gpuSpeed;
         _gpuFanSlider.Value = gpuSpeed;
         _gpuFanTextBlock.Text = $"{gpuSpeed}%";
     }
 
-    // NEW: Determine manual/auto mode based on current fan speeds
+    // Determine manual/auto mode based on current fan speeds
     bool isManualMode = cpuSpeed > 0 || gpuSpeed > 0;
     _isManualFanControl = isManualMode;
     _manualFanSpeedRadioButton.IsChecked = isManualMode;
@@ -485,8 +488,8 @@ private void UpdateUIElementVisibility()
     _keyBrightnessText.Text = $"{_keyboardBrightness}%";
     _lightSpeedTextBlock.Text = _lightingSpeed.ToString();
     
-    // NEW: Update UI visibility based on available features
-    UpdateUIElementVisibility();
+    // Update UI visibility based on available features
+    UpdateUIElementVisibility(false);
 }
 
         private void ApplyKeyboardSettings()
@@ -496,6 +499,11 @@ private void UpdateUIElementVisibility()
                 // TODO: Parse and apply the keyboard lighting settings from
                 // _settings.PerZoneMode and _settings.FourZoneMode
             }
+        }
+
+        private void EnableAllFeatures()
+        {
+            
         }
 
         private async Task ShowErrorDialogAsync(string message)
@@ -825,6 +833,10 @@ private void UpdateUIElementVisibility()
         }
 
         #endregion
-        
+
+        private void DeveloperMode_OnClick(object? sender, RoutedEventArgs e)
+        {
+            UpdateUIElementVisibility(true);
+        }
     }
 }
