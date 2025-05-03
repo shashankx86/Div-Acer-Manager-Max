@@ -269,60 +269,67 @@
           <StackPanel Margin="10,0,20,0">
             <TextBlock Text="Power &amp; Performance" Classes="SectionHeader"/>
             
-            <!-- Performance Profiles -->
-            <Border Classes="Card">
-              <StackPanel>
-                <TextBlock Text="Performance Profiles" Classes="SubHeader"/>
-                <TextBlock Text="Configure thermal profiles to balance performance and temperature" Opacity="0.7" Margin="0 0 0 10"/>
+          <Border Classes="Card">
+          <StackPanel>
+              <!-- Header row with switch -->
+              <Grid ColumnDefinitions="*,Auto" Margin="0 0 0 10">
+                  <TextBlock Text="Performance Profiles" Classes="SubHeader" VerticalAlignment="Center"/>
+                  <ToggleSwitch x:Name="PluggedInToggleSwitch" Grid.Column="1" VerticalAlignment="Center" IsChecked="True">
+                      <ToggleSwitch.OffContent>
+                          <material:MaterialIcon Kind="BatteryOutline" Width="24" Height="24"/>
+                      </ToggleSwitch.OffContent>
+                      <ToggleSwitch.OnContent>
+                          <material:MaterialIcon Kind="PowerPlugOutline" Width="24" Height="24"/>
+                      </ToggleSwitch.OnContent>
+                  </ToggleSwitch>
+              </Grid>
+              
+        <TextBlock Text="Configure thermal profiles to balance performance and temperature" Opacity="0.7" Margin="0 0 0 10"/>
+        
+        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0 10">
+            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0 10 0 0" HorizontalAlignment="Center" >
+                <RadioButton x:Name="LowPowerProfileButton" GroupName="ProfileGroup" Margin="0 0 15 0" IsVisible="{Binding ElementName=PluggedInToggleSwitch, Path=!IsChecked}" >
+                    <StackPanel>
+                        <material:MaterialIcon Kind="Leaf" Width="48" Height="48"/>
+                        <TextBlock Text="Eco" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </RadioButton>
                 
-                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0 10">
-                  
-                 <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0 10 0 0" HorizontalAlignment="Center">
-                                
-                   <RadioButton x:Name="LowPowerProfileButton" GroupName="ProfileGroup" Margin="0 0 15 0">
-                     <StackPanel>
-                       <material:MaterialIcon Kind="Leaf" Width="48" Height="48"  />
-                       <TextBlock Text="Eco" HorizontalAlignment="Center"></TextBlock>
-                     </StackPanel>
-                   </RadioButton>
-                   
-                  <RadioButton x:Name="QuietProfileButton" GroupName="ProfileGroup" Margin="0 0 15 0">
+                <RadioButton x:Name="QuietProfileButton" GroupName="ProfileGroup" Margin="0 0 15 0" IsVisible="{Binding ElementName=PluggedInToggleSwitch, Path=IsChecked}">
                     <StackPanel>
-                      <material:MaterialIcon Kind="FanMinus" Width="48" Height="48"  />
-                      <TextBlock Text="Quiet" HorizontalAlignment="Center"></TextBlock>
+                        <material:MaterialIcon Kind="FanMinus" Width="48" Height="48"/>
+                        <TextBlock Text="Quiet" HorizontalAlignment="Center"/>
                     </StackPanel>
-                  </RadioButton>
-                 
-                  <RadioButton x:Name="BalancedProfileButton" GroupName="ProfileGroup" Margin="0 0 15 0" IsChecked="True">
+                </RadioButton>
+                
+                <RadioButton x:Name="BalancedProfileButton" GroupName="ProfileGroup" Margin="0 0 15 0" IsChecked="True">
                     <StackPanel>
-                      <material:MaterialIcon Kind="Bicycle" Width="48" Height="48"/>
-                      <TextBlock Text="Balanced" HorizontalAlignment="Center" ></TextBlock>
-
+                        <material:MaterialIcon Kind="Bicycle" Width="48" Height="48"/>
+                        <TextBlock Text="Balanced" HorizontalAlignment="Center"/>
                     </StackPanel>
-                  </RadioButton>                    
-                  
-                  <RadioButton x:Name="PerformanceProfileButton" GroupName="ProfileGroup" Margin="0 0 15 0">
+                </RadioButton>
+                
+                <RadioButton x:Name="PerformanceProfileButton" GroupName="ProfileGroup" Margin="0 0 15 0" IsVisible="{Binding ElementName=PluggedInToggleSwitch, Path=IsChecked}">
                     <StackPanel>
-                      <material:MaterialIcon Kind="CarSide" Width="48" Height="48"  />
-                      <TextBlock Text="Performance" HorizontalAlignment="Center"  ></TextBlock>
+                        <material:MaterialIcon Kind="CarSide" Width="48" Height="48"/>
+                        <TextBlock Text="Performance" HorizontalAlignment="Center"/>
                     </StackPanel>
-                  </RadioButton>
-                  
-                  <RadioButton x:Name="TurboProfileButton" GroupName="ProfileGroup" Margin="0 0 15 0">
+                </RadioButton>
+                
+                <RadioButton x:Name="TurboProfileButton" GroupName="ProfileGroup" Margin="0 0 15 0" IsVisible="{Binding ElementName=PluggedInToggleSwitch, Path=IsChecked}">
                     <StackPanel>
-                      <material:MaterialIcon Kind="RocketLaunch" Width="48" Height="48"  />
-                      <TextBlock Text="Turbo" HorizontalAlignment="Center" ></TextBlock>
+                        <material:MaterialIcon Kind="RocketLaunch" Width="48" Height="48" />
+                        <TextBlock Text="Turbo" HorizontalAlignment="Center"/>
                     </StackPanel>
-                  </RadioButton>
-                   
-                     
-                 
-                </StackPanel>
-                              
-                </Grid>
-                   <TextBlock x:Name="ThermalProfileInfoText" Opacity="0.7" Text="Performance profiles are preset modes that control your device's speed, power use, and cooling:" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"/>
-              </StackPanel>
-            </Border>
+                </RadioButton>
+            </StackPanel>
+        </Grid>
+        
+        <TextBlock x:Name="ThermalProfileInfoText" Opacity="0.7" 
+                   Text="Performance profiles are preset modes that control your device's speed, power use, and cooling:" 
+                   HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"/>
+    </StackPanel>
+</Border>
             
             <!-- Fan Speed Control -->
             <Border Classes="Card">

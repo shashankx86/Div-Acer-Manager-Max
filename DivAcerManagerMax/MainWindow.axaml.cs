@@ -31,6 +31,7 @@ namespace DivAcerManagerMax
         private int _keyboardBrightness = 100;
 
         // UI Controls
+        private RadioButton _lowPowerProfileButton;
         private RadioButton _quietProfileButton;
         private RadioButton _balancedProfileButton;
         private RadioButton _performanceProfileButton;
@@ -106,6 +107,7 @@ namespace DivAcerManagerMax
         {
             // Find all controls by name
             // Thermal Profile controls
+            _lowPowerProfileButton = this.FindControl<RadioButton>("LowPowerProfileButton");
             _quietProfileButton = this.FindControl<RadioButton>("QuietProfileButton");
             _balancedProfileButton = this.FindControl<RadioButton>("BalancedProfileButton");
             _performanceProfileButton = this.FindControl<RadioButton>("PerformanceProfileButton");
@@ -178,6 +180,7 @@ namespace DivAcerManagerMax
         private void AttachEventHandlers()
         {
             // Thermal Profile handlers
+            _lowPowerProfileButton.IsCheckedChanged += ProfileButton_Checked;
             _quietProfileButton.IsCheckedChanged += ProfileButton_Checked;
             _balancedProfileButton.IsCheckedChanged += ProfileButton_Checked;
             _performanceProfileButton.IsCheckedChanged += ProfileButton_Checked;
@@ -386,6 +389,7 @@ namespace DivAcerManagerMax
 
             string profile = button.Name switch
             {
+                "LowPowerProfileButton" => "low-power",
                 "QuietProfileButton" => "quiet",
                 "BalancedProfileButton" => "balanced",
                 "PerformanceProfileButton" => "balanced-performance",
@@ -410,6 +414,11 @@ namespace DivAcerManagerMax
             {
                 // Re-enable manual controls (if they were enabled before)
                 _manualFanSpeedRadioButton.IsEnabled = true;
+            }
+            
+            if (profile == "low-power")
+            {
+                _thermalProfileInfoText.Text = "Prioritizes energy efficiency, reduces performance to extend battery life.";
             }
 
             if (profile == "balanced")
