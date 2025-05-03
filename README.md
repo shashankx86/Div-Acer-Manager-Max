@@ -9,10 +9,11 @@ A build will be released soon for open testing
 **Todo:**
 - Hide Turbo Mode on non Supported devices
 - Implement Keyboard Lighting Color Pickers
-- Retriving System Info and Displaying it
+
 - Update button redirecting to the github releases page
 
 **Done:**
+- Retriving System Info and Displaying it
 - Advanced Daemon
 - Basic Gui
 - Advanced GUI
