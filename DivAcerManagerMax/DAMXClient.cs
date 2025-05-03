@@ -459,6 +459,9 @@ namespace DivAcerManagerMax
     
         [JsonPropertyName("available_features")]
         public List<string> AvailableFeatures { get; set; } = new List<string>();
+        
+        [JsonPropertyName("version")]
+        public string Version { get; set; } = "1";
 
         [JsonPropertyName("thermal_profile")]
         public ThermalProfileSettings ThermalProfile { get; set; } = new ThermalProfileSettings();

@@ -400,18 +400,19 @@
               <StackPanel>
                 <TextBlock Text="System Information" Classes="SubHeader"/>
                 
-                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0 10">
-                  <TextBlock Grid.Row="0" Grid.Column="0" Text="Model:" FontWeight="SemiBold" Width="120"/>
-                  <TextBlock Grid.Row="0" Grid.Column="1" Text="Acer Nitro 5"/>
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="0 10" >
+                  <TextBlock Grid.Row="0" Grid.Column="0" Text="Model:" FontWeight="SemiBold" Width="120" Margin="0 10 0 0" />
+                  <TextBlock x:Name="ModelNameText" Grid.Row="0" Grid.Column="1" Text="UNKNOWN" Margin="5 10 0 0"/>
                   
-                  <TextBlock Grid.Row="1" Grid.Column="0" Text="OS:" FontWeight="SemiBold" Width="120" Margin="0 5 0 0"/>
-                  <TextBlock Grid.Row="1" Grid.Column="1" Text="Linux" Margin="0 5 0 0"/>
+                  <TextBlock Grid.Row="1" Grid.Column="0" Text="Laptop Type:" FontWeight="SemiBold" Width="120" Margin="0 10 0 0"/>
+                  <TextBlock x:Name="LaptopTypeText" Grid.Row="1" Grid.Column="1" Text="UNKNOWN" Margin="5 10 0 0"/>
                   
-                  <TextBlock Grid.Row="2" Grid.Column="0" Text="Kernel:" FontWeight="SemiBold" Width="120" Margin="0 5 0 0"/>
-                  <TextBlock Grid.Row="2" Grid.Column="1" Text="6.1.0-generic" Margin="0 5 0 0"/>
+                  <TextBlock Grid.Row="2" Grid.Column="0" Text="Features:" FontWeight="SemiBold" Width="120" Margin="0 10 0 0"/>
+                  <TextBlock x:Name="SupportedFeaturesTextBlock" Grid.Row="2" Grid.Column="1" Text="UNKNOWN" Margin="5 10 0 0" TextWrapping="Wrap"/>
                   
-                  <TextBlock Grid.Row="3" Grid.Column="0" Text="Driver Version:" FontWeight="SemiBold" Width="120" Margin="0 5 0 0"/>
-                  <TextBlock Grid.Row="3" Grid.Column="1" Text="linuwu_sense 1.0.5" Margin="0 5 0 0"/>
+          
+                  <TextBlock Grid.Row="4" Grid.Column="0" Text="Daemon Version:" FontWeight="SemiBold" Width="120" Margin="0 10 0 0"/>
+                  <TextBlock x:Name="DaemonVersionText" Grid.Row="4" Grid.Column="1" Text="UNKNOWN" Margin="5 10 0 0"/>
                 </Grid>
                 
                 <StackPanel Orientation="Horizontal" Spacing="12">

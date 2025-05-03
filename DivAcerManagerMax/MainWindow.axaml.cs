@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Avalonia;
@@ -81,6 +83,9 @@ namespace DivAcerManagerMax
         private CheckBox _bootAnimAndSoundCheckBox;
         
         private TextBlock  _thermalProfileInfoText;
+
+        private TextBlock _modelNameText ,_laptopTypeText, _daemonVersionText, _kernelInfoText, _supportedFeaturesTextBlock;
+        
 
         public MainWindow()
         {
@@ -186,6 +191,13 @@ namespace DivAcerManagerMax
             
             //Info Texts
             _thermalProfileInfoText = this.FindControl<TextBlock>("ThermalProfileInfoText");
+            
+            //About Texts
+            _modelNameText = this.FindControl<TextBlock>("ModelNameText");
+            _laptopTypeText = this.FindControl<TextBlock>("LaptopTypeText");
+            _supportedFeaturesTextBlock = this.FindControl<TextBlock>("SupportedFeaturesTextBlock");
+            _daemonVersionText = this.FindControl<TextBlock>("DaemonVersionText");
+            _kernelInfoText = this.FindControl<TextBlock>("KernelInfoText");
         }
 
         private void InitializeComponent()
@@ -392,7 +404,8 @@ private void UpdateUIElementVisibility(bool ForceAllFeatures)
      private void ApplySettingsToUI()
 {
     if (_settings == null) return;
-
+        
+    
     // Apply thermal profile (with null check)
     if (_settings.ThermalProfile?.Current != null)
     {
@@ -488,8 +501,47 @@ private void UpdateUIElementVisibility(bool ForceAllFeatures)
     _keyBrightnessText.Text = $"{_keyboardBrightness}%";
     _lightSpeedTextBlock.Text = _lightingSpeed.ToString();
     
+    //Update System Info
+    _daemonVersionText.Text = _settings.Version;
+    _laptopTypeText.Text = _settings.LaptopType;
+    _supportedFeaturesTextBlock.Text = _supportedFeaturesTextBlock.Text = string.Join(", ", _settings.AvailableFeatures);;
+    _modelNameText.Text = GetLinuxLaptopModel();
+    
     // Update UI visibility based on available features
     UpdateUIElementVisibility(false);
+}
+     
+private string GetLinuxLaptopModel()
+{
+    try
+    {
+        // Try to read the product name from sysfs (works on most Linux systems)
+        if (File.Exists("/sys/class/dmi/id/product_name"))
+        {
+            return File.ReadAllText("/sys/class/dmi/id/product_name").Trim();
+        }
+        
+        // Fallback: Try to use dmidecode (requires root permissions)
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = "dmidecode",
+            Arguments = "-s system-product-name",
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        
+        using (var process = Process.Start(startInfo))
+        {
+            process.WaitForExit();
+            return process.StandardOutput.ReadToEnd().Trim();
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error getting laptop model: {ex.Message}");
+        return "Unknown";
+    }
 }
 
         private void ApplyKeyboardSettings()

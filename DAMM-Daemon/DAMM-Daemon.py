@@ -414,7 +414,8 @@ class DAMXManager:
         settings = {
             "laptop_type": self.laptop_type.name,
             "has_four_zone_kb": self.has_four_zone_kb,
-            "available_features": list(self.available_features)
+            "available_features": list(self.available_features),
+            "version": VERSION
         }
 
         # Only include thermal profile if available
@@ -956,6 +957,8 @@ def parse_args():
 def main():
     """Main function"""
     args = parse_args()
+    
+    
 
     # Set log level based on verbosity
     if args.verbose:
