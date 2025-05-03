@@ -12,232 +12,7 @@
         Width="1000" Height="700"
         MinWidth="900" MinHeight="480">
   
-  
-<Window.Styles>
-  <!-- Base Styles -->
-  <Style Selector="TabItem">
-    <Setter Property="FontSize" Value="18"/>
-    <Setter Property="FontFamily" Value="{StaticResource OxaniumFont}"/>
-    <Setter Property="Padding" Value="10,0"/>
-    <Setter Property="Foreground" Value="#eff9ff"/>
-  </Style>
-  
-  <Style Selector="TabControl /template/ WrapPanel">
-    <Setter Property="HorizontalAlignment" Value="Center"/>
-    <Setter Property="VerticalAlignment" Value="Top"/>
 
-  </Style>
-  
-  <Style Selector="TextBlock.SectionHeader">
-    <Setter Property="FontSize" Value="20"/>
-    <Setter Property="FontFamily" Value="{StaticResource OxaniumBoldFont}"/>
-    <Setter Property="FontWeight" Value="Bold"/>
-    <Setter Property="Margin" Value="0 15 0 10"/>
-    <Setter Property="Foreground" Value="#eff9ff"/>
-    <Setter Property="HorizontalAlignment" Value="Left"/>
-  </Style>
-  
-  <Style Selector="TextBlock.SubHeader">
-    <Setter Property="FontFamily" Value="{StaticResource OxaniumFont}"/>
-    <Setter Property="FontSize" Value="16"/>
-    <Setter Property="FontWeight" Value="SemiBold"/>
-    <Setter Property="Margin" Value="0 10 0 5"/>
-  </Style>
-  
-  <Style Selector="TextBlock">
-    <Setter Property="FontSize" Value="14"/>
-    <Setter Property="FontFamily" Value="{StaticResource OpenSansFont}"/>
-    <Setter Property="Margin" Value="0 10 0 5"/>
-  </Style>
-  
-  <Style Selector="Border.Card">
-    <Setter Property="Background">
-      <LinearGradientBrush StartPoint="100%,100%" EndPoint="100%,0%">
-        <GradientStop Offset="0" Color="#18181b"/>
-        <GradientStop Offset="1" Color="#242429"/>
-      </LinearGradientBrush>
-    </Setter>
-    <Setter Property="BorderBrush" Value="#201f23"/>
-    <Setter Property="BorderThickness" Value="2"/>
-    <Setter Property="CornerRadius" Value="10"/>
-    <Setter Property="Padding" Value="15"/>
-    <Setter Property="Margin" Value="0 5 0 15"/>
-  </Style>
-  
-  <Style Selector="Slider">
-    <Setter Property="Margin" Value="0 5"/>
-    <Setter Property="Minimum" Value="0"/>
-    <Setter Property="Maximum" Value="100"/>
-    <Setter Property="TickFrequency" Value="10"/>
-    <Setter Property="IsSnapToTickEnabled" Value="True"/>
-    <Setter Property="Foreground" Value="#1B89D8"/>
-  </Style>
-  
-  <!-- Button Styles with Gradients -->
-  <Style Selector="Button">
-    <Setter Property="FontFamily" Value="{StaticResource OpenSansSemiBoldFont}"/>
-    <Setter Property="Background">
-      <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-        <GradientStop Offset="0" Color="#4db5ff"/>
-        <GradientStop Offset="1" Color="#1168A6"/>
-      </LinearGradientBrush>
-    </Setter>
-    <Setter Property="Foreground" Value="#ffffff"/>
-    <Setter Property="Padding" Value="12 6"/>
-    <Setter Property="CornerRadius" Value="4"/>
-    <Setter Property="Margin" Value="0 5"/>
-    <Setter Property="BorderBrush" Value="#1779c4"/>
-    <Setter Property="BorderThickness" Value="1"/>
-  </Style>
-  
-  <Style Selector="Button:pointerover">
-    <Setter Property="Background">
-      <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-        <GradientStop Offset="0" Color="#65c0ff"/>
-        <GradientStop Offset="1" Color="#40a1f1"/>
-      </LinearGradientBrush>
-    </Setter>
-    <Setter Property="Foreground" Value="#193052"/>
-  </Style>
-  
-  <Style Selector="Button:pressed">
-    <Setter Property="Background">
-      <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-        <GradientStop Offset="0" Color="#1c93e8"/>
-        <GradientStop Offset="1" Color="#1779c4"/>
-      </LinearGradientBrush>
-    </Setter>
-    <Setter Property="BorderBrush" Value="#1566a3"/>
-  </Style>
-  
-  <Style Selector="Button:disabled">
-    <Setter Property="Background">
-      <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-        <GradientStop Offset="0" Color="#a0c8e8"/>
-        <GradientStop Offset="1" Color="#7aa7cc"/>
-      </LinearGradientBrush>
-    </Setter>
-    <Setter Property="Foreground" Value="#d0e0f0"/>
-    <Setter Property="BorderBrush" Value="#7aa7cc"/>
-  </Style>
-  
-  <!-- Radio Button Styles with Gradients -->
-  <Style Selector="RadioButton">
-    <Setter Property="FontFamily" Value="{StaticResource OxaniumFont}"/>
-    <Setter Property="Height" Value="100"/>
-    <Setter Property="Width" Value="120"/>
-    <Setter Property="Background">
-      <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-        <GradientStop Offset="0" Color="#d4eeff"/>
-        <GradientStop Offset="1" Color="#c1e5fc"/>
-      </LinearGradientBrush>
-    </Setter>
-    <Setter Property="Foreground" Value="#193052"/>
-    <Setter Property="BorderBrush" Value="#65bdf5"/>
-    <Setter Property="BorderThickness" Value="2"/>
-    <Setter Property="Padding" Value="12,6"/>
-    <Setter Property="CornerRadius" Value="8"/>
-    <Setter Property="HorizontalContentAlignment" Value="Center"/>
-    <Setter Property="VerticalContentAlignment" Value="Bottom"/>
-    <Setter Property="Template">
-      <ControlTemplate>
-        <Panel>
-          <Border Name="border"
-                  Background="{TemplateBinding Background}"
-                  BorderBrush="{TemplateBinding BorderBrush}"
-                  BorderThickness="{TemplateBinding BorderThickness}"
-                  CornerRadius="{TemplateBinding CornerRadius}">
-            <ContentPresenter Name="PART_ContentPresenter"
-                            Content="{TemplateBinding Content}"
-                            ContentTemplate="{TemplateBinding ContentTemplate}"
-                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                            Padding="{TemplateBinding Padding}"
-                            Foreground="{TemplateBinding Foreground}"/>
-          </Border>
-        </Panel>
-      </ControlTemplate>
-    </Setter>
-  </Style>
-
-  <!-- Pointer over state -->
-  <Style Selector="RadioButton:pointerover /template/ Border#border">
-    <Setter Property="Background">
-      <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-        <GradientStop Offset="0" Color="#c1e5fc"/>
-        <GradientStop Offset="1" Color="#96d6fa"/>
-      </LinearGradientBrush>
-    </Setter>
-    <Setter Property="BorderBrush" Value="#40a1f1"/>
-  </Style>
-  
-
-  <!-- Pressed state -->
-  <Style Selector="RadioButton:pressed /template/ Border#border">
-    <Setter Property="Background">
-      <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-        <GradientStop Offset="0" Color="#96d6fa"/>
-        <GradientStop Offset="1" Color="#65bdf5"/>
-      </LinearGradientBrush>
-    </Setter>
-    <Setter Property="BorderBrush" Value="#40a1f1"/>
-  </Style>
-
-  <!-- Selected state -->
-  <Style Selector="RadioButton:checked /template/ Border#border">
-    <Setter Property="Background">
-      <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-        <GradientStop Offset="0" Color="#7ac6f9"/>
-        <GradientStop Offset="1" Color="#40a1f1"/>
-      </LinearGradientBrush>
-    </Setter>
-    <Setter Property="BorderBrush" Value="#1779c4"/>
-    <Setter Property="BorderThickness" Value="3"/>
-  </Style>
-
-  <!-- Selected adjustment for size -->
-  <Style Selector="RadioButton:checked">
-    <Setter Property="Width" Value="150"/>
-    <Setter Property="Foreground" Value="#112139"/>
-  </Style>
-
-  <!-- Selected + Pointer over state -->
-  <Style Selector="RadioButton:checked:pointerover /template/ Border#border">
-    <Setter Property="Background">
-      <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-        <GradientStop Offset="0" Color="#96d6fa"/>
-        <GradientStop Offset="1" Color="#65bdf5"/>
-      </LinearGradientBrush>
-    </Setter>
-    <Setter Property="BorderBrush" Value="#1779c4"/>
-  </Style>
-
-  <!-- Selected + Pressed state -->
-  <Style Selector="RadioButton:checked:pressed /template/ Border#border">
-    <Setter Property="Background">
-      <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-        <GradientStop Offset="0" Color="#65bdf5"/>
-        <GradientStop Offset="1" Color="#40a1f1"/>
-      </LinearGradientBrush>
-    </Setter>
-    <Setter Property="BorderBrush" Value="#1566a3"/>
-  </Style>
-
-  <!-- Disabled state -->
-  <Style Selector="RadioButton:disabled /template/ Border#border">
-    <Setter Property="Background">
-      <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-        <GradientStop Offset="0" Color="#a0c8e8"/>
-        <GradientStop Offset="1" Color="#7aa7cc"/>
-      </LinearGradientBrush>
-    </Setter>
-    <Setter Property="BorderBrush" Value="#7aa7cc"/>
-  </Style>
-
-  <Style Selector="RadioButton:disabled /template/ ContentPresenter#PART_ContentPresenter">
-    <Setter Property="Foreground" Value="#6d8cb0"/>
-  </Style>
-</Window.Styles>
   
 
   <Grid RowDefinitions="Auto,*">
@@ -269,12 +44,12 @@
           <StackPanel Margin="10,0,20,0">
             <TextBlock Text="Power &amp; Performance" Classes="SectionHeader"/>
             
-          <Border Classes="Card">
+          <Border Classes="Card" x:Name="ThermalProfilePanel" >
           <StackPanel>
               <!-- Header row with switch -->
               <Grid ColumnDefinitions="*,Auto" Margin="0 0 0 10">
                   <TextBlock Text="Performance Profiles" Classes="SubHeader" VerticalAlignment="Center"/>
-                  <ToggleSwitch x:Name="PluggedInToggleSwitch" Grid.Column="1" VerticalAlignment="Center" IsChecked="True">
+                  <ToggleSwitch x:Name="PluggedInToggleSwitch" Grid.Column="1" VerticalAlignment="Center" IsChecked="True" IsHitTestVisible="False">
                       <ToggleSwitch.OffContent>
                           <material:MaterialIcon Kind="BatteryOutline" Width="24" Height="24"/>
                       </ToggleSwitch.OffContent>
@@ -332,7 +107,7 @@
 </Border>
             
             <!-- Fan Speed Control -->
-            <Border Classes="Card">
+            <Border Classes="Card"  x:Name="FanControlPanel" >
               <StackPanel>
                 <TextBlock Text="Fan Speed Control" Classes="SubHeader"/>
                 <TextBlock Text="Set custom fan speeds for CPU and GPU" Opacity="0.7" Margin="0 0 0 10"/>
@@ -380,13 +155,13 @@
       </TabItem>
       
       <!-- Power Controls Tab -->
-      <TabItem Header="Power Controls">
+      <TabItem Header="Battery Controls" x:Name="BatteryPanel">
         <ScrollViewer>
           <StackPanel Margin="10,0,20,0">
             <TextBlock Text="Power Controls" Classes="SectionHeader"/>
             
             <!-- Battery Calibration -->
-            <Border Classes="Card">
+            <Border Classes="Card" x:Name="CalibrationControls">
               <StackPanel>
                 <TextBlock Text="Battery Calibration" Classes="SubHeader"/>
                 <TextBlock Text="Calibrate your battery to get accurate battery percentage readings" 
@@ -408,7 +183,7 @@
             </Border>
             
             <!-- Charge Limit -->
-            <Border Classes="Card">
+            <Border Classes="Card" x:Name="LimiterControls">
               <StackPanel>
                 <TextBlock Text="Battery Charge Limit" Classes="SubHeader"/>
                 <TextBlock Text="Limit maximum battery charge to extend battery lifespan" Opacity="0.7" Margin="0 0 0 10"/>
@@ -424,7 +199,7 @@
             </Border>
             
             <!-- USB Power Delivery -->
-            <Border Classes="Card">
+            <Border Classes="Card" x:Name="UsbChargingPanel">
               <StackPanel>
                 <TextBlock Text="USB Power Delivery" Classes="SubHeader"/>
                 <TextBlock Text="Configure USB charging when laptop is powered off" Opacity="0.7" Margin="0 0 0 10"/>
@@ -445,12 +220,12 @@
       </TabItem>
       
       <!-- Keyboard Lighting Tab -->
-      <TabItem Header="Keyboard Lighting">
+      <TabItem Header="Keyboard Lighting" x:Name="KeyboardLightingPanel">
         <ScrollViewer>
           <StackPanel Margin="10,0,20,0">
             <TextBlock Text="Keyboard Lighting" Classes="SectionHeader"/>
             <!-- Zone Color Control -->
-            <Border Classes="Card">
+            <Border Classes="Card" x:Name="ZoneColorControlPanel">
               <StackPanel>
                 <TextBlock Text="Zone Color Control" Classes="SubHeader"/>
                 <TextBlock Text="Customize colors for each keyboard zone" Opacity="0.7" Margin="0 0 0 10"/>
@@ -533,7 +308,7 @@
             </Border>
 
             <!-- Lighting Effects -->
-            <Border Classes="Card">
+            <Border Classes="Card" x:Name="KeyboardEffectsPanel">
               <StackPanel>
                 <TextBlock Text="Lighting Effects" Classes="SubHeader"/>
                 <TextBlock Text="Choose dynamic lighting effects for your keyboard" Opacity="0.7" Margin="0 0 0 10"/>
@@ -580,7 +355,7 @@
             </Border>
             
             <!-- Backlight Timeout -->
-            <Border Classes="Card">
+            <Border Classes="Card" x:Name="BacklightTimeoutControls">
               <StackPanel>
                 <TextBlock Text="Backlight Timeout" Classes="SubHeader"/>
                 <TextBlock Text="Automatically turn off keyboard lighting after period of inactivity" Opacity="0.7" Margin="0 0 0 10"/>
@@ -594,13 +369,13 @@
       </TabItem>
       
       <!-- System Settings Tab -->
-      <TabItem Header="System Settings">
+      <TabItem Header="System Settings" x:Name="SystemSettingsPanel">
         <ScrollViewer>
           <StackPanel Margin="10,0,20,0">
             <TextBlock Text="System Settings" Classes="SectionHeader"/>
             
             <!-- LCD Override -->
-            <Border Classes="Card">
+            <Border Classes="Card" x:Name="LcdOverrideControls">
               <StackPanel>
                 <TextBlock Text="LCD Override" Classes="SubHeader"/>
                 <TextBlock Text="Reduce LCD latency and minimize ghosting" Opacity="0.7" Margin="0 0 0 10"/>
@@ -610,7 +385,7 @@
             </Border>
             
             <!-- Boot Sound and Animation -->
-            <Border Classes="Card">
+            <Border Classes="Card" x:Name="BootSoundControls">
               <StackPanel>
                 <TextBlock Text="Boot Sound and Animation" Classes="SubHeader"/>
                 <TextBlock Text="Enable or disable custom boot animation and sound" Opacity="0.7" Margin="0 0 0 10"/>

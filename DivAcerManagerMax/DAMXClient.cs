@@ -19,6 +19,12 @@ namespace DivAcerManagerMax
         private bool _isConnected;
 
         public bool IsConnected => _isConnected;
+        
+        // Cache of available features
+        private HashSet<string> _availableFeatures = new HashSet<string>();
+        
+        // Property to check if a feature is available
+        public bool IsFeatureAvailable(string featureName) => _availableFeatures.Contains(featureName);
 
         public DAMXClient()
         {
@@ -44,6 +50,9 @@ namespace DivAcerManagerMax
                 await _socket.ConnectAsync(endpoint);
                 _isConnected = true;
                 
+                // Get available features upon connection
+                await RefreshAvailableFeaturesAsync();
+                
                 return true;
             }
             catch (Exception ex)
@@ -51,6 +60,36 @@ namespace DivAcerManagerMax
                 Console.WriteLine($"Failed to connect to daemon: {ex.Message}");
                 _isConnected = false;
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Refresh the available features cache from the daemon
+        /// </summary>
+        private async Task RefreshAvailableFeaturesAsync()
+        {
+            try
+            {
+                var response = await SendCommandAsync("get_supported_features");
+                var success = response.RootElement.GetProperty("success").GetBoolean();
+                
+                if (success)
+                {
+                    var data = response.RootElement.GetProperty("data");
+                    var features = data.GetProperty("available_features");
+                    
+                    _availableFeatures.Clear();
+                    foreach (var feature in features.EnumerateArray())
+                    {
+                        _availableFeatures.Add(feature.GetString());
+                    }
+                    
+                    Console.WriteLine($"Available features: {string.Join(", ", _availableFeatures)}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to get available features: {ex.Message}");
             }
         }
 
@@ -141,7 +180,15 @@ namespace DivAcerManagerMax
             if (success)
             {
                 var data = response.RootElement.GetProperty("data");
-                return JsonSerializer.Deserialize<DAMXSettings>(data.GetRawText());
+                var settings = JsonSerializer.Deserialize<DAMXSettings>(data.GetRawText());
+                
+                // Update available features cache
+                if (settings.AvailableFeatures != null)
+                {
+                    _availableFeatures = new HashSet<string>(settings.AvailableFeatures);
+                }
+                
+                return settings;
             }
             else
             {
@@ -157,6 +204,12 @@ namespace DivAcerManagerMax
         /// <returns>True if successful</returns>
         public async Task<bool> SetThermalProfileAsync(string profile)
         {
+            if (!IsFeatureAvailable("thermal_profile"))
+            {
+                Console.WriteLine("Thermal profile feature is not available on this device");
+                return false;
+            }
+            
             var parameters = new Dictionary<string, object>
             {
                 { "profile", profile }
@@ -174,6 +227,12 @@ namespace DivAcerManagerMax
         /// <returns>True if successful</returns>
         public async Task<bool> SetFanSpeedAsync(int cpu, int gpu)
         {
+            if (!IsFeatureAvailable("fan_speed"))
+            {
+                Console.WriteLine("Fan speed control is not available on this device");
+                return false;
+            }
+            
             var parameters = new Dictionary<string, object>
             {
                 { "cpu", cpu },
@@ -191,6 +250,12 @@ namespace DivAcerManagerMax
         /// <returns>True if successful</returns>
         public async Task<bool> SetBacklightTimeoutAsync(bool enabled)
         {
+            if (!IsFeatureAvailable("backlight_timeout"))
+            {
+                Console.WriteLine("Backlight timeout feature is not available on this device");
+                return false;
+            }
+            
             var parameters = new Dictionary<string, object>
             {
                 { "enabled", enabled }
@@ -207,6 +272,12 @@ namespace DivAcerManagerMax
         /// <returns>True if successful</returns>
         public async Task<bool> SetBatteryCalibrationAsync(bool enabled)
         {
+            if (!IsFeatureAvailable("battery_calibration"))
+            {
+                Console.WriteLine("Battery calibration feature is not available on this device");
+                return false;
+            }
+            
             var parameters = new Dictionary<string, object>
             {
                 { "enabled", enabled }
@@ -223,6 +294,12 @@ namespace DivAcerManagerMax
         /// <returns>True if successful</returns>
         public async Task<bool> SetBatteryLimiterAsync(bool enabled)
         {
+            if (!IsFeatureAvailable("battery_limiter"))
+            {
+                Console.WriteLine("Battery limiter feature is not available on this device");
+                return false;
+            }
+            
             var parameters = new Dictionary<string, object>
             {
                 { "enabled", enabled }
@@ -239,6 +316,12 @@ namespace DivAcerManagerMax
         /// <returns>True if successful</returns>
         public async Task<bool> SetBootAnimationSoundAsync(bool enabled)
         {
+            if (!IsFeatureAvailable("boot_animation_sound"))
+            {
+                Console.WriteLine("Boot animation sound feature is not available on this device");
+                return false;
+            }
+            
             var parameters = new Dictionary<string, object>
             {
                 { "enabled", enabled }
@@ -255,6 +338,12 @@ namespace DivAcerManagerMax
         /// <returns>True if successful</returns>
         public async Task<bool> SetLcdOverrideAsync(bool enabled)
         {
+            if (!IsFeatureAvailable("lcd_override"))
+            {
+                Console.WriteLine("LCD override feature is not available on this device");
+                return false;
+            }
+            
             var parameters = new Dictionary<string, object>
             {
                 { "enabled", enabled }
@@ -271,6 +360,12 @@ namespace DivAcerManagerMax
         /// <returns>True if successful</returns>
         public async Task<bool> SetUsbChargingAsync(int level)
         {
+            if (!IsFeatureAvailable("usb_charging"))
+            {
+                Console.WriteLine("USB charging control is not available on this device");
+                return false;
+            }
+            
             var parameters = new Dictionary<string, object>
             {
                 { "level", level }
@@ -291,6 +386,12 @@ namespace DivAcerManagerMax
         /// <returns>True if successful</returns>
         public async Task<bool> SetPerZoneModeAsync(string zone1, string zone2, string zone3, string zone4, int brightness)
         {
+            if (!IsFeatureAvailable("per_zone_mode"))
+            {
+                Console.WriteLine("Per-zone keyboard mode is not available on this device");
+                return false;
+            }
+            
             var parameters = new Dictionary<string, object>
             {
                 { "zone1", zone1 },
@@ -317,6 +418,12 @@ namespace DivAcerManagerMax
         /// <returns>True if successful</returns>
         public async Task<bool> SetFourZoneModeAsync(int mode, int speed, int brightness, int direction, int red, int green, int blue)
         {
+            if (!IsFeatureAvailable("four_zone_mode"))
+            {
+                Console.WriteLine("Four-zone keyboard mode is not available on this device");
+                return false;
+            }
+            
             var parameters = new Dictionary<string, object>
             {
                 { "mode", mode },
@@ -349,6 +456,9 @@ namespace DivAcerManagerMax
 
         [JsonPropertyName("has_four_zone_kb")]
         public bool HasFourZoneKb { get; set; }
+        
+        [JsonPropertyName("available_features")]
+        public List<string> AvailableFeatures { get; set; }
 
         [JsonPropertyName("thermal_profile")]
         public ThermalProfileSettings ThermalProfile { get; set; }
