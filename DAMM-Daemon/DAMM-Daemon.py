@@ -19,7 +19,7 @@ from enum import Enum
 from typing import Dict, List, Tuple, Union, Optional, Set
 
 # Constants
-VERSION = "1.0.1"
+VERSION = "v0.2.1"
 SOCKET_PATH = "/var/run/DAMX.sock"
 LOG_PATH = "/var/log/DAMX_Daemon_Log.log"
 CONFIG_PATH = "/etc/DAMX_Daemon/config.ini"

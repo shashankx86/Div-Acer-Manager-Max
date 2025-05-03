@@ -418,8 +418,11 @@
                   <TextBlock x:Name="SupportedFeaturesTextBlock" Grid.Row="2" Grid.Column="1" Text="UNKNOWN" Margin="5 10 0 0" TextWrapping="Wrap"/>
                   
           
-                  <TextBlock Grid.Row="4" Grid.Column="0" Text="Daemon Version:" FontWeight="SemiBold" Width="120" Margin="0 10 0 0"/>
-                  <TextBlock x:Name="DaemonVersionText" Grid.Row="4" Grid.Column="1" Text="UNKNOWN" Margin="5 10 0 0"/>
+                  <TextBlock Grid.Row="3" Grid.Column="0" Text="Daemon Version:" FontWeight="SemiBold" Width="120" Margin="0 10 0 0"/>
+                  <TextBlock x:Name="DaemonVersionText" Grid.Row="3" Grid.Column="1" Text="UNKNOWN" Margin="5 10 0 0"/>
+                  
+                  <TextBlock Grid.Row="4" Grid.Column="0" Text="GUI Version:" FontWeight="SemiBold" Width="120" Margin="0 10 0 0"/>
+                  <TextBlock x:Name="GuiVersionText" Grid.Row="4" Grid.Column="1" Text="UNKNOWN" Margin="5 10 0 0"/>
                 </Grid>
                 
                 <StackPanel Orientation="Horizontal" Spacing="12">
@@ -471,8 +474,5 @@
         </StackPanel>
       </Border>
     </Grid>
-
-    
   </Grid>
-  
 </Window>
