@@ -417,13 +417,14 @@
                   <TextBlock Grid.Row="2" Grid.Column="0" Text="Features:" FontWeight="SemiBold" Width="120" Margin="0 10 0 0"/>
                   <TextBlock x:Name="SupportedFeaturesTextBlock" Grid.Row="2" Grid.Column="1" Text="UNKNOWN" Margin="5 10 0 0" TextWrapping="Wrap"/>
                   
+                  <TextBlock Grid.Row="4" Grid.Column="0" Text="Project Version:" FontWeight="SemiBold" Width="120" Margin="0 10 0 0"/>
+                  <TextBlock x:Name="ProjectVersionText" Grid.Row="4" Grid.Column="1" Text="UNKNOWN" Margin="5 10 0 0"/>
+
           
                   <TextBlock Grid.Row="3" Grid.Column="0" Text="Daemon Version:" FontWeight="SemiBold" Width="120" Margin="0 10 0 0"/>
                   <TextBlock x:Name="DaemonVersionText" Grid.Row="3" Grid.Column="1" Text="UNKNOWN" Margin="5 10 0 0"/>
                   
-                  <TextBlock Grid.Row="4" Grid.Column="0" Text="GUI Version:" FontWeight="SemiBold" Width="120" Margin="0 10 0 0"/>
-                  <TextBlock x:Name="GuiVersionText" Grid.Row="4" Grid.Column="1" Text="UNKNOWN" Margin="5 10 0 0"/>
-                </Grid>
+     </Grid>
                 
                 <StackPanel Orientation="Horizontal" Spacing="12">
                 <Button x:Name="UpdatesButton" Content="Check for Updates" Margin="0 15 0 0"/>

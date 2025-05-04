@@ -19,7 +19,7 @@ namespace DivAcerManagerMax
         private readonly DAMXClient _client;
         private DAMXSettings _settings;
         private PowerSourceDetection _powerDetection;
-        private string GUIVersion = "0.4.5"; 
+        private string ProjectVersion = "0.4.6"; 
         
         private bool _isManualFanControl;
         private int _cpuFanSpeed = 50;
@@ -201,8 +201,8 @@ namespace DivAcerManagerMax
             _laptopTypeText = this.FindControl<TextBlock>("LaptopTypeText");
             _supportedFeaturesTextBlock = this.FindControl<TextBlock>("SupportedFeaturesTextBlock");
             _daemonVersionText = this.FindControl<TextBlock>("DaemonVersionText");
-            _guiVersionTextBlock = this.FindControl<TextBlock>("GuiVersionText");
-            _guiVersionTextBlock.Text = GUIVersion;
+            _guiVersionTextBlock = this.FindControl<TextBlock>("ProjectVersionText");
+            _guiVersionTextBlock.Text = ProjectVersion;
             _kernelInfoText = this.FindControl<TextBlock>("KernelInfoText");
             
             //Error Message

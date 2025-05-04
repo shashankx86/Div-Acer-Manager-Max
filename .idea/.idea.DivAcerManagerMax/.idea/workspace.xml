@@ -9,8 +9,8 @@
   <component name="ChangeListManager">
     <list default="true" id="946eaab8-0dd2-4963-b8be-4ed6ac03a9a6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DAMM-Daemon/DAMM-Daemon.py" beforeDir="false" afterPath="$PROJECT_DIR$/DAMM-Daemon/DAMX-Daemon.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/DAMXClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/DAMXClient.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -168,6 +168,9 @@
       <workItem from="1746277822070" duration="4326000" />
       <workItem from="1746345680500" duration="5846000" />
       <workItem from="1746352888216" duration="3790000" />
+      <workItem from="1746358746125" duration="1080000" />
+      <workItem from="1746360662559" duration="31000" />
+      <workItem from="1746381034545" duration="2878000" />
     </task>
     <servers />
   </component>
