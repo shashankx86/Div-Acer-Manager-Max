@@ -514,7 +514,7 @@ public async Task<JsonDocument> SendCommandAsync(string command, Dictionary<stri
         public List<string> AvailableFeatures { get; set; } = new List<string>();
         
         [JsonPropertyName("version")]
-        public string Version { get; set; } = "1";
+        public string Version { get; set; } = "NOT CONNECTED PROPERLY";
 
         [JsonPropertyName("thermal_profile")]
         public ThermalProfileSettings ThermalProfile { get; set; } = new ThermalProfileSettings();
