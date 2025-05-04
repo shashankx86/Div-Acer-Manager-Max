@@ -20,7 +20,7 @@ from PowerSourceDetection import PowerSourceDetector  # Assuming you named the n
 from typing import Dict, List, Tuple, Union, Optional, Set
 
 # Constants
-VERSION = "v0.2.4"
+VERSION = "0.3.2-x"
 SOCKET_PATH = "/var/run/DAMX.sock"
 LOG_PATH = "/var/log/DAMX_Daemon_Log.log"
 CONFIG_PATH = "/etc/DAMX_Daemon/config.ini"
