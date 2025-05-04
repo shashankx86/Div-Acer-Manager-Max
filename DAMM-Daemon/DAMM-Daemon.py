@@ -16,10 +16,11 @@ import configparser
 import traceback
 from pathlib import Path
 from enum import Enum
+from PowerSourceDetection import PowerSourceDetector  # Assuming you named the new file power_source_detector.py
 from typing import Dict, List, Tuple, Union, Optional, Set
 
 # Constants
-VERSION = "v0.2.1"
+VERSION = "v0.2.4"
 SOCKET_PATH = "/var/run/DAMX.sock"
 LOG_PATH = "/var/log/DAMX_Daemon_Log.log"
 CONFIG_PATH = "/etc/DAMX_Daemon/config.ini"
@@ -32,7 +33,7 @@ if os.geteuid() != 0:
 
 # Configure logging
 log = logging.getLogger("DAMXDaemon")
-log.setLevel(logging.INFO)
+log.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 # Console handler
@@ -71,6 +72,8 @@ class DAMXManager:
         if not os.path.exists(self.base_path) and self.laptop_type != LaptopType.UNKNOWN:
             log.error(f"Base path does not exist: {self.base_path}")
             raise FileNotFoundError(f"Base path does not exist: {self.base_path}")
+        
+        self.power_monitor = None
 
     def _detect_laptop_type(self) -> LaptopType:
         """Detect whether this is a Predator or Nitro laptop"""
@@ -872,7 +875,9 @@ class DAMXDaemon:
         if 'General' in config and 'LogLevel' in config['General']:
             log_level = config['General']['LogLevel'].upper()
             if log_level in ('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'):
-                log.setLevel(getattr(logging, log_level))
+                #log.setLevel(getattr(logging, log_level))
+                log.setLevel(logging.DEBUG)
+                
                 log.info(f"Log level set to {log_level}")
 
         return config
@@ -889,12 +894,14 @@ class DAMXDaemon:
             # Log detected features
             features_str = ", ".join(sorted(self.manager.available_features))
             log.info(f"Detected features: {features_str}")
+            self.power_monitor = PowerSourceDetector(self.manager)
 
             return True
         except Exception as e:
             log.error(f"Failed to set up daemon: {e}")
             log.error(traceback.format_exc())
             return False
+        
 
     def run(self):
         """Run the daemon"""
@@ -912,7 +919,9 @@ class DAMXDaemon:
         try:
             self.running = True
             self.server = DaemonServer(self.manager)
+            self.power_monitor.start_monitoring()
             self.server.start()
+            
         except Exception as e:
             log.error(f"Error running daemon: {e}")
             log.error(traceback.format_exc())
@@ -926,6 +935,9 @@ class DAMXDaemon:
         # Stop server
         if self.server:
             self.server.stop()
+
+        if self.power_monitor:
+            self.power_monitor.stop_monitoring()
 
         # Remove PID file
         try:

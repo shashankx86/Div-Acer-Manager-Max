@@ -1,7 +1,7 @@
 # Div Acer Manager Max
 Div Acer Manager Max is a Linux GUI for Acer laptops using Linuwu Sense drivers. It replicates NitroSense functionality with fan control, performance modes, battery limiter, and more. Built with Avalonia, it offers a clean, easy-to-use interface for managing system performance and cooling.
 
-![image](https://github.com/user-attachments/assets/f8d51bb9-bed9-4a03-9d73-115c8733c507)
+![image](https://github.com/user-attachments/assets/a0374db2-d6ac-4fdc-a91b-a3d246b41d90)
 
 This Project is under active development not fully functional
 A build will be released soon for open testing
