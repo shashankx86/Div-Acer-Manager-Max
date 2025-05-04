@@ -19,7 +19,7 @@ namespace DivAcerManagerMax
         private readonly DAMXClient _client;
         private DAMXSettings _settings;
         private PowerSourceDetection _powerDetection;
-        private string GUIVersion = "v0.4.2"; 
+        private string GUIVersion = "v0.4.5"; 
         
         private bool _isManualFanControl;
         private int _cpuFanSpeed = 50;
@@ -426,102 +426,62 @@ private void UpdateUIElementVisibility()
             }
         }
         
-   private void ApplySettingsToUI()
-{
-    if (_settings == null) return;
-    
-    // Apply thermal profile settings
-    if (_settings.ThermalProfile != null)
-    {
-        // First hide all profile buttons
-        _lowPowerProfileButton.IsVisible = false;
-        _quietProfileButton.IsVisible = false;
-        _balancedProfileButton.IsVisible = false;
-        _performanceProfileButton.IsVisible = false;
-        _turboProfileButton.IsVisible = false;
-
-        _lowPowerProfileButton.IsEnabled = false;
-        _quietProfileButton.IsEnabled = false;
-        _balancedProfileButton.IsEnabled = false;
-        _performanceProfileButton.IsEnabled = false;
-        _turboProfileButton.IsEnabled = false;
         
-        // Show only available profiles
-        foreach (var profile in _settings.ThermalProfile.Available)
-        {
-            switch (profile.ToLower())
-            {
-                case "low-power":
-                    (_lowPowerProfileButton.IsEnabled) = true;
-                    if (_powerToggleSwitch.IsChecked == false)
-                    {
-                        (_lowPowerProfileButton.IsVisible) = true;
-                    }
-                    break;
-                case "quiet":
-                    _quietProfileButton.IsVisible = true;
-                    _quietProfileButton.IsEnabled = true;
-                    
-                    break;
-                case "balanced":
-                    _balancedProfileButton.IsVisible = true;
-                    _balancedProfileButton.IsEnabled = true;
-                    break;
-                case "balanced-performance":
-                    _performanceProfileButton.IsVisible = true;
-                    _performanceProfileButton.IsEnabled = true;
-                    break;
-                case "performance":
-                    _turboProfileButton.IsVisible = true;
-                    _turboProfileButton.IsEnabled = true;
-                    break;
-            }
-        }
+        private void UpdateProfileButtons()
+{
+    if (_settings == null || _settings.ThermalProfile == null) 
+        return;
 
-        if (devMode)
-        {
-            _lowPowerProfileButton.IsVisible = devMode;
-            _quietProfileButton.IsVisible = devMode;
-            _balancedProfileButton.IsVisible = devMode;
-            _performanceProfileButton.IsVisible = devMode;
-            _turboProfileButton.IsVisible = devMode;
+    bool isPluggedIn = _powerToggleSwitch?.IsChecked ?? false;
+    
+    // Initialize profile configuration
+    var profileConfigs = new Dictionary<string, (RadioButton button, string description, bool showOnBattery, bool showOnAC)>()
+    {
+        { "low-power", (_lowPowerProfileButton, "Prioritizes energy efficiency, reduces performance to extend battery life.", true, false) },
+        { "quiet", (_quietProfileButton, "Minimizes noise, prioritizes low power and cooling.", false, true) },
+        { "balanced", (_balancedProfileButton, "Optimal mix of performance and noise for everyday tasks.", true, true) },
+        { "balanced-performance", (_performanceProfileButton, "Maximizes speed for demanding workloads, higher fan noise", false, true) },
+        { "performance", (_turboProfileButton, "Unleashes peak power for extreme tasks, loudest fans.", false, true) }
+    };
 
-            _lowPowerProfileButton.IsEnabled = devMode;
-            _quietProfileButton.IsEnabled = devMode;
-            _balancedProfileButton.IsEnabled = devMode;
-            _performanceProfileButton.IsEnabled = devMode;
-            _turboProfileButton.IsEnabled = devMode;
-        }
+    // Reset all buttons
+    foreach (var config in profileConfigs.Values)
+    {
+        config.button.IsVisible = false;
+        config.button.IsEnabled = false;
+    }
 
-        // Set the current active profile
-        if (!string.IsNullOrEmpty(_settings.ThermalProfile.Current))
+    // Configure available profiles
+    foreach (var profile in _settings.ThermalProfile.Available)
+    {
+        string profileKey = profile.ToLower();
+        if (profileConfigs.TryGetValue(profileKey, out var config))
         {
-            switch (_settings.ThermalProfile.Current.ToLower())
-            {
-                case "low-power":
-                    _lowPowerProfileButton.IsChecked = true;
-                    _thermalProfileInfoText.Text = "Prioritizes energy efficiency, reduces performance to extend battery life.";
-                    break;
-                case "quiet":
-                    _quietProfileButton.IsChecked = true;
-                    _thermalProfileInfoText.Text = "Minimizes noise, prioritizes low power and cooling.";
-                    break;
-                case "balanced":
-                    _balancedProfileButton.IsChecked = true;
-                    _thermalProfileInfoText.Text = "Optimal mix of performance and noise for everyday tasks.";
-                    break;
-                case "balanced-performance":
-                    _performanceProfileButton.IsChecked = true;
-                    _thermalProfileInfoText.Text = "Maximizes speed for demanding workloads, higher fan noise";
-                    break;
-                case "performance":
-                    _turboProfileButton.IsChecked = true;
-                    _thermalProfileInfoText.Text = "Unleashes peak power for extreme tasks, loudest fans.";
-                    break;
-            }
+            bool shouldShow = isPluggedIn ? config.showOnAC : config.showOnBattery;
+            config.button.IsEnabled = true;
+            config.button.IsVisible = shouldShow || devMode;
         }
     }
 
+    // Set active profile
+    if (!string.IsNullOrEmpty(_settings.ThermalProfile.Current))
+    {
+        string currentProfileKey = _settings.ThermalProfile.Current.ToLower();
+        if (profileConfigs.TryGetValue(currentProfileKey, out var config) && 
+            config.button.IsEnabled)
+        {
+            config.button.IsChecked = true;
+            _thermalProfileInfoText.Text = config.description;
+        }
+    }
+    
+}
+
+        
+   private void ApplySettingsToUI()
+{
+    UpdateProfileButtons();
+    
     // Apply backlight timeout setting (with null check)
     Console.Write( _settings.BacklightTimeout.ToLower());
     bool backlightTimeoutEnabled = (_settings.BacklightTimeout ?? "0").Equals("1", StringComparison.OrdinalIgnoreCase);
@@ -983,6 +943,7 @@ private string GetLinuxLaptopModel()
         private void DeveloperMode_OnClick(object? sender, RoutedEventArgs e)
         {
             devMode = true;
+            _powerToggleSwitch.IsHitTestVisible = true;
             ApplySettingsToUI();
         }
 
