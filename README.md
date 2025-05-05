@@ -81,11 +81,13 @@ Please star this repository to show support. It motivates me to make the project
    * `2` → Uninstall
    * `3` → Reinstall/Update
 
+6. And a Reboot
+
 That’s it!
 
 
 ## 🖥️ Troubleshooting
-You can check the logs at /var/logs/DAMX_Daemon_Log.log
+You can check the logs at /var/log/DAMX_Daemon_Log.log
 
 If you get UNKNOWN as Laptop type, try restarting (it happens somethings)
 But if it still happenes that might mean the Drivers Installation failed, Make sure you have the approprite kernel headers to compile the drivers.
