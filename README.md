@@ -60,9 +60,6 @@ Please star this repository to show support. It motivates me to make the project
 
 * 🎨 RGB Keyboard Lighting Control
 * 🔗 Update button linking directly to GitHub Releases
-* 📦 Linuwu Drivers included in packaged builds
-* ⚙️ Auto-installation script enhancements
-
 
 
 ## 🖥️ Installation
@@ -86,6 +83,14 @@ Please star this repository to show support. It motivates me to make the project
 
 That’s it!
 
+
+## 🖥️ Troubleshooting
+You can check the logs at /var/logs/DAMX_Daemon_Log.log
+
+If you get UNKNOWN as Laptop type, try restarting (it happens somethings)
+But if it still happenes that might mean the Drivers Installation failed, Make sure you have the approprite kernel headers to compile the drivers.
+
+Please file a Issue in the issue corner and include the logs to get support and help the project grow
 
 
 ## ❤️ Powered by Linuwu
