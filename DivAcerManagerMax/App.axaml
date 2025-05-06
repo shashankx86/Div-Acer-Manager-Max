@@ -21,6 +21,7 @@
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://Material.Icons.Avalonia/MaterialIconStyles.axaml" />
+        <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
     </Application.Styles>
                
 <Application.Styles>

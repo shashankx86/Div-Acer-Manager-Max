@@ -6,6 +6,11 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Layout;
+using Avalonia.Media;
+using static Avalonia.Controls.ColorPicker;
 
 namespace DivAcerManagerMax
 {
@@ -564,4 +569,7 @@ public async Task<JsonDocument> SendCommandAsync(string command, Dictionary<stri
         [JsonPropertyName("gpu")]
         public string Gpu { get; set; } = "0";
     }
+    
+    
+    
 }

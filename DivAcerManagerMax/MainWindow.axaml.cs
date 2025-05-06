@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
@@ -15,11 +16,11 @@ namespace DivAcerManagerMax
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private bool devMode = false;
+        private bool devMode = true;
         private readonly DAMXClient _client;
         private DAMXSettings _settings;
         private PowerSourceDetection _powerDetection;
-        private string ProjectVersion = "0.4.6"; 
+        private string ProjectVersion = "0.4.8"; 
         
         private bool _isManualFanControl;
         private int _cpuFanSpeed = 50;
@@ -28,10 +29,6 @@ namespace DivAcerManagerMax
         private bool _isConnected = false;
 
         // Color properties for the four keyboard zones
-        private string _zone1Color = "#4287f5";
-        private string _zone2Color = "#ff5733";
-        private string _zone3Color = "#33ff57";
-        private string _zone4Color = "#ff33a6";
         private string _effectColor = "#0078D7";
         private int _keyboardBrightness = 100;
 
@@ -62,7 +59,8 @@ namespace DivAcerManagerMax
         private Border _zone1Border;
         private Border _zone2Border;
         private Border _zone3Border;
-        private Border _zone4Border;
+
+        private ColorPicker _zone1ColorPicker, _zone2ColorPicker, _zone3ColorPicker, _zone4ColorPicker;
         private Button _pickColor1Button;
         private Button _pickColor2Button;
         private Button _pickColor3Button;
@@ -74,8 +72,7 @@ namespace DivAcerManagerMax
         private ComboBox _lightingModeComboBox;
         private Slider _lightingSpeedSlider;
         private TextBlock _lightSpeedTextBlock;
-        private Border _effectColorBorder;
-        private Button _lightingEffectsColorPickButton;
+        private ColorPicker _lightEffectColorPicker;
         private RadioButton _leftToRightRadioButton;
         private RadioButton _rightToLeftRadioButton;
         private Button _lightingEffectsApplyButton;
@@ -169,11 +166,12 @@ namespace DivAcerManagerMax
             _zone1Border = this.FindControl<Border>("Zone1Border");
             _zone2Border = this.FindControl<Border>("Zone2Border");
             _zone3Border = this.FindControl<Border>("Zone3Border");
-            _zone4Border = this.FindControl<Border>("Zone4Border");
-            _pickColor1Button = this.FindControl<Button>("PickColor1Button");
-            _pickColor2Button = this.FindControl<Button>("PickColor2Button");
-            _pickColor3Button = this.FindControl<Button>("PickColor3Button");
-            _pickColor4Button = this.FindControl<Button>("PickColor4Button");
+
+            _zone1ColorPicker = this.FindControl<ColorPicker>("Zone1ColorPicker");
+            _zone2ColorPicker = this.FindControl<ColorPicker>("Zone2ColorPicker");
+            _zone3ColorPicker = this.FindControl<ColorPicker>("Zone3ColorPicker");
+            _zone4ColorPicker = this.FindControl<ColorPicker>("Zone4ColorPicker");
+
             _keyBrightnessSlider = this.FindControl<Slider>("KeyBrightnessSlider");
             _keyBrightnessText = this.FindControl<TextBlock>("KeyBrightnessText");
             _applyKeyboardColorsButton = this.FindControl<Button>("ApplyKeyboardColorsButton");
@@ -182,8 +180,7 @@ namespace DivAcerManagerMax
             _lightingModeComboBox = this.FindControl<ComboBox>("LightingModeComboBox");
             _lightingSpeedSlider = this.FindControl<Slider>("LightingSpeedSlider");
             _lightSpeedTextBlock = this.FindControl<TextBlock>("LightSpeedTextBlock");
-            _effectColorBorder = this.FindControl<Border>("EffectColorBorder");
-            _lightingEffectsColorPickButton = this.FindControl<Button>("LightingEffectsColorPickButton");
+            _lightEffectColorPicker = this.FindControl<ColorPicker>("LightEffectColorPicker");
             _leftToRightRadioButton = this.FindControl<RadioButton>("LeftToRightRadioButton");
             _rightToLeftRadioButton = this.FindControl<RadioButton>("RightToLeftRadioButton");
             _lightingEffectsApplyButton = this.FindControl<Button>("LightingEffectsApplyButton");
@@ -245,17 +242,12 @@ namespace DivAcerManagerMax
             // USB charging handler
             _usbChargeButton.Click += UsbChargeButton_Click;
 
-            // Keyboard lighting zone color handlers
-            _pickColor1Button.Click += PickColor1Button_Click;
-            _pickColor2Button.Click += PickColor2Button_Click;
-            _pickColor3Button.Click += PickColor3Button_Click;
-            _pickColor4Button.Click += PickColor4Button_Click;
+
             _keyBrightnessSlider.PropertyChanged += KeyboardBrightnessSlider_ValueChanged;
             _applyKeyboardColorsButton.Click += ApplyKeyboardColorsButton_Click;
 
             // Lighting effects handlers
             _lightingSpeedSlider.PropertyChanged += LightingSpeedSlider_ValueChanged;
-            _lightingEffectsColorPickButton.Click += LightingEffectsColorPickButton_Click;
             _lightingEffectsApplyButton.Click += LightingEffectsApplyButton_Click;
 
             // System settings handlers
@@ -546,12 +538,8 @@ private void UpdateUIElementVisibility()
     // Apply keyboard lighting settings
     ApplyKeyboardSettings();
     
-    // Update UI with initial values
-    _zone1Border.Background = new SolidColorBrush(Color.Parse(_zone1Color));
-    _zone2Border.Background = new SolidColorBrush(Color.Parse(_zone2Color));
-    _zone3Border.Background = new SolidColorBrush(Color.Parse(_zone3Color));
-    _zone4Border.Background = new SolidColorBrush(Color.Parse(_zone4Color));
-    _effectColorBorder.Background = new SolidColorBrush(Color.Parse(_effectColor));
+
+    _lightEffectColorPicker.Color = (Color.Parse(_effectColor));
     _keyBrightnessText.Text = $"{_keyboardBrightness}%";
     _lightSpeedTextBlock.Text = _lightingSpeed.ToString();
     
@@ -793,34 +781,7 @@ private string GetLinuxLaptopModel()
                 await _client.SetUsbChargingAsync(level);
             }
         }
-
-        // Keyboard Lighting Zone Color Handlers
-        private void PickColor1Button_Click(object sender, RoutedEventArgs e)
-        {
-            // TODO: Implement color picker dialog
-            // For now, we'll just use a predefined color
-            _zone1Color = "#4287f5";
-            _zone1Border.Background = new SolidColorBrush(Color.Parse(_zone1Color));
-        }
-
-        private void PickColor2Button_Click(object sender, RoutedEventArgs e)
-        {
-            _zone2Color = "#ff5733";
-            _zone2Border.Background = new SolidColorBrush(Color.Parse(_zone2Color));
-        }
-
-        private void PickColor3Button_Click(object sender, RoutedEventArgs e)
-        {
-            _zone3Color = "#33ff57";
-            _zone3Border.Background = new SolidColorBrush(Color.Parse(_zone3Color));
-        }
-
-        private void PickColor4Button_Click(object sender, RoutedEventArgs e)
-        {
-            _zone4Color = "#ff33a6";
-            _zone4Border.Background = new SolidColorBrush(Color.Parse(_zone4Color));
-        }
-
+        
         private void KeyboardBrightnessSlider_ValueChanged(object sender, AvaloniaPropertyChangedEventArgs e)
         {
             if (e.Property == Slider.ValueProperty)
@@ -833,13 +794,30 @@ private string GetLinuxLaptopModel()
 
         private async void ApplyKeyboardColorsButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_isConnected && _settings.HasFourZoneKb)
+            /*if (_isConnected && _settings.HasFourZoneKb)
             {
                 await _client.SetPerZoneModeAsync(
                     _zone1Color,
                     _zone2Color,
                     _zone3Color,
                     _zone4Color,
+                    _keyboardBrightness
+                );
+            }*/
+            
+                Console.WriteLine ("Zone1:"+  _zone1ColorPicker.Color.ToString().Substring(3)+ " Zone2:" +
+                    _zone2ColorPicker.Color.ToString().Substring(3)+ " Zone3:" +
+                    _zone3ColorPicker.Color.ToString().Substring(3)+ " Zone4:" +
+                    _zone4ColorPicker.Color.ToString().Substring(3) + 
+                    " Brightness: " +  _keyboardBrightness); 
+                
+            if (_isConnected && _settings.HasFourZoneKb)
+            {
+                await _client.SetPerZoneModeAsync(
+                    _zone1ColorPicker.Color.ToString().Substring(3),
+                    _zone2ColorPicker.Color.ToString().Substring(3),
+                    _zone3ColorPicker.Color.ToString().Substring(3),
+                    _zone4ColorPicker.Color.ToString().Substring(3),
                     _keyboardBrightness
                 );
             }
@@ -856,23 +834,20 @@ private string GetLinuxLaptopModel()
             }
         }
 
-        private void LightingEffectsColorPickButton_Click(object sender, RoutedEventArgs e)
-        {
-            // TODO: Implement color picker dialog
-            // For now, we'll just use a predefined color
-            _effectColor = "#0078D7";
-            _effectColorBorder.Background = new SolidColorBrush(Color.Parse(_effectColor));
-        }
-
         private async void LightingEffectsApplyButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_isConnected && _settings.HasFourZoneKb)
+            if (_isConnected && _settings.HasFourZoneKb || devMode)
             {
                 int mode = _lightingModeComboBox.SelectedIndex;
                 int direction = _leftToRightRadioButton.IsChecked == true ? 2 : 1;
                 
                 // Parse the hex color
-                Color color = Color.Parse(_effectColor);
+                Color color = _lightEffectColorPicker.Color;
+                
+                Console.WriteLine(_lightEffectColorPicker.Color + 
+                                  " Color Sent: R:" + color.R + 
+                                  " G:" + color.G + 
+                                  " B:" + color.B);
                 
                 await _client.SetFourZoneModeAsync(
                     mode,
@@ -885,7 +860,8 @@ private string GetLinuxLaptopModel()
                 );
             }
         }
-
+        
+      
         // Backlight Timeout Handler
         private async void BacklightTimeoutCheckBox_Click(object sender, RoutedEventArgs e)
         {

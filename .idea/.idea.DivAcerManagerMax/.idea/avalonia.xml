@@ -4,6 +4,7 @@
     <option name="projectPerEditor">
       <map>
         <entry key="DivAcerManagerMax/App.axaml" value="DivAcerManagerMax/DivAcerManagerMax.csproj" />
+        <entry key="DivAcerManagerMax/ColorPickerDialouge.axaml" value="DivAcerManagerMax/DivAcerManagerMax.csproj" />
         <entry key="DivAcerManagerMax/MainWindow.axaml" value="DivAcerManagerMax/DivAcerManagerMax.csproj" />
       </map>
     </option>

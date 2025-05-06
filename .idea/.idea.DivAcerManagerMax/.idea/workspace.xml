@@ -8,7 +8,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="946eaab8-0dd2-4963-b8be-4ed6ac03a9a6" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/avalonia.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/avalonia.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/App.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/App.axaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/DAMXClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/DAMXClient.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" afterDir="false" />
     </list>
@@ -35,7 +38,7 @@
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
+    <option name="selectedTabId" value="SWEA" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
@@ -68,7 +71,7 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected="Publish to folder.Publish">
+  <component name="RunManager" selected=".NET Project.DivAcerManagerMax">
     <configuration name="Publish" type="DotNetFolderPublish" factoryName="Publish to folder">
       <riderPublish configuration="Release" delete_existing_files="true" include_all_content_for_self_extract="true" include_native_libs_for_self_extract="true" platform="Any CPU" produce_single_file="true" runtime="linux-x64" self_contained="true" target_folder="$PROJECT_DIR$/publish" target_framework="net9.0" uuid_high="7341861591033859200" uuid_low="-5557819635835235413" />
       <method v="2" />
@@ -170,7 +173,8 @@
       <workItem from="1746352888216" duration="3790000" />
       <workItem from="1746358746125" duration="1080000" />
       <workItem from="1746360662559" duration="31000" />
-      <workItem from="1746381034545" duration="2878000" />
+      <workItem from="1746381034545" duration="3678000" />
+      <workItem from="1746440796544" duration="4736000" />
     </task>
     <servers />
   </component>
