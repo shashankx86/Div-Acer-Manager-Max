@@ -16,7 +16,7 @@ namespace DivAcerManagerMax
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private bool devMode = true;
+        private bool devMode = false;
         private readonly DAMXClient _client;
         private DAMXSettings _settings;
         private PowerSourceDetection _powerDetection;

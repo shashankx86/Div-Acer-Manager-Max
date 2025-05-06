@@ -231,7 +231,7 @@
         <ScrollViewer>
           <StackPanel Margin="10,0,20,0">
             <TextBlock Text="Keyboard Lighting" Classes="SectionHeader"/>
-            <TextBlock Text="This Section is non functional. Only for visualising layout. Will be done later"  Foreground="#FFA500"   Margin="0 0 0 10"/>
+            <TextBlock Text="This Section Requires Testing."  Foreground="#FFA500"   Margin="0 0 0 10"/>
 
             <!-- Zone Color Control -->
 
