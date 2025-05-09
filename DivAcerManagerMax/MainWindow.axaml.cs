@@ -16,7 +16,7 @@ namespace DivAcerManagerMax
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private bool devMode = false;
+        private bool devMode = true;
         private readonly DAMXClient _client;
         private DAMXSettings _settings;
         private PowerSourceDetection _powerDetection;
@@ -99,6 +99,8 @@ namespace DivAcerManagerMax
             this.Loaded += MainWindow_Loaded;
         }
 
+        
+        
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             // Find all the UI controls
@@ -110,6 +112,7 @@ namespace DivAcerManagerMax
             // Initialize application logic
             InitializeAsync();
         }
+        
 
         private void FindControls()
         {
@@ -475,7 +478,6 @@ private void UpdateUIElementVisibility()
     UpdateProfileButtons();
     
     // Apply backlight timeout setting (with null check)
-    Console.Write( _settings.BacklightTimeout.ToLower());
     bool backlightTimeoutEnabled = (_settings.BacklightTimeout ?? "0").Equals("1", StringComparison.OrdinalIgnoreCase);
     _backlightTimeoutCheckBox.IsChecked = backlightTimeoutEnabled;
 
