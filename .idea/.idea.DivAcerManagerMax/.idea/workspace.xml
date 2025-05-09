@@ -8,13 +8,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="946eaab8-0dd2-4963-b8be-4ed6ac03a9a6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/DivAcerManagerMax.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/DivAcerManagerMax.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,6 +33,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file:///tmp/JetBrainsPerUserTemp-1000-1/SourceGeneratedDocuments/E14C16AA929AE4FC8CBCAF58/Avalonia.Generators/Avalonia.Generators.NameGenerator.AvaloniaNameSourceGenerator/DivAcerManagerMax.Dashboard.g.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file:///usr/lib/dotnet/sdk/9.0.105/Sdks/Microsoft.NET.Sdk/targets/Microsoft.PackageDependencyResolution.targets" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
@@ -179,6 +177,8 @@
       <workItem from="1746714041654" duration="801000" />
       <workItem from="1746791998150" duration="641000" />
       <workItem from="1746793330492" duration="754000" />
+      <workItem from="1746797028957" duration="52000" />
+      <workItem from="1746816500344" duration="4867000" />
     </task>
     <servers />
   </component>
