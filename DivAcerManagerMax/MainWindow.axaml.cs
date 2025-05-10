@@ -841,7 +841,7 @@ private string GetLinuxLaptopModel()
             if (_isConnected && _settings.HasFourZoneKb || devMode)
             {
                 int mode = _lightingModeComboBox.SelectedIndex;
-                int direction = _leftToRightRadioButton.IsChecked == true ? 2 : 1;
+                int direction = _leftToRightRadioButton.IsChecked == true ? 1 : 2;
                 
                 // Parse the hex color
                 Color color = _lightEffectColorPicker.Color;
