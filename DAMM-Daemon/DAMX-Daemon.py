@@ -20,7 +20,7 @@ from PowerSourceDetection import PowerSourceDetector  # Assuming you named the n
 from typing import Dict, List, Tuple, Union, Optional, Set
 
 # Constants
-VERSION = "0.2.5"
+VERSION = "0.2.6"
 SOCKET_PATH = "/var/run/DAMX.sock"
 LOG_PATH = "/var/log/DAMX_Daemon_Log.log"
 CONFIG_PATH = "/etc/DAMX_Daemon/config.ini"
@@ -56,6 +56,12 @@ class DAMXManager:
     """Manages all the DAMX-Daemon features"""
 
     def __init__(self):
+        # Check if linuwu_sense is installed
+        if not os.path.exists("/sys/module/linuwu_sense"):
+            log.error("linuwu_sense module not found. Please install the linuwu_sense driver first.")
+        else:
+            log.info("linuwu_sense module found. Proceeding with initialization.")
+        
         self.laptop_type = self._detect_laptop_type()
         self.base_path = self._get_base_path()
         self.has_four_zone_kb = self._check_four_zone_kb()

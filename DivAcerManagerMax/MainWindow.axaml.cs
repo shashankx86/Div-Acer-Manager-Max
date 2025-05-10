@@ -20,7 +20,7 @@ namespace DivAcerManagerMax
         private readonly DAMXClient _client;
         private DAMXSettings _settings;
         private PowerSourceDetection _powerDetection;
-        private string ProjectVersion = "0.5.5"; 
+        private string ProjectVersion = "0.5.8"; 
         
         private bool _isManualFanControl;
         private int _cpuFanSpeed = 50;
@@ -929,5 +929,10 @@ private string GetLinuxLaptopModel()
         {
             InitializeAsync();
         }
+
+            private void UpdatesButton_OnClick(object? sender, RoutedEventArgs e)
+            {
+                Process.Start("xdg-open", "https://github.com/PXDiv/Div-Acer-Manager-Max/releases");
+            }
     }
 }

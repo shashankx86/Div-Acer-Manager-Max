@@ -498,7 +498,7 @@
      </Grid>
                 
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                <Button x:Name="UpdatesButton" Content="Check for Updates" Margin="0 15 0 0"/>
+                <Button x:Name="UpdatesButton" Content="Check for Updates" Margin="0 15 0 0" Click="UpdatesButton_OnClick"/>
                 <Button x:Name="DeveloperMode" Content="Developer Mode" Margin="0 15 0 0" Click="DeveloperMode_OnClick"/>
                 </StackPanel>
               </StackPanel>
