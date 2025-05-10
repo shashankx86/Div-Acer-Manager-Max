@@ -11,6 +11,9 @@
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/DivAcerManagerMax.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/DivAcerManagerMax.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -178,7 +181,8 @@
       <workItem from="1746793330492" duration="754000" />
       <workItem from="1746797028957" duration="52000" />
       <workItem from="1746816500344" duration="4867000" />
-      <workItem from="1746869408298" duration="4078000" />
+      <workItem from="1746869408298" duration="7596000" />
+      <workItem from="1746883761573" duration="1416000" />
     </task>
     <servers />
   </component>

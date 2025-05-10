@@ -20,7 +20,7 @@ namespace DivAcerManagerMax
         private readonly DAMXClient _client;
         private DAMXSettings _settings;
         private PowerSourceDetection _powerDetection;
-        private string ProjectVersion = "0.5.1"; 
+        private string ProjectVersion = "0.5.5"; 
         
         private bool _isManualFanControl;
         private int _cpuFanSpeed = 50;

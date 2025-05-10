@@ -10,6 +10,7 @@
         Title="DAMX"
         Icon="iconTransparent.png"
         WindowStartupLocation="CenterScreen"
+        SystemDecorations="Full"
         Background="#0e0e11"
 
         Width="1200" Height="700"
