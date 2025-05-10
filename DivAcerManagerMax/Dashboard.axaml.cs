@@ -98,11 +98,11 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
         set => SetProperty(ref _batteryStatus, value);
     }
     
-    private string _batteryPercentageString;
-    public string BatteryPercentageString
+    private int _batteryPercentageInt;
+    public int BatteryPercentageInt
     {
-        get => _batteryPercentageString;
-        set => SetProperty(ref _batteryPercentageString, value);
+        get => _batteryPercentageInt;
+        set => SetProperty(ref _batteryPercentageInt, value);
     }
     
     private string _batteryTimeRemainingString;
@@ -175,7 +175,7 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
                 var batteryInfo = GetBatteryInfo();
                 data.BatteryPercentage = batteryInfo.percentage;
                 data.BatteryStatus = batteryInfo.status;
-                data.BatteryTimeRemaining = batteryInfo.timeRemaining;
+                data.BatteryTimeRemaining = $"{batteryInfo.timeRemaining:F2} hours";
                 
                 return data;
             });
@@ -189,7 +189,7 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
                 RamUsage = metricsData.RamUsage;
                 GpuTemp = metricsData.GpuTemp;
                 GpuUsage = metricsData.GpuUsage;
-                BatteryPercentage.Text = metricsData.BatteryPercentage;
+                BatteryPercentageInt = metricsData.BatteryPercentage;
                 BatteryStatus = metricsData.BatteryStatus;
                 BatteryTimeRemaining.Text = metricsData.BatteryTimeRemaining;
             });
@@ -209,7 +209,7 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
         public double RamUsage { get; set; }
         public double GpuTemp { get; set; }
         public double GpuUsage { get; set; }
-        public string BatteryPercentage { get; set; } = "0";
+        public int BatteryPercentage { get; set; } = 0;
         public string BatteryStatus { get; set; } = "Unknown";
         public string BatteryTimeRemaining { get; set; } = "0";
     }
@@ -842,18 +842,18 @@ private string GetFallbackGpuName()
         }
     }
 
-    private (string percentage, string status, string timeRemaining) GetBatteryInfo()
+    private (int percentage, string status, double timeRemaining) GetBatteryInfo()
     {
         if (!HasBattery)
         {
-            return ("0", "No Battery", "0");
+            return (0, "No Battery", 0);
         }
 
         try
         {
-            string percentage = "0";
+            int percentage = 0;
             string status = "Unknown";
-            string timeRemaining = "0";
+            double timeRemaining = 0;
 
             var batteryDirs = Directory.GetDirectories("/sys/class/power_supply")
                 .Where(dir => File.Exists(Path.Combine(dir, "type")) && 
@@ -871,7 +871,7 @@ private string GetFallbackGpuName()
                     string capacityStr = File.ReadAllText(capacityFile);
                     if (int.TryParse(capacityStr.Trim(), out int capacity))
                     {
-                        percentage = capacity.ToString();
+                        percentage = capacity;
                     }
                 }
 
@@ -906,12 +906,12 @@ private string GetFallbackGpuName()
                             if (status == "Discharging")
                             {
                                 // Time remaining until empty in hours
-                                timeRemaining = (energyNow / powerNow).ToString("F2");
+                                timeRemaining = (energyNow / powerNow);
                             }
                             else if (status == "Charging")
                             {
                                 // Time remaining until full in hours
-                                timeRemaining = ((energyFull - energyNow) / powerNow).ToString("F2");
+                                timeRemaining = ((energyFull - energyNow) / powerNow);
                             }
                         }
                     }
@@ -922,7 +922,7 @@ private string GetFallbackGpuName()
         }
         catch
         {
-            return ("0", "Error", "0");
+            return (0, "Error", 0);
         }
     }
 

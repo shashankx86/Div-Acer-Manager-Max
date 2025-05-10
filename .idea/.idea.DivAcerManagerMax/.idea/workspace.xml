@@ -11,7 +11,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,7 +37,7 @@
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="SWEA" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
@@ -179,6 +178,7 @@
       <workItem from="1746793330492" duration="754000" />
       <workItem from="1746797028957" duration="52000" />
       <workItem from="1746816500344" duration="4867000" />
+      <workItem from="1746869408298" duration="4078000" />
     </task>
     <servers />
   </component>

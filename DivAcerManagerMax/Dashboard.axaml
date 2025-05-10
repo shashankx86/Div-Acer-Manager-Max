@@ -25,7 +25,7 @@
                     <DockPanel LastChildFill="True" Margin="0,7,0,0" VerticalAlignment="Center">
                         <TextBlock DockPanel.Dock="Left" Text="Temperature:" Opacity="0.7" Width="90" VerticalAlignment="Center"/>
                         <StackPanel DockPanel.Dock="Right">
-                            <TextBlock x:Name="CpuTemperature" Text="{Binding CpuTemp}" FontWeight="SemiBold" Width="50" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="CpuTemperature" Text="{Binding CpuTemp, StringFormat='{}{0}°C'}" FontWeight="SemiBold" Width="50" VerticalAlignment="Center"/>
                             <ProgressBar x:Name="CpuTemperatureBar" Value="{Binding CpuTemp}" Maximum="100" MinWidth="10" MaxWidth="Infinity" Margin="0" VerticalAlignment="Center"/>
                         </StackPanel>
                     </DockPanel>
@@ -33,7 +33,7 @@
                     <DockPanel LastChildFill="True" Margin="0,7,0,0" VerticalAlignment="Center">
                         <TextBlock DockPanel.Dock="Left" Text="Usage:" Opacity="0.7" Width="90" VerticalAlignment="Center"/>
                         <StackPanel DockPanel.Dock="Right">
-                            <TextBlock Text="{Binding CpuUsage}" FontWeight="SemiBold" Width="50" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding CpuUsage, StringFormat='{}{0}%'}" FontWeight="SemiBold" Width="50" VerticalAlignment="Center" />
                             <ProgressBar Value="{Binding CpuUsage}" Maximum="100" MinWidth="10" MaxWidth="Infinity" Margin="0" VerticalAlignment="Center"/>
                         </StackPanel>
                     </DockPanel>
@@ -56,7 +56,7 @@
                     <DockPanel LastChildFill="True" Margin="0,2" VerticalAlignment="Center">
                         <TextBlock DockPanel.Dock="Left" Text="Temperature:" Opacity="0.7" Width="90" VerticalAlignment="Center"/>
                         <StackPanel DockPanel.Dock="Right">
-                            <TextBlock x:Name="GpuTemperature" Text="{Binding GpuTemp}" FontWeight="SemiBold" Width="50" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="GpuTemperature" Text="{Binding GpuTemp, StringFormat='{}{0}°C'}" FontWeight="SemiBold" Width="50" VerticalAlignment="Center"/>
                             <ProgressBar x:Name="GpuTemperatureBar" Value="{Binding GpuTemp}" Maximum="100" MinWidth="10" MaxWidth="Infinity" Margin="0" VerticalAlignment="Center"/>
                         </StackPanel>
                     </DockPanel>
@@ -64,18 +64,11 @@
                     <DockPanel LastChildFill="True" Margin="0,2" VerticalAlignment="Center">
                         <TextBlock DockPanel.Dock="Left" Text="Usage:" Opacity="0.7" Width="90" VerticalAlignment="Center"/>
                         <StackPanel DockPanel.Dock="Right">
-                            <TextBlock Text="{Binding GpuUsage}" FontWeight="SemiBold" Width="50" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding GpuUsage, StringFormat='{}{0}%'}" FontWeight="SemiBold" Width="50" VerticalAlignment="Center"/>
                             <ProgressBar Value="{Binding GpuUsage}" Maximum="100" MinWidth="10" MaxWidth="Infinity" Margin="0" VerticalAlignment="Center"/>
                         </StackPanel>
                     </DockPanel>
-                    
-                    <DockPanel LastChildFill="True" Margin="0,2" VerticalAlignment="Center">
-                        <TextBlock DockPanel.Dock="Left" Text="VRAM Usage:" Opacity="0.7" Width="90" VerticalAlignment="Center"/>
-                        <StackPanel DockPanel.Dock="Right">
-                            <TextBlock x:Name="GpuVramUsage" Text="5.2 GB / 8 GB" FontWeight="SemiBold" Width="90" VerticalAlignment="Center"/>
-                            <ProgressBar x:Name="GpuVramBar" Value="65" Maximum="100" MinWidth="10" MaxWidth="Infinity" Margin="0" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </DockPanel>
+   
                     
                     <DockPanel LastChildFill="True" Margin="0,2" VerticalAlignment="Center">
                         <TextBlock DockPanel.Dock="Left" Text="Driver:" Opacity="0.7" Width="90" VerticalAlignment="Center"/>
@@ -149,7 +142,7 @@
                     
                     <StackPanel Margin="0,20,0,0" HorizontalAlignment="Center">
                         <ProgressBar x:Name="BatteryLevelBar" Value="70" Maximum="100" Width="180" Height="16"/>
-                        <TextBlock x:Name="BatteryPercentage" Text="{Binding BatteryPercentageString}" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                        <TextBlock x:Name="BatteryPercentage"  Text="{Binding BatteryPercentageInt , StringFormat='{}{0}%'}" FontFamily="{StaticResource OxaniumBoldFont}" FontStretch="ExtraExpanded" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,5,0,0"/>
                     </StackPanel>
                     
                     <DockPanel LastChildFill="True" Margin="0,20,0,10" VerticalAlignment="Center">
@@ -162,7 +155,7 @@
                     
                     <DockPanel LastChildFill="True" Margin="0,0,0,10" VerticalAlignment="Center">
                         <TextBlock DockPanel.Dock="Left" Text="Remaining:" Opacity="0.7" Width="110" VerticalAlignment="Center"/>
-                        <TextBlock x:Name="BatteryTimeRemaining" Text="{Binding BatteryTimeRemainingString}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="BatteryTimeRemaining" Text="{Binding BatteryTimeRemainingString , StringFormat='{}{0}%'}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </DockPanel>
                     
                     <DockPanel LastChildFill="True" Margin="0,0,0,10" VerticalAlignment="Center">
