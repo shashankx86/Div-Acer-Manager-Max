@@ -11,9 +11,9 @@
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/DivAcerManagerMax.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/DivAcerManagerMax.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/PowerSourceDetection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/PowerSourceDetection.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,29 +50,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Project.DivAcerManagerMax.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Publish to folder.Publish.executor&quot;: &quot;Run&quot;,
-    &quot;Python.DAMM-Daemon.executor&quot;: &quot;Run&quot;,
-    &quot;Python.DAMX-Daemon.executor&quot;: &quot;Run&quot;,
-    &quot;Python.DAMXDaemon_Op.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;gui/feature/dashboard&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/div/RiderProjects/Div-Acer-Manager-Max/publish&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.smartKeys_rider&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Project.DivAcerManagerMax.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Publish to folder.Publish.executor": "Run",
+    "Python.DAMM-Daemon.executor": "Run",
+    "Python.DAMX-Daemon.executor": "Run",
+    "Python.DAMXDaemon_Op.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "gui/feature/dashboardfananimation",
+    "last_opened_file_path": "/home/div/RiderProjects/Div-Acer-Manager-Max/publish",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "rider.code.cleanup.on.save": "true",
+    "settings.editor.selected.configurable": "actions.on.save",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected=".NET Project.DivAcerManagerMax">
     <configuration name="Publish" type="DotNetFolderPublish" factoryName="Publish to folder">
       <riderPublish configuration="Release" delete_existing_files="true" include_all_content_for_self_extract="true" include_native_libs_for_self_extract="true" platform="Any CPU" produce_single_file="true" runtime="linux-x64" self_contained="true" target_folder="$PROJECT_DIR$/publish" target_framework="net9.0" uuid_high="7341861591033859200" uuid_low="-5557819635835235413" />
@@ -183,6 +184,10 @@
       <workItem from="1746816500344" duration="4867000" />
       <workItem from="1746869408298" duration="7596000" />
       <workItem from="1746883761573" duration="1416000" />
+      <workItem from="1746896957686" duration="11911000" />
+      <workItem from="1746944644790" duration="4043000" />
+      <workItem from="1746956480714" duration="4180000" />
+      <workItem from="1746963015946" duration="4821000" />
     </task>
     <servers />
   </component>
@@ -191,6 +196,17 @@
   </component>
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
   </component>
