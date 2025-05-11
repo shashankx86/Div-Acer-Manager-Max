@@ -10,10 +10,12 @@
 
 > ⚠️ **Project is under active development.**
 
+![image](https://github.com/user-attachments/assets/ec58e0f2-dbbc-459d-bbd6-c634c8707f92)
+
 ![image](https://github.com/user-attachments/assets/f8c26491-8995-40b5-9d5d-8711bb574d10)
 
 <h4 align="center">
-Please star this repository to show support. It motivates me to make the project better for everyone
+⭐ Please star this repository to show support. It motivates me to make the project better for everyone
 </h4>  
 
 
