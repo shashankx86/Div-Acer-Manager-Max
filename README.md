@@ -58,11 +58,6 @@
   * Real-time feedback from daemon
 
 
-## 🔧 Upcoming Features
-
-* 🎨 RGB Keyboard Lighting Control
-* 🔗 Update button linking directly to GitHub Releases
-
 
 ## 🖥️ Installation
 
