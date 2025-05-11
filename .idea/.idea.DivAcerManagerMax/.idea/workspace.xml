@@ -9,11 +9,8 @@
   <component name="ChangeListManager">
     <list default="true" id="946eaab8-0dd2-4963-b8be-4ed6ac03a9a6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/PowerSourceDetection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/PowerSourceDetection.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/App.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/App.axaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/App.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/App.axaml.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,7 +59,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "gui/feature/dashboardfananimation",
+    "git-widget-placeholder": "main",
     "last_opened_file_path": "/home/div/RiderProjects/Div-Acer-Manager-Max/publish",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -188,6 +185,7 @@
       <workItem from="1746944644790" duration="4043000" />
       <workItem from="1746956480714" duration="4180000" />
       <workItem from="1746963015946" duration="4821000" />
+      <workItem from="1746988401494" duration="660000" />
     </task>
     <servers />
   </component>
