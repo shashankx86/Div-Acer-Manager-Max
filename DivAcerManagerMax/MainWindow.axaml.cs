@@ -17,7 +17,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 {
     private readonly DAMXClient _client;
 
-    // Color properties for the four keyboard zones
     private readonly string _effectColor = "#0078D7";
     private readonly string ProjectVersion = "0.6.1";
     private Button _applyKeyboardColorsButton;
@@ -92,7 +91,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private ColorPicker _zone1ColorPicker, _zone2ColorPicker, _zone3ColorPicker, _zone4ColorPicker;
     private Border _zone2Border;
     private Border _zone3Border;
-    private bool devMode = true;
+
+    private bool devMode;
 
 
     public MainWindow()
