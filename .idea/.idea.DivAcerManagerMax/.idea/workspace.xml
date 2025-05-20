@@ -9,7 +9,8 @@
   <component name="ChangeListManager">
     <list default="true" id="946eaab8-0dd2-4963-b8be-4ed6ac03a9a6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DAMM-Daemon/DAMX-Daemon.py" beforeDir="false" afterPath="$PROJECT_DIR$/DAMM-Daemon/DAMX-Daemon.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/Dashboard.axaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,7 +59,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "daemon/socketcleaningmechanism",
+    "git-widget-placeholder": "gui/daemonOptimization",
     "last_opened_file_path": "/home/div/RiderProjects/Div-Acer-Manager-Max/publish",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -186,7 +187,7 @@
       <workItem from="1746963015946" duration="4821000" />
       <workItem from="1746988401494" duration="2265000" />
       <workItem from="1747047329107" duration="133000" />
-      <workItem from="1747731768285" duration="2335000" />
+      <workItem from="1747731768285" duration="7011000" />
     </task>
     <servers />
   </component>
