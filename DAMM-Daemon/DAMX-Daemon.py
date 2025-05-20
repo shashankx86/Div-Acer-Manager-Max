@@ -17,10 +17,10 @@ import traceback
 from pathlib import Path
 from enum import Enum
 from PowerSourceDetection import PowerSourceDetector  # Assuming you named the new file power_source_detector.py
-from typing import Dict, List, Tuple, Union, Optional, Set
+from typing import Dict, List, Tuple, Set
 
 # Constants
-VERSION = "0.2.6"
+VERSION = "0.2.9"
 SOCKET_PATH = "/var/run/DAMX.sock"
 LOG_PATH = "/var/log/DAMX_Daemon_Log.log"
 CONFIG_PATH = "/etc/DAMX_Daemon/config.ini"
@@ -80,7 +80,7 @@ class DAMXManager:
             raise FileNotFoundError(f"Base path does not exist: {self.base_path}")
         
         self.power_monitor = None
-
+        
     def _detect_laptop_type(self) -> LaptopType:
         """Detect whether this is a Predator or Nitro laptop"""
         predator_path = "/sys/module/linuwu_sense/drivers/platform:acer-wmi/acer-wmi/predator_sense"
@@ -530,27 +530,33 @@ class DaemonServer:
         """Stop the server and clean up"""
         log.info("Stopping server...")
         self.running = False
-
+    
         # Close all client connections
         for client, _ in self.clients:
             try:
                 client.close()
             except:
                 pass
-
+    
         # Close server socket
         if self.socket:
             try:
                 self.socket.close()
             except:
                 pass
+    
+        # Clean up socket file
+        self.cleanup_socket()
 
-        # Remove socket file
+    def cleanup_socket(self):
+        """Clean up the socket file"""
         try:
             if os.path.exists(SOCKET_PATH):
                 os.unlink(SOCKET_PATH)
-        except:
-            pass
+                log.info(f"Removed socket file: {SOCKET_PATH}")
+        except Exception as e:
+            log.error(f"Failed to remove socket file: {e}")
+
 
     def handle_client(self, client_socket):
         """Handle communication with a client"""
@@ -937,21 +943,22 @@ class DAMXDaemon:
     def cleanup(self):
         """Clean up resources"""
         log.info("Cleaning up resources...")
-
-        # Stop server
+    
+        # Stop server and clean up socket
         if self.server:
             self.server.stop()
-
+            self.server.cleanup_socket()  # Additional cleanup
+    
         if self.power_monitor:
             self.power_monitor.stop_monitoring()
-
+    
         # Remove PID file
         try:
             if os.path.exists(PID_FILE):
                 os.unlink(PID_FILE)
         except:
             pass
-
+    
         log.info("Daemon stopped")
 
     def signal_handler(self, sig, frame):
@@ -971,6 +978,15 @@ def parse_args():
     parser.add_argument('--config', type=str, help=f"Path to config file (default: {CONFIG_PATH})")
     return parser.parse_args()
 
+def signal_handler(self, sig, frame):
+    """Handle termination signals"""
+    log.info(f"Received signal {sig}, shutting down...")
+    self.running = False
+    if self.server:
+        self.server.running = False
+    # Ensure socket is cleaned up
+    if hasattr(self, 'server') and self.server:
+        self.server.cleanup_socket()
 
 def main():
     """Main function"""
