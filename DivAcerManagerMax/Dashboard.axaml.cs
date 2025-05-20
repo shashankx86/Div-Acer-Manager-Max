@@ -38,65 +38,37 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
     // Timer to refresh dynamic system metrics
     private readonly DispatcherTimer _refreshTimer;
 
+    // Cache for system info paths
+    private readonly Dictionary<string, string> _systemInfoPaths = new();
+
     private bool _animationsInitialized;
-
+    private string? _batteryDir;
     private int _batteryPercentageInt;
-
-    // Add battery-related properties
     private string _batteryStatus;
-
     private string _batteryTimeRemainingString;
-
-    // Fan animation properties
     private Animation? _cpuFanAnimation;
-
-
-    // Cache for fan speed file paths
-    private string? _cpuFanSpeedPath;
-
-    // Fan speed properties
     private int _cpuFanSpeedRpm;
-
-    // System info properties
     private string _cpuName;
-
-    // Dynamic metrics
     private double _cpuTemp;
     private ObservableCollection<double> _cpuTempHistory;
-
     private double _cpuUsage;
-    private bool _fanPathsSearched;
     private Animation? _gpuFanAnimation;
-    private string? _gpuFanSpeedPath;
-
     private int _gpuFanSpeedRpm;
-
     private string _gpuName;
-
     private double _gpuTemp;
     private ObservableCollection<double> _gpuTempHistory;
-
     private GpuType _gpuType = GpuType.Unknown;
-
     private double _gpuUsage;
-
     private bool _hasBattery;
-
     private string _kernelVersion;
     private int _lastCpuRpm;
     private int _lastGpuRpm;
-
     private string _osVersion;
-
     private string _ramTotal;
-
     private double _ramUsage;
-
     private CartesianChart _temperatureChart;
     private ObservableCollection<ISeries> _tempSeries;
 
-
-// Modify your constructor
     public Dashboard()
     {
         InitializeComponent();
@@ -125,7 +97,6 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
         // Initial refresh of dynamic metrics
         RefreshDynamicMetricsAsync();
     }
-
 
     public string CpuName
     {
@@ -243,11 +214,10 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
                 data.CpuUsage = GetCpuUsage();
                 data.CpuTemp = GetCpuTemperature();
 
-                // Update fan metrics
+                // Update fan metrics - now using cached paths
                 var fanSpeeds = GetFanSpeeds();
                 data.CpuFanSpeedRPM = fanSpeeds.cpuFan;
                 data.GpuFanSpeedRPM = fanSpeeds.gpuFan;
-
 
                 // Update RAM metrics
                 data.RamUsage = GetRamUsage();
@@ -282,6 +252,8 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
                 CpuFanSpeed.Text = $"{metricsData.CpuFanSpeedRPM} RPM";
                 GpuFanSpeed.Text = $"{metricsData.GpuFanSpeedRPM} RPM";
                 UpdateFanAnimations();
+
+                // Update temperature history charts
                 if (_cpuTempHistory.Count >= MAX_HISTORY_POINTS)
                     _cpuTempHistory.RemoveAt(0);
                 _cpuTempHistory.Add(metricsData.CpuTemp);
@@ -300,31 +272,40 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
 
     private void InitializeStaticSystemInfo()
     {
-        // Get CPU information
-        CpuName = GetCpuName();
+        try
+        {
+            // Initialize CPU information
+            CpuName = GetCpuName();
 
-        // Get GPU information
-        DetectGpuType();
-        GpuName = GetGpuName();
+            // Initialize GPU information
+            DetectGpuType();
+            GpuName = GetGpuName();
 
-        FindFanSpeedPaths();
+            // Find fan speed paths and cache them
+            FindSystemPaths();
 
-        // Update GPU driver info on UI thread
-        var gpuDriver = GetGpuDriverVersion();
+            // Update GPU driver info on UI thread
+            var gpuDriver = GetGpuDriverVersion();
 
-        InitializeTemperatureGraph();
+            // Initialize temperature graph
+            InitializeTemperatureGraph();
 
-        Dispatcher.UIThread.Post(() => { GpuDriver.Text = gpuDriver; });
+            Dispatcher.UIThread.Post(() => { GpuDriver.Text = gpuDriver; });
 
-        // Get OS information
-        OsVersion = GetOsVersion();
-        KernelVersion = GetKernelVersion();
+            // Get OS information
+            OsVersion = GetOsVersion();
+            KernelVersion = GetKernelVersion();
 
-        // Get RAM information
-        RamTotal = GetTotalRam();
+            // Get RAM information
+            RamTotal = GetTotalRam();
 
-        // Check if system has a battery
-        HasBattery = CheckForBattery();
+            // Check if system has a battery and find its directory
+            CheckForBattery();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during initialization: {ex.Message}");
+        }
     }
 
     private string GetCpuName()
@@ -577,12 +558,52 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
         }
     }
 
-    private bool CheckForBattery()
+    private void CheckForBattery()
     {
-        return Directory.Exists("/sys/class/power_supply") &&
-               Directory.GetDirectories("/sys/class/power_supply")
-                   .Any(dir => File.Exists(Path.Combine(dir, "type")) &&
-                               File.ReadAllText(Path.Combine(dir, "type")).Trim() == "Battery");
+        try
+        {
+            if (!Directory.Exists("/sys/class/power_supply"))
+            {
+                HasBattery = false;
+                return;
+            }
+
+            var batteryDirs = Directory.GetDirectories("/sys/class/power_supply")
+                .Where(dir => File.Exists(Path.Combine(dir, "type")) &&
+                              File.ReadAllText(Path.Combine(dir, "type")).Trim() == "Battery")
+                .ToList();
+
+            HasBattery = batteryDirs.Any();
+
+            if (HasBattery)
+            {
+                _batteryDir = batteryDirs.First();
+
+                // Cache battery-related paths
+                if (File.Exists(Path.Combine(_batteryDir, "energy_now")))
+                    _systemInfoPaths["energy_now"] = Path.Combine(_batteryDir, "energy_now");
+                else if (File.Exists(Path.Combine(_batteryDir, "charge_now")))
+                    _systemInfoPaths["energy_now"] = Path.Combine(_batteryDir, "charge_now");
+
+                if (File.Exists(Path.Combine(_batteryDir, "power_now")))
+                    _systemInfoPaths["power_now"] = Path.Combine(_batteryDir, "power_now");
+                else if (File.Exists(Path.Combine(_batteryDir, "current_now")))
+                    _systemInfoPaths["power_now"] = Path.Combine(_batteryDir, "current_now");
+
+                if (File.Exists(Path.Combine(_batteryDir, "energy_full")))
+                    _systemInfoPaths["energy_full"] = Path.Combine(_batteryDir, "energy_full");
+                else if (File.Exists(Path.Combine(_batteryDir, "charge_full")))
+                    _systemInfoPaths["energy_full"] = Path.Combine(_batteryDir, "charge_full");
+
+                _systemInfoPaths["capacity"] = Path.Combine(_batteryDir, "capacity");
+                _systemInfoPaths["status"] = Path.Combine(_batteryDir, "status");
+            }
+        }
+        catch (Exception ex)
+        {
+            HasBattery = false;
+            Console.WriteLine($"Error checking battery: {ex.Message}");
+        }
     }
 
     private void InitializeTemperatureGraph()
@@ -590,7 +611,6 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
         // Initialize collections
         _cpuTempHistory = new ObservableCollection<double>();
         _gpuTempHistory = new ObservableCollection<double>();
-
 
         // Initialize series
         _tempSeries = new ObservableCollection<ISeries>
@@ -604,21 +624,17 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
                 GeometryFill = new SolidColorPaint(SKColors.DeepSkyBlue),
                 Fill = new SolidColorPaint(SKColors.Transparent),
                 GeometrySize = 5,
-                // Replace the problematic TooltipLabelFormatter with:
                 XToolTipLabelFormatter = chartPoint => $"CPU: {chartPoint.Label}°C"
             },
             new LineSeries<double>
             {
                 Values = _gpuTempHistory,
                 Name = "GPU Temperature",
-
                 Stroke = new SolidColorPaint(SKColors.LimeGreen) { StrokeThickness = 3 },
                 GeometryFill = new SolidColorPaint(SKColors.GreenYellow),
                 GeometryStroke = new SolidColorPaint(SKColors.GreenYellow),
                 Fill = new SolidColorPaint(SKColors.Transparent),
-
                 GeometrySize = 5,
-                // Replace the problematic TooltipLabelFormatter with:
                 XToolTipLabelFormatter = chartPoint => $"GPU: {chartPoint.Label}°C"
             }
         };
@@ -697,34 +713,15 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
     {
         try
         {
-            // Try several common temperature sensors paths
-            string[] possiblePaths =
+            // Use cached CPU temperature path if available
+            if (_systemInfoPaths.ContainsKey("cpu_temp") && File.Exists(_systemInfoPaths["cpu_temp"]))
             {
-                "/sys/class/hwmon/hwmon6/temp2_input",
-                "/sys/class/hwmon/hwmon6/temp1_input",
-                "/sys/class/hwmon/hwmon6/temp6_input",
-                "/sys/class/hwmon/hwmon1/temp1_input",
-                "/sys/class/thermal/thermal_zone0/temp",
-                "/sys/devices/platform/coretemp.0/hwmon/hwmon*/temp1_input",
-                "/sys/class/hwmon/hwmon*/temp1_input"
-            };
-
-            foreach (var pathPattern in possiblePaths)
-            {
-                var files = Directory.Exists(Path.GetDirectoryName(pathPattern) ?? string.Empty)
-                    ? Directory.GetFiles(Path.GetDirectoryName(pathPattern) ?? string.Empty,
-                        Path.GetFileName(pathPattern))
-                    : Array.Empty<string>();
-
-                if (files.Length > 0)
+                var temperatureStr = File.ReadAllText(_systemInfoPaths["cpu_temp"]);
+                if (int.TryParse(temperatureStr, out var tempValue))
                 {
-                    var temperatureStr = File.ReadAllText(files[0]);
-                    if (int.TryParse(temperatureStr, out var tempValue))
-                    {
-                        // Temperature is often reported in millidegrees C
-                        var tempC = tempValue / 1000.0;
-                        return Math.Round(tempC, 1);
-                    }
+                    // Temperature is often reported in millidegrees C
+                    var tempC = tempValue / 1000.0;
+                    return Math.Round(tempC, 1);
                 }
             }
 
@@ -830,53 +827,22 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
             double temp = 0;
             double usage = 0;
 
-            // Try reading from AMD specific paths
-            // For temperature
-            string[] possibleTempPaths =
+            // Use cached GPU temp path if available
+            if (_systemInfoPaths.ContainsKey("gpu_temp") && File.Exists(_systemInfoPaths["gpu_temp"]))
             {
-                "/sys/class/drm/card0/device/hwmon/hwmon*/temp1_input",
-                "/sys/class/hwmon/hwmon*/temp1_input"
-            };
+                var tempStr = File.ReadAllText(_systemInfoPaths["gpu_temp"]);
+                if (int.TryParse(tempStr.Trim(), out var tempValue))
+                    temp = tempValue / 1000.0; // Convert from milliCelsius to Celsius
+            }
 
-            foreach (var pathPattern in possibleTempPaths)
-                if (Directory.Exists(Path.GetDirectoryName(pathPattern) ?? string.Empty))
-                {
-                    var files = Directory.GetFiles(
-                        Path.GetDirectoryName(pathPattern) ?? string.Empty,
-                        Path.GetFileName(pathPattern).Replace("*", "").Replace("?", ""),
-                        SearchOption.AllDirectories);
-
-                    foreach (var file in files)
-                        if (File.Exists(file))
-                        {
-                            var tempStr = File.ReadAllText(file);
-                            if (int.TryParse(tempStr.Trim(), out var tempValue))
-                            {
-                                temp = tempValue / 1000.0; // Convert from milliCelsius to Celsius
-                                break;
-                            }
-                        }
-                }
-
-            // For usage, we can try to read from the GPU load file if it exists
-            string[] possibleUsagePaths =
+            // Use cached GPU usage path if available
+            if (_systemInfoPaths.ContainsKey("gpu_usage") && File.Exists(_systemInfoPaths["gpu_usage"]))
             {
-                "/sys/class/drm/card0/device/gpu_busy_percent",
-                "/sys/class/hwmon/hwmon*/device/gpu_busy_percent"
-            };
+                var usageStr = File.ReadAllText(_systemInfoPaths["gpu_usage"]);
+                if (int.TryParse(usageStr.Trim(), out var usageValue)) usage = usageValue;
+            }
 
-            foreach (var path in possibleUsagePaths)
-                if (File.Exists(path))
-                {
-                    var usageStr = File.ReadAllText(path);
-                    if (int.TryParse(usageStr.Trim(), out var usageValue))
-                    {
-                        usage = usageValue;
-                        break;
-                    }
-                }
-
-            // If we couldn't get values, try radeontop
+            // If we couldn't get values from cached paths, try radeontop
             if (temp == 0 || usage == 0)
             {
                 var radeontopOutput = RunCommand("radeontop", "-d- -l1");
@@ -907,38 +873,13 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
             double temp = 0;
             double usage = 0;
 
-            // Intel GPU metrics are harder to get - try some common paths
-            // For temperature
-            string[] possibleTempPaths =
+            // Use cached GPU temp path if available
+            if (_systemInfoPaths.ContainsKey("gpu_temp") && File.Exists(_systemInfoPaths["gpu_temp"]))
             {
-                "/sys/class/thermal/thermal_zone*/temp",
-                "/sys/class/hwmon/hwmon*/temp1_input"
-            };
-
-            // Try to find a thermal zone that might be the GPU
-            foreach (var pathPattern in possibleTempPaths)
-                if (Directory.Exists(Path.GetDirectoryName(pathPattern) ?? string.Empty))
-                {
-                    var dirs = Directory.GetDirectories(Path.GetDirectoryName(pathPattern) ?? string.Empty);
-
-                    foreach (var dir in dirs)
-                    {
-                        var typeFile = Path.Combine(dir, "type");
-                        if (File.Exists(typeFile) && File.ReadAllText(typeFile).Contains("gpu"))
-                        {
-                            var tempFile = Path.Combine(dir, "temp");
-                            if (File.Exists(tempFile))
-                            {
-                                var tempStr = File.ReadAllText(tempFile);
-                                if (int.TryParse(tempStr.Trim(), out var tempValue))
-                                {
-                                    temp = tempValue / 1000.0; // Convert from milliCelsius to Celsius
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
+                var tempStr = File.ReadAllText(_systemInfoPaths["gpu_temp"]);
+                if (int.TryParse(tempStr.Trim(), out var tempValue))
+                    temp = tempValue / 1000.0; // Convert from milliCelsius to Celsius
+            }
 
             // For usage, we might be able to use the intel_gpu_top tool
             var intelOutput = RunCommand("intel_gpu_top", "-o -");
@@ -955,75 +896,231 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
         }
     }
 
-
-    private void FindFanSpeedPaths()
+    private void FindSystemPaths()
     {
         try
         {
-            if (_fanPathsSearched)
-                return;
-
-            _fanPathsSearched = true;
-
-            // Try to find fan speed readings from hwmon directories
-            var hwmonDirs = Directory.GetDirectories("/sys/class/hwmon");
-
-            foreach (var hwmonDir in hwmonDirs)
+            // Find CPU temperature path
+            string[] possibleCpuTempPaths =
             {
-                // Check if this is a fan device
-                var nameFile = Path.Combine(hwmonDir, "name");
-                if (File.Exists(nameFile))
-                {
-                    var deviceName = File.ReadAllText(nameFile).Trim().ToLower();
-
-                    // Look for known Acer fan controller names
-                    if (deviceName.Contains("acer") || deviceName.Contains("fan") ||
-                        deviceName.Contains("acpi") || deviceName.Contains("thinkpad"))
-                    {
-                        var fan1File = Path.Combine(hwmonDir, "fan1_input");
-                        var fan2File = Path.Combine(hwmonDir, "fan2_input");
-
-                        if (File.Exists(fan1File) && _cpuFanSpeedPath == null) _cpuFanSpeedPath = fan1File;
-
-                        if (File.Exists(fan2File) && _gpuFanSpeedPath == null) _gpuFanSpeedPath = fan2File;
-
-                        if (_cpuFanSpeedPath != null && _gpuFanSpeedPath != null)
-                            return; // Found both paths, no need to continue
-                    }
-                }
-            }
-
-            // If paths not found yet, check Acer-specific locations
-            string[] possibleAcerFanPaths =
-            {
-                "/sys/devices/platform/acer-wmi/fan1_input",
-                "/sys/devices/platform/acer-wmi/fan2_input",
-                "/sys/devices/platform/acer-wmi/fan_speed",
-                "/proc/acpi/acer-wmi/fans"
+                "/sys/class/hwmon/hwmon6/temp2_input",
+                "/sys/class/hwmon/hwmon6/temp1_input",
+                "/sys/class/hwmon/hwmon6/temp6_input",
+                "/sys/class/hwmon/hwmon1/temp1_input",
+                "/sys/class/thermal/thermal_zone0/temp",
+                "/sys/devices/platform/coretemp.0/hwmon/hwmon1/temp1_input",
             };
 
-            // Try direct paths first
-            foreach (var path in possibleAcerFanPaths.Where(p => !p.Contains("*")))
-                if (File.Exists(path))
+            foreach (var pathPattern in possibleCpuTempPaths)
+                if (Directory.Exists(Path.GetDirectoryName(pathPattern) ?? string.Empty))
                 {
-                    // Check if this is a multi-value file
-                    var content = File.ReadAllText(path).Trim();
-                    if (content.Contains("CPU") || content.Contains("GPU"))
+                    var files = Directory.GetFiles(Path.GetDirectoryName(pathPattern) ?? string.Empty,
+                        Path.GetFileName(pathPattern));
+                    if (files.Length > 0)
                     {
-                        // This is a special file with both readings
-                        _cpuFanSpeedPath = path + "#CPU"; // Special marker to indicate parsing needed
-                        _gpuFanSpeedPath = path + "#GPU";
-                        return;
+                        _systemInfoPaths["cpu_temp"] = files[0];
+                        break;
                     }
-
-                    // If we only have one path, assume it's for CPU fan
-                    if (_cpuFanSpeedPath == null)
-                        _cpuFanSpeedPath = path;
-                    // If we find a second path, assume it's for GPU fan
-                    else if (_gpuFanSpeedPath == null) _gpuFanSpeedPath = path;
                 }
 
-            // Search for wildcard paths
+            // Find fan speed paths
+            FindFanSpeedPaths();
+
+            // Find GPU temperature path based on GPU type
+            switch (_gpuType)
+            {
+                case GpuType.Nvidia:
+                    // Nvidia uses nvidia-smi command
+                    break;
+                case GpuType.Amd:
+                    string[] possibleAmdGpuTempPaths =
+                    {
+                        "/sys/class/drm/card0/device/hwmon/hwmon*/temp1_input",
+                        "/sys/class/hwmon/hwmon*/temp1_input"
+                    };
+                    foreach (var pathPattern in possibleAmdGpuTempPaths)
+                        if (Directory.Exists(Path.GetDirectoryName(pathPattern) ?? string.Empty))
+                        {
+                            var files = Directory.GetFiles(
+                                Path.GetDirectoryName(pathPattern) ?? string.Empty,
+                                Path.GetFileName(pathPattern).Replace("*", "").Replace("?", ""),
+                                SearchOption.AllDirectories);
+                            if (files.Length > 0)
+                            {
+                                _systemInfoPaths["gpu_temp"] = files[0];
+                                break;
+                            }
+                        }
+
+                    break;
+                case GpuType.Intel:
+                    string[] possibleIntelGpuTempPaths =
+                    {
+                        "/sys/class/thermal/thermal_zone*/temp",
+                        "/sys/class/hwmon/hwmon*/temp1_input"
+                    };
+                    foreach (var pathPattern in possibleIntelGpuTempPaths)
+                        if (Directory.Exists(Path.GetDirectoryName(pathPattern) ?? string.Empty))
+                        {
+                            var dirs = Directory.GetDirectories(Path.GetDirectoryName(pathPattern) ?? string.Empty);
+                            foreach (var dir in dirs)
+                            {
+                                var typeFile = Path.Combine(dir, "type");
+                                if (File.Exists(typeFile) && File.ReadAllText(typeFile).Contains("gpu"))
+                                {
+                                    var tempFile = Path.Combine(dir, "temp");
+                                    if (File.Exists(tempFile))
+                                    {
+                                        _systemInfoPaths["gpu_temp"] = tempFile;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error finding system paths: {ex.Message}");
+        }
+    }
+
+    public bool _fanPathsSearched;
+    
+  private void FindFanSpeedPaths()
+{
+    try
+    {
+        if (_fanPathsSearched)
+            return;
+
+        _fanPathsSearched = true;
+
+        // Try to find fan speed readings from hwmon directories
+        var hwmonDirs = Directory.GetDirectories("/sys/class/hwmon");
+
+        foreach (var hwmonDir in hwmonDirs)
+        {
+            // Check if this is a fan device
+            var nameFile = Path.Combine(hwmonDir, "name");
+            if (File.Exists(nameFile))
+            {
+                var deviceName = File.ReadAllText(nameFile).Trim().ToLower();
+
+                // Look for known Acer fan controller names
+                if (deviceName.Contains("acer") || deviceName.Contains("fan") ||
+                    deviceName.Contains("acpi") || deviceName.Contains("thinkpad"))
+                {
+                    var fan1File = Path.Combine(hwmonDir, "fan1_input");
+                    var fan2File = Path.Combine(hwmonDir, "fan2_input");
+
+                    if (File.Exists(fan1File) && !_systemInfoPaths.ContainsKey("cpu_fan"))
+                        _systemInfoPaths["cpu_fan"] = fan1File;
+
+                    if (File.Exists(fan2File) && !_systemInfoPaths.ContainsKey("gpu_fan"))
+                        _systemInfoPaths["gpu_fan"] = fan2File;
+
+                    if (_systemInfoPaths.ContainsKey("cpu_fan") && _systemInfoPaths.ContainsKey("gpu_fan"))
+                        return; // Found both paths, no need to continue
+                }
+            }
+        }
+
+        // Check common paths for fan speed information
+        string[] possibleCpuFanPaths =
+        {
+            "/sys/class/hwmon/hwmon*/fan1_input",
+            "/sys/devices/platform/asus-nb-wmi/hwmon/hwmon*/fan1_input",
+            "/sys/devices/platform/it87.*/hwmon/hwmon*/fan1_input",
+            "/sys/devices/platform/nct6775.*/hwmon/hwmon*/fan1_input",
+            "/sys/class/hwmon/hwmon*/pwm1",
+            "/sys/devices/platform/acer-wmi/fan1_input"
+        };
+
+        string[] possibleGpuFanPaths =
+        {
+            "/sys/class/hwmon/hwmon*/fan2_input",
+            "/sys/class/drm/card0/device/hwmon/hwmon*/fan1_input",
+            "/sys/devices/platform/it87.*/hwmon/hwmon*/fan2_input",
+            "/sys/devices/platform/nct6775.*/hwmon/hwmon*/fan2_input",
+            "/sys/class/hwmon/hwmon*/pwm2",
+            "/sys/devices/platform/acer-wmi/fan2_input"
+        };
+
+        // Also check Acer-specific locations
+        string[] possibleAcerMultiValuePaths =
+        {
+            "/sys/devices/platform/acer-wmi/fan_speed",
+            "/proc/acpi/acer-wmi/fans"
+        };
+
+        // Check for multi-value Acer fan files
+        foreach (var path in possibleAcerMultiValuePaths)
+        {
+            if (File.Exists(path))
+            {
+                // Check if this is a multi-value file
+                var content = File.ReadAllText(path).Trim();
+                if (content.Contains("CPU") || content.Contains("GPU"))
+                {
+                    // This is a special file with both readings
+                    _systemInfoPaths["cpu_fan_special"] = path + "#CPU"; // Special marker to indicate parsing needed
+                    _systemInfoPaths["gpu_fan_special"] = path + "#GPU";
+                    return;
+                }
+            }
+        }
+
+        // Find CPU fan speed path
+        if (!_systemInfoPaths.ContainsKey("cpu_fan"))
+        {
+            foreach (var pathPattern in possibleCpuFanPaths)
+            {
+                var baseDir = Path.GetDirectoryName(pathPattern);
+                if (baseDir == null || !Directory.Exists(baseDir)) continue;
+
+       
+                foreach (var hwmonDir in hwmonDirs)
+                {
+                    var fanFile = Path.Combine(hwmonDir, Path.GetFileName(pathPattern).Replace("*", ""));
+                    if (File.Exists(fanFile))
+                    {
+                        _systemInfoPaths["cpu_fan"] = fanFile;
+                        break;
+                    }
+                }
+
+                if (_systemInfoPaths.ContainsKey("cpu_fan")) break;
+            }
+        }
+
+        // Find GPU fan speed path
+        if (!_systemInfoPaths.ContainsKey("gpu_fan"))
+        {
+            foreach (var pathPattern in possibleGpuFanPaths)
+            {
+                var baseDir = Path.GetDirectoryName(pathPattern);
+                if (baseDir == null || !Directory.Exists(baseDir)) continue;
+                
+                foreach (var hwmonDir in hwmonDirs)
+                {
+                    var fanFile = Path.Combine(hwmonDir, Path.GetFileName(pathPattern).Replace("*", ""));
+                    if (File.Exists(fanFile))
+                    {
+                        _systemInfoPaths["gpu_fan"] = fanFile;
+                        break;
+                    }
+                }
+
+                if (_systemInfoPaths.ContainsKey("gpu_fan")) break;
+            }
+        }
+
+        // Search for wildcard paths using the original method as fallback
+        if (!_systemInfoPaths.ContainsKey("cpu_fan") || !_systemInfoPaths.ContainsKey("gpu_fan"))
+        {
             string[] wildcardPaths =
             {
                 "/sys/class/hwmon/hwmon*/fan1_input",
@@ -1040,19 +1137,20 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
                     var matchingFiles = Directory.GetFiles(dir, pattern, SearchOption.AllDirectories);
 
                     foreach (var file in matchingFiles)
+                    {
                         try
                         {
                             // Make sure the file actually contains a number
                             var content = File.ReadAllText(file).Trim();
                             if (int.TryParse(content, out _))
                             {
-                                if (_cpuFanSpeedPath == null)
+                                if (!_systemInfoPaths.ContainsKey("cpu_fan"))
                                 {
-                                    _cpuFanSpeedPath = file;
+                                    _systemInfoPaths["cpu_fan"] = file;
                                 }
-                                else if (_gpuFanSpeedPath == null)
+                                else if (!_systemInfoPaths.ContainsKey("gpu_fan"))
                                 {
-                                    _gpuFanSpeedPath = file;
+                                    _systemInfoPaths["gpu_fan"] = file;
                                     break;
                                 }
                             }
@@ -1061,107 +1159,155 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
                         {
                             /* Continue if this file fails */
                         }
+                    }
 
-                    if (_cpuFanSpeedPath != null && _gpuFanSpeedPath != null)
+                    if (_systemInfoPaths.ContainsKey("cpu_fan") && _systemInfoPaths.ContainsKey("gpu_fan"))
                         break;
                 }
             }
-
-            // If still no paths found, we'll fallback to sensors command
-            if (_cpuFanSpeedPath == null) _cpuFanSpeedPath = "sensors#fan1"; // Special marker for sensors command
-            if (_gpuFanSpeedPath == null) _gpuFanSpeedPath = "sensors#fan2"; // Special marker for sensors command
         }
-        catch
+
+        // For NVIDIA GPUs, if we couldn't find a path, try detecting with nvidia-smi
+        if (_gpuType == GpuType.Nvidia && !_systemInfoPaths.ContainsKey("gpu_fan"))
         {
-            // If any error occurs, set paths to null and mark as searched
-            _cpuFanSpeedPath = null;
-            _gpuFanSpeedPath = null;
-            _fanPathsSearched = true;
+            var nvidiaSmiOutput = RunCommand("nvidia-smi", "--query-gpu=fan.speed --format=csv,noheader");
+            if (!string.IsNullOrWhiteSpace(nvidiaSmiOutput) && nvidiaSmiOutput.Contains("%"))
+                // Mark that we're using nvidia-smi for fan speed (special case)
+                _systemInfoPaths["gpu_fan_nvidia_smi"] = "true";
         }
-    }
 
-    private (int cpuFan, int gpuFan) GetFanSpeeds()
+        // For AMD GPUs, if we couldn't find a path, try with rocm-smi
+        if (_gpuType == GpuType.Amd && !_systemInfoPaths.ContainsKey("gpu_fan"))
+        {
+            var rocmSmiOutput = RunCommand("rocm-smi", "--showfan");
+            if (!string.IsNullOrWhiteSpace(rocmSmiOutput) && rocmSmiOutput.Contains("Fan Speed (%)"))
+                // Mark that we're using rocm-smi for fan speed (special case)
+                _systemInfoPaths["gpu_fan_rocm_smi"] = "true";
+        }
+
+        // If still no paths found, we'll fallback to sensors command
+        if (!_systemInfoPaths.ContainsKey("cpu_fan"))
+            _systemInfoPaths["cpu_fan_sensors"] = "sensors#fan1"; // Special marker for sensors command
+            
+        if (!_systemInfoPaths.ContainsKey("gpu_fan"))
+            _systemInfoPaths["gpu_fan_sensors"] = "sensors#fan2"; // Special marker for sensors command
+    }
+    catch (Exception ex)
     {
-        try
-        {
-            // If paths haven't been searched yet, find them
-            if (!_fanPathsSearched) FindFanSpeedPaths();
-
-            var cpuFanSpeed = 0;
-            var gpuFanSpeed = 0;
-
-            // Read CPU fan speed
-            if (!string.IsNullOrEmpty(_cpuFanSpeedPath))
-            {
-                if (_cpuFanSpeedPath.StartsWith("sensors#"))
-                {
-                    // Use sensors command for fan readings
-                    var sensorsOutput = RunCommand("sensors", "");
-
-                    // Parse based on fan number
-                    var fanPattern = _cpuFanSpeedPath.EndsWith("fan1") ? @"fan1:\s+(\d+) RPM" : @"fan\d+:\s+(\d+) RPM";
-
-                    var match = Regex.Match(sensorsOutput, fanPattern);
-                    if (match.Success) cpuFanSpeed = int.Parse(match.Groups[1].Value);
-                }
-                else if (_cpuFanSpeedPath.Contains("#CPU"))
-                {
-                    // This is a special case where the file contains labeled values
-                    var actualPath = _cpuFanSpeedPath.Split('#')[0];
-                    var content = File.ReadAllText(actualPath).Trim();
-                    var match = Regex.Match(content, @"CPU:?\s*(\d+)");
-                    if (match.Success) cpuFanSpeed = int.Parse(match.Groups[1].Value);
-                }
-                else
-                {
-                    // Direct file reading
-                    var content = File.ReadAllText(_cpuFanSpeedPath).Trim();
-                    if (int.TryParse(content, out var speed)) cpuFanSpeed = speed;
-                }
-            }
-
-            // Read GPU fan speed
-            if (!string.IsNullOrEmpty(_gpuFanSpeedPath))
-            {
-                if (_gpuFanSpeedPath.StartsWith("sensors#"))
-                {
-                    // Use sensors command for fan readings
-                    var sensorsOutput = RunCommand("sensors", "");
-
-                    // Parse based on fan number
-                    var fanPattern = _gpuFanSpeedPath.EndsWith("fan2") ? @"fan2:\s+(\d+) RPM" : @"fan\d+:\s+(\d+) RPM";
-
-                    var matches = Regex.Matches(sensorsOutput, fanPattern);
-                    if (matches.Count >= 2)
-                        gpuFanSpeed = int.Parse(matches[1].Groups[1].Value);
-                    else if (matches.Count == 1 && _gpuFanSpeedPath.EndsWith("fan2"))
-                        gpuFanSpeed = int.Parse(matches[0].Groups[1].Value);
-                }
-                else if (_gpuFanSpeedPath.Contains("#GPU"))
-                {
-                    // This is a special case where the file contains labeled values
-                    var actualPath = _gpuFanSpeedPath.Split('#')[0];
-                    var content = File.ReadAllText(actualPath).Trim();
-                    var match = Regex.Match(content, @"GPU:?\s*(\d+)");
-                    if (match.Success) gpuFanSpeed = int.Parse(match.Groups[1].Value);
-                }
-                else
-                {
-                    // Direct file reading
-                    var content = File.ReadAllText(_gpuFanSpeedPath).Trim();
-                    if (int.TryParse(content, out var speed)) gpuFanSpeed = speed;
-                }
-            }
-
-            CpuFanSpeedRPM = cpuFanSpeed;
-            GpuFanSpeedRPM = gpuFanSpeed;
-            return (cpuFanSpeed, gpuFanSpeed);
-        }
-        catch
-        {
-            return (0, 0);
-        }
+        Console.WriteLine($"Error finding fan speed paths: {ex.Message}");
+        _fanPathsSearched = true;
     }
+}
+
+   private (int cpuFan, int gpuFan) GetFanSpeeds()
+{
+    try
+    {
+        // If paths haven't been searched yet, find them
+        if (!_fanPathsSearched) FindFanSpeedPaths();
+
+        var cpuFanSpeed = 0;
+        var gpuFanSpeed = 0;
+
+        // Read CPU fan speed
+        if (_systemInfoPaths.ContainsKey("cpu_fan") && File.Exists(_systemInfoPaths["cpu_fan"]))
+        {
+            var content = File.ReadAllText(_systemInfoPaths["cpu_fan"]).Trim();
+            if (int.TryParse(content, out var speed))
+                cpuFanSpeed = speed;
+        }
+        else if (_systemInfoPaths.ContainsKey("cpu_fan_special"))
+        {
+            // This is a special case where the file contains labeled values
+            var specialPath = _systemInfoPaths["cpu_fan_special"];
+            var actualPath = specialPath.Split('#')[0];
+            var content = File.ReadAllText(actualPath).Trim();
+            var match = Regex.Match(content, @"CPU:?\s*(\d+)");
+            if (match.Success) cpuFanSpeed = int.Parse(match.Groups[1].Value);
+        }
+        else if (_systemInfoPaths.ContainsKey("cpu_fan_sensors"))
+        {
+            // Use sensors command for fan readings
+            var sensorsOutput = RunCommand("sensors", "");
+
+            // Parse based on fan number
+            var fanPattern = _systemInfoPaths["cpu_fan_sensors"].EndsWith("fan1") ? 
+                @"fan1:\s+(\d+) RPM" : @"fan\d+:\s+(\d+) RPM";
+
+            var match = Regex.Match(sensorsOutput, fanPattern);
+            if (match.Success) cpuFanSpeed = int.Parse(match.Groups[1].Value);
+        }
+
+        // Read GPU fan speed
+        if (_systemInfoPaths.ContainsKey("gpu_fan") && File.Exists(_systemInfoPaths["gpu_fan"]))
+        {
+            var content = File.ReadAllText(_systemInfoPaths["gpu_fan"]).Trim();
+            if (int.TryParse(content, out var speed))
+                gpuFanSpeed = speed;
+        }
+        else if (_systemInfoPaths.ContainsKey("gpu_fan_special"))
+        {
+            // This is a special case where the file contains labeled values
+            var specialPath = _systemInfoPaths["gpu_fan_special"];
+            var actualPath = specialPath.Split('#')[0];
+            var content = File.ReadAllText(actualPath).Trim();
+            var match = Regex.Match(content, @"GPU:?\s*(\d+)");
+            if (match.Success) gpuFanSpeed = int.Parse(match.Groups[1].Value);
+        }
+        else if (_systemInfoPaths.ContainsKey("gpu_fan_sensors"))
+        {
+            // Use sensors command for fan readings
+            var sensorsOutput = RunCommand("sensors", "");
+
+            // Parse based on fan number
+            var fanPattern = _systemInfoPaths["gpu_fan_sensors"].EndsWith("fan2") ? 
+                @"fan2:\s+(\d+) RPM" : @"fan\d+:\s+(\d+) RPM";
+
+            var matches = Regex.Matches(sensorsOutput, fanPattern);
+            if (matches.Count >= 2)
+                gpuFanSpeed = int.Parse(matches[1].Groups[1].Value);
+            else if (matches.Count == 1 && _systemInfoPaths["gpu_fan_sensors"].EndsWith("fan2"))
+                gpuFanSpeed = int.Parse(matches[0].Groups[1].Value);
+        }
+        else if (_systemInfoPaths.ContainsKey("gpu_fan_nvidia_smi"))
+        {
+            var nvidiaSmiOutput = RunCommand("nvidia-smi", "--query-gpu=fan.speed --format=csv,noheader");
+            if (!string.IsNullOrWhiteSpace(nvidiaSmiOutput))
+            {
+                var match = Regex.Match(nvidiaSmiOutput, @"(\d+)\s*%");
+                if (match.Success)
+                {
+                    // Convert percentage to RPM (approximation)
+                    var percentage = int.Parse(match.Groups[1].Value);
+                    gpuFanSpeed = percentage * 60; // Rough approximation
+                }
+            }
+        }
+        else if (_systemInfoPaths.ContainsKey("gpu_fan_rocm_smi"))
+        {
+            var rocmSmiOutput = RunCommand("rocm-smi", "--showfan");
+            if (!string.IsNullOrWhiteSpace(rocmSmiOutput))
+            {
+                var match = Regex.Match(rocmSmiOutput, @"Fan Speed \(%\)\s*:\s*(\d+)");
+                if (match.Success)
+                {
+                    // Convert percentage to RPM (approximation)
+                    var percentage = int.Parse(match.Groups[1].Value);
+                    gpuFanSpeed = percentage * 60; // Rough approximation
+                }
+            }
+        }
+
+        CpuFanSpeedRPM = cpuFanSpeed;
+        GpuFanSpeedRPM = gpuFanSpeed;
+        return (cpuFanSpeed, gpuFanSpeed);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error in GetFanSpeeds: {ex.Message}");
+        return (0, 0);
+    }
+}
 
     private void InitializeFanAnimations(MaterialIcon cpuFanIcon, MaterialIcon gpuFanIcon)
     {
@@ -1218,30 +1364,22 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
     {
         try
         {
-            //Console.WriteLine("Updating fan animations");
             var cpuFanIcon = this.FindControl<MaterialIcon>("CpuFanIcon");
             var gpuFanIcon = this.FindControl<MaterialIcon>("GpuFanIcon");
 
             if (cpuFanIcon == null || gpuFanIcon == null) return;
 
-            // Initialize animations if not done yet
             if (!_animationsInitialized)
             {
                 InitializeFanAnimations(cpuFanIcon, gpuFanIcon);
                 _animationsInitialized = true;
             }
 
-            //Console.WriteLine(_cpuFanSpeedRpm - _lastCpuRpm);
-
-            // Update CPU fan animation if RPM changed significantly
             if (Math.Abs(_cpuFanSpeedRpm - _lastCpuRpm) >= RPM_CHANGE_THRESHOLD)
                 UpdateFanSpeed(_cpuFanAnimation, _cpuFanSpeedRpm, ref _lastCpuRpm);
-            //Console.WriteLine($"CPU fan speed changed to {_cpuFanSpeedRpm} RPM");
 
-            // Update GPU fan animation if RPM changed significantly
             if (Math.Abs(_gpuFanSpeedRpm - _lastGpuRpm) > RPM_CHANGE_THRESHOLD)
                 UpdateFanSpeed(_gpuFanAnimation, _gpuFanSpeedRpm, ref _lastGpuRpm);
-            //Console.WriteLine($"CPU fan speed changed to {_cpuFanSpeedRpm} RPM");
         }
         catch (Exception ex)
         {
@@ -1251,25 +1389,16 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
 
     private void UpdateFanSpeed(Animation animation, int currentRpm, ref int lastRpm)
     {
-        //Console.WriteLine($"{currentRpm} N");
         if (currentRpm < MIN_RPM_FOR_ANIMATION)
         {
-            // If RPM is very low, use maximum duration (slow rotation)
             animation.Duration = TimeSpan.FromSeconds(MAX_ANIMATION_DURATION);
-            //Console.WriteLine("Updating fan animation with slow duration");
         }
         else
         {
-            // Calculate duration based on RPM (60/RPM gives seconds per revolution)
-            // Then multiply by 6 to make the animation more visible (1/10th of actual speed)
             var durationSeconds = 1000.0 / currentRpm * 2;
-
-            // Clamp the duration between min and max values
             durationSeconds = Math.Max(MIN_ANIMATION_DURATION,
                 Math.Min(MAX_ANIMATION_DURATION, durationSeconds));
-
             animation.Duration = TimeSpan.FromSeconds(durationSeconds);
-            //Console.WriteLine($"Updating fan animation with duration {durationSeconds}");
         }
 
         lastRpm = currentRpm;
@@ -1285,54 +1414,30 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
             var status = "Unknown";
             double timeRemaining = 0;
 
-            var batteryDirs = Directory.GetDirectories("/sys/class/power_supply")
-                .Where(dir => File.Exists(Path.Combine(dir, "type")) &&
-                              File.ReadAllText(Path.Combine(dir, "type")).Trim() == "Battery")
-                .ToList();
-
-            if (batteryDirs.Any())
+            // Read from cached paths
+            if (_systemInfoPaths.ContainsKey("capacity") && File.Exists(_systemInfoPaths["capacity"]))
             {
-                var batteryDir = batteryDirs.First();
-
-                // Get capacity
-                var capacityFile = Path.Combine(batteryDir, "capacity");
-                if (File.Exists(capacityFile))
-                {
-                    var capacityStr = File.ReadAllText(capacityFile);
-                    if (int.TryParse(capacityStr.Trim(), out var capacity)) percentage = capacity;
-                }
-
-                // Get status (charging/discharging)
-                var statusFile = Path.Combine(batteryDir, "status");
-                if (File.Exists(statusFile)) status = File.ReadAllText(statusFile).Trim();
-
-                // Try to estimate time remaining
-                var energyNowFile = Path.Combine(batteryDir, "energy_now");
-                var powerNowFile = Path.Combine(batteryDir, "power_now");
-                var energyFullFile = Path.Combine(batteryDir, "energy_full");
-
-                // Fallbacks for different naming schemes
-                if (!File.Exists(energyNowFile))
-                    energyNowFile = Path.Combine(batteryDir, "charge_now");
-                if (!File.Exists(powerNowFile))
-                    powerNowFile = Path.Combine(batteryDir, "current_now");
-                if (!File.Exists(energyFullFile))
-                    energyFullFile = Path.Combine(batteryDir, "charge_full");
-
-                if (File.Exists(energyNowFile) && File.Exists(powerNowFile) && File.Exists(energyFullFile))
-                    if (double.TryParse(File.ReadAllText(energyNowFile).Trim(), out var energyNow) &&
-                        double.TryParse(File.ReadAllText(powerNowFile).Trim(), out var powerNow) &&
-                        double.TryParse(File.ReadAllText(energyFullFile).Trim(), out var energyFull))
-                        if (powerNow > 0)
-                        {
-                            if (status == "Discharging")
-                                // Time remaining until empty in hours
-                                timeRemaining = energyNow / powerNow;
-                            else if (status == "Charging")
-                                // Time remaining until full in hours
-                                timeRemaining = (energyFull - energyNow) / powerNow;
-                        }
+                var capacityStr = File.ReadAllText(_systemInfoPaths["capacity"]).Trim();
+                if (int.TryParse(capacityStr, out var capacity))
+                    percentage = capacity;
             }
+
+            if (_systemInfoPaths.ContainsKey("status") && File.Exists(_systemInfoPaths["status"]))
+                status = File.ReadAllText(_systemInfoPaths["status"]).Trim();
+
+            if (_systemInfoPaths.ContainsKey("energy_now") && File.Exists(_systemInfoPaths["energy_now"]) &&
+                _systemInfoPaths.ContainsKey("power_now") && File.Exists(_systemInfoPaths["power_now"]) &&
+                _systemInfoPaths.ContainsKey("energy_full") && File.Exists(_systemInfoPaths["energy_full"]))
+                if (double.TryParse(File.ReadAllText(_systemInfoPaths["energy_now"]).Trim(), out var energyNow) &&
+                    double.TryParse(File.ReadAllText(_systemInfoPaths["power_now"]).Trim(), out var powerNow) &&
+                    double.TryParse(File.ReadAllText(_systemInfoPaths["energy_full"]).Trim(), out var energyFull))
+                    if (powerNow > 0)
+                    {
+                        if (status == "Discharging")
+                            timeRemaining = energyNow / powerNow;
+                        else if (status == "Charging")
+                            timeRemaining = (energyFull - energyNow) / powerNow;
+                    }
 
             return (percentage, status, timeRemaining);
         }
@@ -1342,7 +1447,6 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
         }
     }
 
-    // Helper method to run shell commands
     private string RunCommand(string command, string arguments)
     {
         try
@@ -1384,7 +1488,6 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    // Class to hold metrics data
     private class MetricsData
     {
         public double CpuUsage { get; set; }
@@ -1395,14 +1498,10 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
         public int BatteryPercentage { get; set; }
         public string BatteryStatus { get; set; } = "Unknown";
         public string BatteryTimeRemaining { get; set; } = "0";
-
-        // Inside the MetricsData class, add:
         public int CpuFanSpeedRPM { get; set; }
         public int GpuFanSpeedRPM { get; set; }
     }
 
-
-    // Enum for GPU types
     private enum GpuType
     {
         Unknown,
