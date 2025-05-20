@@ -26,7 +26,7 @@ namespace DivAcerManagerMax;
 public partial class Dashboard : UserControl, INotifyPropertyChanged
 {
     private const int REFRESH_INTERVAL_MS = 2000; // 2 seconds
-    private const int MAX_HISTORY_POINTS = 30; // 1 minute of history (30 * 2s refresh)
+    private const int MAX_HISTORY_POINTS = 60; // 1 minute of history (30 * 2s refresh)
 
     private const int MIN_RPM_FOR_ANIMATION = 100;
     private const double MAX_ANIMATION_DURATION = 5.0; // seconds for very slow rotation

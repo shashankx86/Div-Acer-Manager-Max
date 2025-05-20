@@ -18,7 +18,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private readonly DAMXClient _client;
 
     private readonly string _effectColor = "#0078D7";
-    private readonly string ProjectVersion = "0.6.8";
+    private readonly string ProjectVersion = "0.7.0";
     private Button _applyKeyboardColorsButton;
     private RadioButton _autoFanSpeedRadioButton;
 
@@ -641,6 +641,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void UpdatesButton_OnClick(object? sender, RoutedEventArgs e)
     {
         Process.Start("xdg-open", "https://github.com/PXDiv/Div-Acer-Manager-Max/releases");
+    }
+
+    private void StarProject_OnClick(object? sender, RoutedEventArgs e)
+    {
+        Process.Start("xdg-open", "https://github.com/PXDiv/Div-Acer-Manager-Max/");
+    }
+
+    private void IssuePageButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        Process.Start("xdg-open", "https://github.com/PXDiv/Div-Acer-Manager-Max/issues");
     }
 
     #region Event Handlers
