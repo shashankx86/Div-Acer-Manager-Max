@@ -262,7 +262,6 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
                 data.BatteryPercentage = batteryInfo.percentage;
                 data.BatteryStatus = batteryInfo.status;
                 data.BatteryTimeRemaining = $"{batteryInfo.timeRemaining:F2} hours";
-
                 return data;
             });
 
@@ -278,6 +277,8 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
                 BatteryPercentageInt = metricsData.BatteryPercentage;
                 BatteryStatus = metricsData.BatteryStatus;
                 BatteryTimeRemaining.Text = metricsData.BatteryTimeRemaining;
+                BatteryLevelBar.Value = metricsData.BatteryPercentage;
+
                 CpuFanSpeed.Text = $"{metricsData.CpuFanSpeedRPM} RPM";
                 GpuFanSpeed.Text = $"{metricsData.GpuFanSpeedRPM} RPM";
                 UpdateFanAnimations();
