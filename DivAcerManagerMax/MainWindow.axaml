@@ -154,6 +154,15 @@
                                             </StackPanel>
                                         </RadioButton>
 
+                                        <RadioButton x:Name="MaxFanSpeedRadioButton" GroupName="FanModeGroup"
+                                                     Margin="0 0 15 0"
+                                                     Click="MaxFanSpeedRadioButton_OnClick">
+                                            <StackPanel>
+                                                <material:MaterialIcon Kind="Turbine" Width="48" Height="48" />
+                                                <TextBlock Text="Max" HorizontalAlignment="Center" />
+                                            </StackPanel>
+                                        </RadioButton>
+
                                         <RadioButton x:Name="ManualFanSpeedRadioButton" GroupName="FanModeGroup"
                                                      Margin="0 0 15 0">
                                             <StackPanel>
@@ -172,18 +181,21 @@
                                     <StackPanel
                                         IsVisible="{Binding ElementName=ManualFanSpeedRadioButton , Path=IsChecked}">
 
-                                        <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto" Margin="0 5">
+                                        <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto"
+                                              Margin="0 5">
                                             <TextBlock Grid.Row="0" Grid.Column="0" Text="CPU Fan:"
                                                        VerticalAlignment="Center" Width="80" />
                                             <Slider x:Name="CpuFanSlider" Grid.Row="0" Grid.Column="1" Value="50" />
-                                            <TextBlock x:Name="CpuFanTextBlock" Grid.Row="0" Grid.Column="2" Text="50%"
+                                            <TextBlock x:Name="CpuFanTextBlock" Grid.Row="0" Grid.Column="2"
+                                                       Text="50%"
                                                        Width="50" TextAlignment="Right" />
 
                                             <TextBlock Grid.Row="1" Grid.Column="0" Text="GPU Fan:"
                                                        VerticalAlignment="Center" Width="80" Margin="0 15 0 0" />
                                             <Slider x:Name="GpuFanSlider" Grid.Row="1" Grid.Column="1" Value="70"
                                                     Margin="0 15 0 0" />
-                                            <TextBlock x:Name="GpuFanTextBlock" Grid.Row="1" Grid.Column="2" Text="70%"
+                                            <TextBlock x:Name="GpuFanTextBlock" Grid.Row="1" Grid.Column="2"
+                                                       Text="70%"
                                                        Width="50" TextAlignment="Right" Margin="0 15 0 0" />
                                         </Grid>
 

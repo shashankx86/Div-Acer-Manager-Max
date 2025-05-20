@@ -18,7 +18,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private readonly DAMXClient _client;
 
     private readonly string _effectColor = "#0078D7";
-    private readonly string ProjectVersion = "0.7.0";
+    private readonly string ProjectVersion = "0.7.2";
     private Button _applyKeyboardColorsButton;
     private RadioButton _autoFanSpeedRadioButton;
 
@@ -653,6 +653,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         Process.Start("xdg-open", "https://github.com/PXDiv/Div-Acer-Manager-Max/issues");
     }
 
+
     #region Event Handlers
 
     // Unified thermal profile handler
@@ -750,6 +751,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             // Reset to default values based on current profile
             await LoadSettingsAsync(); // Reload settings to get default values
         }
+    }
+
+    private async void MaxFanSpeedRadioButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (_isConnected) await _client.SetFanSpeedAsync(100, 100);
     }
 
     // Battery Calibration Handlers
