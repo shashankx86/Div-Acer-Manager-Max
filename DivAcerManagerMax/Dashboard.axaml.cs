@@ -52,6 +52,8 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
     private double _cpuTemp;
     private ObservableCollection<double> _cpuTempHistory;
     private double _cpuUsage;
+
+    public bool _fanPathsSearched;
     private Animation? _gpuFanAnimation;
     private int _gpuFanSpeedRpm;
     private string _gpuName;
@@ -713,10 +715,37 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
     {
         try
         {
-            // Use cached CPU temperature path if available
+            // Check for multiple temperature files from hwmon6
+            if (_systemInfoPaths.ContainsKey("cpu_temp_files"))
+            {
+                var tempFiles = _systemInfoPaths["cpu_temp_files"].Split(',');
+                if (tempFiles.Length > 0)
+                {
+                    double tempSum = 0;
+                    var validReadings = 0;
+
+                    foreach (var tempFile in tempFiles)
+                        if (File.Exists(tempFile))
+                        {
+                            var temperatureStr = File.ReadAllText(tempFile).Trim();
+                            if (int.TryParse(temperatureStr, out var tempValue))
+                            {
+                                // Temperature is often reported in millidegrees C
+                                tempSum += tempValue / 1000.0;
+                                validReadings++;
+                            }
+                        }
+
+                    if (validReadings > 0)
+                        // Calculate average temperature
+                        return Math.Round(tempSum / validReadings, 1);
+                }
+            }
+
+            // Fallback to single temperature file if available
             if (_systemInfoPaths.ContainsKey("cpu_temp") && File.Exists(_systemInfoPaths["cpu_temp"]))
             {
-                var temperatureStr = File.ReadAllText(_systemInfoPaths["cpu_temp"]);
+                var temperatureStr = File.ReadAllText(_systemInfoPaths["cpu_temp"]).Trim();
                 if (int.TryParse(temperatureStr, out var tempValue))
                 {
                     // Temperature is often reported in millidegrees C
@@ -735,8 +764,9 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
             // Couldn't get temperature
             return 0;
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine($"Error getting CPU temperature: {ex.Message}");
             return 0;
         }
     }
@@ -900,15 +930,27 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
     {
         try
         {
-            // Find CPU temperature path
+            // First check for hwmon6 directory and collect all temp input files
+            var hwmon6Path = "/sys/class/hwmon/hwmon6";
+            if (Directory.Exists(hwmon6Path))
+            {
+                var tempFiles = Directory.GetFiles(hwmon6Path, "temp*_input");
+                if (tempFiles.Length > 0)
+                {
+                    // Store all temperature files in a list
+                    _systemInfoPaths["cpu_temp_files"] = string.Join(",", tempFiles);
+                    Console.WriteLine(
+                        $"Found CPU Reporting Temps at {_systemInfoPaths["cpu_temp_files"].Split(',').Length} Cores, using their Avg");
+                    return;
+                }
+            }
+
+            // Fallback to other possible paths if hwmon6 doesn't have temperature files
             string[] possibleCpuTempPaths =
             {
-                "/sys/class/hwmon/hwmon6/temp2_input",
-                "/sys/class/hwmon/hwmon6/temp1_input",
-                "/sys/class/hwmon/hwmon6/temp6_input",
                 "/sys/class/hwmon/hwmon1/temp1_input",
                 "/sys/class/thermal/thermal_zone0/temp",
-                "/sys/devices/platform/coretemp.0/hwmon/hwmon1/temp1_input",
+                "/sys/devices/platform/coretemp.0/hwmon/hwmon1/temp1_input"
             };
 
             foreach (var pathPattern in possibleCpuTempPaths)
@@ -987,327 +1029,320 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
         }
     }
 
-    public bool _fanPathsSearched;
-    
-  private void FindFanSpeedPaths()
-{
-    try
+    private void FindFanSpeedPaths()
     {
-        if (_fanPathsSearched)
-            return;
-
-        _fanPathsSearched = true;
-
-        // Try to find fan speed readings from hwmon directories
-        var hwmonDirs = Directory.GetDirectories("/sys/class/hwmon");
-
-        foreach (var hwmonDir in hwmonDirs)
+        try
         {
-            // Check if this is a fan device
-            var nameFile = Path.Combine(hwmonDir, "name");
-            if (File.Exists(nameFile))
+            if (_fanPathsSearched)
+                return;
+
+            _fanPathsSearched = true;
+
+            // Try to find fan speed readings from hwmon directories
+            var hwmonDirs = Directory.GetDirectories("/sys/class/hwmon");
+
+            foreach (var hwmonDir in hwmonDirs)
             {
-                var deviceName = File.ReadAllText(nameFile).Trim().ToLower();
-
-                // Look for known Acer fan controller names
-                if (deviceName.Contains("acer") || deviceName.Contains("fan") ||
-                    deviceName.Contains("acpi") || deviceName.Contains("thinkpad"))
+                // Check if this is a fan device
+                var nameFile = Path.Combine(hwmonDir, "name");
+                if (File.Exists(nameFile))
                 {
-                    var fan1File = Path.Combine(hwmonDir, "fan1_input");
-                    var fan2File = Path.Combine(hwmonDir, "fan2_input");
+                    var deviceName = File.ReadAllText(nameFile).Trim().ToLower();
 
-                    if (File.Exists(fan1File) && !_systemInfoPaths.ContainsKey("cpu_fan"))
-                        _systemInfoPaths["cpu_fan"] = fan1File;
-
-                    if (File.Exists(fan2File) && !_systemInfoPaths.ContainsKey("gpu_fan"))
-                        _systemInfoPaths["gpu_fan"] = fan2File;
-
-                    if (_systemInfoPaths.ContainsKey("cpu_fan") && _systemInfoPaths.ContainsKey("gpu_fan"))
-                        return; // Found both paths, no need to continue
-                }
-            }
-        }
-
-        // Check common paths for fan speed information
-        string[] possibleCpuFanPaths =
-        {
-            "/sys/class/hwmon/hwmon*/fan1_input",
-            "/sys/devices/platform/asus-nb-wmi/hwmon/hwmon*/fan1_input",
-            "/sys/devices/platform/it87.*/hwmon/hwmon*/fan1_input",
-            "/sys/devices/platform/nct6775.*/hwmon/hwmon*/fan1_input",
-            "/sys/class/hwmon/hwmon*/pwm1",
-            "/sys/devices/platform/acer-wmi/fan1_input"
-        };
-
-        string[] possibleGpuFanPaths =
-        {
-            "/sys/class/hwmon/hwmon*/fan2_input",
-            "/sys/class/drm/card0/device/hwmon/hwmon*/fan1_input",
-            "/sys/devices/platform/it87.*/hwmon/hwmon*/fan2_input",
-            "/sys/devices/platform/nct6775.*/hwmon/hwmon*/fan2_input",
-            "/sys/class/hwmon/hwmon*/pwm2",
-            "/sys/devices/platform/acer-wmi/fan2_input"
-        };
-
-        // Also check Acer-specific locations
-        string[] possibleAcerMultiValuePaths =
-        {
-            "/sys/devices/platform/acer-wmi/fan_speed",
-            "/proc/acpi/acer-wmi/fans"
-        };
-
-        // Check for multi-value Acer fan files
-        foreach (var path in possibleAcerMultiValuePaths)
-        {
-            if (File.Exists(path))
-            {
-                // Check if this is a multi-value file
-                var content = File.ReadAllText(path).Trim();
-                if (content.Contains("CPU") || content.Contains("GPU"))
-                {
-                    // This is a special file with both readings
-                    _systemInfoPaths["cpu_fan_special"] = path + "#CPU"; // Special marker to indicate parsing needed
-                    _systemInfoPaths["gpu_fan_special"] = path + "#GPU";
-                    return;
-                }
-            }
-        }
-
-        // Find CPU fan speed path
-        if (!_systemInfoPaths.ContainsKey("cpu_fan"))
-        {
-            foreach (var pathPattern in possibleCpuFanPaths)
-            {
-                var baseDir = Path.GetDirectoryName(pathPattern);
-                if (baseDir == null || !Directory.Exists(baseDir)) continue;
-
-       
-                foreach (var hwmonDir in hwmonDirs)
-                {
-                    var fanFile = Path.Combine(hwmonDir, Path.GetFileName(pathPattern).Replace("*", ""));
-                    if (File.Exists(fanFile))
+                    // Look for known Acer fan controller names
+                    if (deviceName.Contains("acer") || deviceName.Contains("fan") ||
+                        deviceName.Contains("acpi") || deviceName.Contains("thinkpad"))
                     {
-                        _systemInfoPaths["cpu_fan"] = fanFile;
-                        break;
+                        var fan1File = Path.Combine(hwmonDir, "fan1_input");
+                        var fan2File = Path.Combine(hwmonDir, "fan2_input");
+
+                        if (File.Exists(fan1File) && !_systemInfoPaths.ContainsKey("cpu_fan"))
+                            _systemInfoPaths["cpu_fan"] = fan1File;
+
+                        if (File.Exists(fan2File) && !_systemInfoPaths.ContainsKey("gpu_fan"))
+                            _systemInfoPaths["gpu_fan"] = fan2File;
+
+                        if (_systemInfoPaths.ContainsKey("cpu_fan") && _systemInfoPaths.ContainsKey("gpu_fan"))
+                            return; // Found both paths, no need to continue
                     }
                 }
-
-                if (_systemInfoPaths.ContainsKey("cpu_fan")) break;
             }
-        }
 
-        // Find GPU fan speed path
-        if (!_systemInfoPaths.ContainsKey("gpu_fan"))
-        {
-            foreach (var pathPattern in possibleGpuFanPaths)
-            {
-                var baseDir = Path.GetDirectoryName(pathPattern);
-                if (baseDir == null || !Directory.Exists(baseDir)) continue;
-                
-                foreach (var hwmonDir in hwmonDirs)
-                {
-                    var fanFile = Path.Combine(hwmonDir, Path.GetFileName(pathPattern).Replace("*", ""));
-                    if (File.Exists(fanFile))
-                    {
-                        _systemInfoPaths["gpu_fan"] = fanFile;
-                        break;
-                    }
-                }
-
-                if (_systemInfoPaths.ContainsKey("gpu_fan")) break;
-            }
-        }
-
-        // Search for wildcard paths using the original method as fallback
-        if (!_systemInfoPaths.ContainsKey("cpu_fan") || !_systemInfoPaths.ContainsKey("gpu_fan"))
-        {
-            string[] wildcardPaths =
+            // Check common paths for fan speed information
+            string[] possibleCpuFanPaths =
             {
                 "/sys/class/hwmon/hwmon*/fan1_input",
-                "/sys/class/hwmon/hwmon*/fan2_input"
+                "/sys/devices/platform/asus-nb-wmi/hwmon/hwmon*/fan1_input",
+                "/sys/devices/platform/it87.*/hwmon/hwmon*/fan1_input",
+                "/sys/devices/platform/nct6775.*/hwmon/hwmon*/fan1_input",
+                "/sys/class/hwmon/hwmon*/pwm1",
+                "/sys/devices/platform/acer-wmi/fan1_input"
             };
 
-            foreach (var pathPattern in wildcardPaths)
+            string[] possibleGpuFanPaths =
             {
-                var dir = Path.GetDirectoryName(pathPattern) ?? string.Empty;
-                var pattern = Path.GetFileName(pathPattern).Replace("*", "").Replace("?", "");
+                "/sys/class/hwmon/hwmon*/fan2_input",
+                "/sys/class/drm/card0/device/hwmon/hwmon*/fan1_input",
+                "/sys/devices/platform/it87.*/hwmon/hwmon*/fan2_input",
+                "/sys/devices/platform/nct6775.*/hwmon/hwmon*/fan2_input",
+                "/sys/class/hwmon/hwmon*/pwm2",
+                "/sys/devices/platform/acer-wmi/fan2_input"
+            };
 
-                if (Directory.Exists(dir))
+            // Also check Acer-specific locations
+            string[] possibleAcerMultiValuePaths =
+            {
+                "/sys/devices/platform/acer-wmi/fan_speed",
+                "/proc/acpi/acer-wmi/fans"
+            };
+
+            // Check for multi-value Acer fan files
+            foreach (var path in possibleAcerMultiValuePaths)
+                if (File.Exists(path))
                 {
-                    var matchingFiles = Directory.GetFiles(dir, pattern, SearchOption.AllDirectories);
-
-                    foreach (var file in matchingFiles)
+                    // Check if this is a multi-value file
+                    var content = File.ReadAllText(path).Trim();
+                    if (content.Contains("CPU") || content.Contains("GPU"))
                     {
-                        try
+                        // This is a special file with both readings
+                        _systemInfoPaths["cpu_fan_special"] =
+                            path + "#CPU"; // Special marker to indicate parsing needed
+                        _systemInfoPaths["gpu_fan_special"] = path + "#GPU";
+                        return;
+                    }
+                }
+
+            // Find CPU fan speed path
+            if (!_systemInfoPaths.ContainsKey("cpu_fan"))
+                foreach (var pathPattern in possibleCpuFanPaths)
+                {
+                    var baseDir = Path.GetDirectoryName(pathPattern);
+                    if (baseDir == null || !Directory.Exists(baseDir)) continue;
+
+
+                    foreach (var hwmonDir in hwmonDirs)
+                    {
+                        var fanFile = Path.Combine(hwmonDir, Path.GetFileName(pathPattern).Replace("*", ""));
+                        if (File.Exists(fanFile))
                         {
-                            // Make sure the file actually contains a number
-                            var content = File.ReadAllText(file).Trim();
-                            if (int.TryParse(content, out _))
-                            {
-                                if (!_systemInfoPaths.ContainsKey("cpu_fan"))
-                                {
-                                    _systemInfoPaths["cpu_fan"] = file;
-                                }
-                                else if (!_systemInfoPaths.ContainsKey("gpu_fan"))
-                                {
-                                    _systemInfoPaths["gpu_fan"] = file;
-                                    break;
-                                }
-                            }
-                        }
-                        catch
-                        {
-                            /* Continue if this file fails */
+                            _systemInfoPaths["cpu_fan"] = fanFile;
+                            break;
                         }
                     }
 
-                    if (_systemInfoPaths.ContainsKey("cpu_fan") && _systemInfoPaths.ContainsKey("gpu_fan"))
-                        break;
+                    if (_systemInfoPaths.ContainsKey("cpu_fan")) break;
                 }
-            }
-        }
 
-        // For NVIDIA GPUs, if we couldn't find a path, try detecting with nvidia-smi
-        if (_gpuType == GpuType.Nvidia && !_systemInfoPaths.ContainsKey("gpu_fan"))
-        {
-            var nvidiaSmiOutput = RunCommand("nvidia-smi", "--query-gpu=fan.speed --format=csv,noheader");
-            if (!string.IsNullOrWhiteSpace(nvidiaSmiOutput) && nvidiaSmiOutput.Contains("%"))
-                // Mark that we're using nvidia-smi for fan speed (special case)
-                _systemInfoPaths["gpu_fan_nvidia_smi"] = "true";
-        }
-
-        // For AMD GPUs, if we couldn't find a path, try with rocm-smi
-        if (_gpuType == GpuType.Amd && !_systemInfoPaths.ContainsKey("gpu_fan"))
-        {
-            var rocmSmiOutput = RunCommand("rocm-smi", "--showfan");
-            if (!string.IsNullOrWhiteSpace(rocmSmiOutput) && rocmSmiOutput.Contains("Fan Speed (%)"))
-                // Mark that we're using rocm-smi for fan speed (special case)
-                _systemInfoPaths["gpu_fan_rocm_smi"] = "true";
-        }
-
-        // If still no paths found, we'll fallback to sensors command
-        if (!_systemInfoPaths.ContainsKey("cpu_fan"))
-            _systemInfoPaths["cpu_fan_sensors"] = "sensors#fan1"; // Special marker for sensors command
-            
-        if (!_systemInfoPaths.ContainsKey("gpu_fan"))
-            _systemInfoPaths["gpu_fan_sensors"] = "sensors#fan2"; // Special marker for sensors command
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error finding fan speed paths: {ex.Message}");
-        _fanPathsSearched = true;
-    }
-}
-
-   private (int cpuFan, int gpuFan) GetFanSpeeds()
-{
-    try
-    {
-        // If paths haven't been searched yet, find them
-        if (!_fanPathsSearched) FindFanSpeedPaths();
-
-        var cpuFanSpeed = 0;
-        var gpuFanSpeed = 0;
-
-        // Read CPU fan speed
-        if (_systemInfoPaths.ContainsKey("cpu_fan") && File.Exists(_systemInfoPaths["cpu_fan"]))
-        {
-            var content = File.ReadAllText(_systemInfoPaths["cpu_fan"]).Trim();
-            if (int.TryParse(content, out var speed))
-                cpuFanSpeed = speed;
-        }
-        else if (_systemInfoPaths.ContainsKey("cpu_fan_special"))
-        {
-            // This is a special case where the file contains labeled values
-            var specialPath = _systemInfoPaths["cpu_fan_special"];
-            var actualPath = specialPath.Split('#')[0];
-            var content = File.ReadAllText(actualPath).Trim();
-            var match = Regex.Match(content, @"CPU:?\s*(\d+)");
-            if (match.Success) cpuFanSpeed = int.Parse(match.Groups[1].Value);
-        }
-        else if (_systemInfoPaths.ContainsKey("cpu_fan_sensors"))
-        {
-            // Use sensors command for fan readings
-            var sensorsOutput = RunCommand("sensors", "");
-
-            // Parse based on fan number
-            var fanPattern = _systemInfoPaths["cpu_fan_sensors"].EndsWith("fan1") ? 
-                @"fan1:\s+(\d+) RPM" : @"fan\d+:\s+(\d+) RPM";
-
-            var match = Regex.Match(sensorsOutput, fanPattern);
-            if (match.Success) cpuFanSpeed = int.Parse(match.Groups[1].Value);
-        }
-
-        // Read GPU fan speed
-        if (_systemInfoPaths.ContainsKey("gpu_fan") && File.Exists(_systemInfoPaths["gpu_fan"]))
-        {
-            var content = File.ReadAllText(_systemInfoPaths["gpu_fan"]).Trim();
-            if (int.TryParse(content, out var speed))
-                gpuFanSpeed = speed;
-        }
-        else if (_systemInfoPaths.ContainsKey("gpu_fan_special"))
-        {
-            // This is a special case where the file contains labeled values
-            var specialPath = _systemInfoPaths["gpu_fan_special"];
-            var actualPath = specialPath.Split('#')[0];
-            var content = File.ReadAllText(actualPath).Trim();
-            var match = Regex.Match(content, @"GPU:?\s*(\d+)");
-            if (match.Success) gpuFanSpeed = int.Parse(match.Groups[1].Value);
-        }
-        else if (_systemInfoPaths.ContainsKey("gpu_fan_sensors"))
-        {
-            // Use sensors command for fan readings
-            var sensorsOutput = RunCommand("sensors", "");
-
-            // Parse based on fan number
-            var fanPattern = _systemInfoPaths["gpu_fan_sensors"].EndsWith("fan2") ? 
-                @"fan2:\s+(\d+) RPM" : @"fan\d+:\s+(\d+) RPM";
-
-            var matches = Regex.Matches(sensorsOutput, fanPattern);
-            if (matches.Count >= 2)
-                gpuFanSpeed = int.Parse(matches[1].Groups[1].Value);
-            else if (matches.Count == 1 && _systemInfoPaths["gpu_fan_sensors"].EndsWith("fan2"))
-                gpuFanSpeed = int.Parse(matches[0].Groups[1].Value);
-        }
-        else if (_systemInfoPaths.ContainsKey("gpu_fan_nvidia_smi"))
-        {
-            var nvidiaSmiOutput = RunCommand("nvidia-smi", "--query-gpu=fan.speed --format=csv,noheader");
-            if (!string.IsNullOrWhiteSpace(nvidiaSmiOutput))
-            {
-                var match = Regex.Match(nvidiaSmiOutput, @"(\d+)\s*%");
-                if (match.Success)
+            // Find GPU fan speed path
+            if (!_systemInfoPaths.ContainsKey("gpu_fan"))
+                foreach (var pathPattern in possibleGpuFanPaths)
                 {
-                    // Convert percentage to RPM (approximation)
-                    var percentage = int.Parse(match.Groups[1].Value);
-                    gpuFanSpeed = percentage * 60; // Rough approximation
-                }
-            }
-        }
-        else if (_systemInfoPaths.ContainsKey("gpu_fan_rocm_smi"))
-        {
-            var rocmSmiOutput = RunCommand("rocm-smi", "--showfan");
-            if (!string.IsNullOrWhiteSpace(rocmSmiOutput))
-            {
-                var match = Regex.Match(rocmSmiOutput, @"Fan Speed \(%\)\s*:\s*(\d+)");
-                if (match.Success)
-                {
-                    // Convert percentage to RPM (approximation)
-                    var percentage = int.Parse(match.Groups[1].Value);
-                    gpuFanSpeed = percentage * 60; // Rough approximation
-                }
-            }
-        }
+                    var baseDir = Path.GetDirectoryName(pathPattern);
+                    if (baseDir == null || !Directory.Exists(baseDir)) continue;
 
-        CpuFanSpeedRPM = cpuFanSpeed;
-        GpuFanSpeedRPM = gpuFanSpeed;
-        return (cpuFanSpeed, gpuFanSpeed);
+                    foreach (var hwmonDir in hwmonDirs)
+                    {
+                        var fanFile = Path.Combine(hwmonDir, Path.GetFileName(pathPattern).Replace("*", ""));
+                        if (File.Exists(fanFile))
+                        {
+                            _systemInfoPaths["gpu_fan"] = fanFile;
+                            break;
+                        }
+                    }
+
+                    if (_systemInfoPaths.ContainsKey("gpu_fan")) break;
+                }
+
+            // Search for wildcard paths using the original method as fallback
+            if (!_systemInfoPaths.ContainsKey("cpu_fan") || !_systemInfoPaths.ContainsKey("gpu_fan"))
+            {
+                string[] wildcardPaths =
+                {
+                    "/sys/class/hwmon/hwmon*/fan1_input",
+                    "/sys/class/hwmon/hwmon*/fan2_input"
+                };
+
+                foreach (var pathPattern in wildcardPaths)
+                {
+                    var dir = Path.GetDirectoryName(pathPattern) ?? string.Empty;
+                    var pattern = Path.GetFileName(pathPattern).Replace("*", "").Replace("?", "");
+
+                    if (Directory.Exists(dir))
+                    {
+                        var matchingFiles = Directory.GetFiles(dir, pattern, SearchOption.AllDirectories);
+
+                        foreach (var file in matchingFiles)
+                            try
+                            {
+                                // Make sure the file actually contains a number
+                                var content = File.ReadAllText(file).Trim();
+                                if (int.TryParse(content, out _))
+                                {
+                                    if (!_systemInfoPaths.ContainsKey("cpu_fan"))
+                                    {
+                                        _systemInfoPaths["cpu_fan"] = file;
+                                    }
+                                    else if (!_systemInfoPaths.ContainsKey("gpu_fan"))
+                                    {
+                                        _systemInfoPaths["gpu_fan"] = file;
+                                        break;
+                                    }
+                                }
+                            }
+                            catch
+                            {
+                                /* Continue if this file fails */
+                            }
+
+                        if (_systemInfoPaths.ContainsKey("cpu_fan") && _systemInfoPaths.ContainsKey("gpu_fan"))
+                            break;
+                    }
+                }
+            }
+
+            // For NVIDIA GPUs, if we couldn't find a path, try detecting with nvidia-smi
+            if (_gpuType == GpuType.Nvidia && !_systemInfoPaths.ContainsKey("gpu_fan"))
+            {
+                var nvidiaSmiOutput = RunCommand("nvidia-smi", "--query-gpu=fan.speed --format=csv,noheader");
+                if (!string.IsNullOrWhiteSpace(nvidiaSmiOutput) && nvidiaSmiOutput.Contains("%"))
+                    // Mark that we're using nvidia-smi for fan speed (special case)
+                    _systemInfoPaths["gpu_fan_nvidia_smi"] = "true";
+            }
+
+            // For AMD GPUs, if we couldn't find a path, try with rocm-smi
+            if (_gpuType == GpuType.Amd && !_systemInfoPaths.ContainsKey("gpu_fan"))
+            {
+                var rocmSmiOutput = RunCommand("rocm-smi", "--showfan");
+                if (!string.IsNullOrWhiteSpace(rocmSmiOutput) && rocmSmiOutput.Contains("Fan Speed (%)"))
+                    // Mark that we're using rocm-smi for fan speed (special case)
+                    _systemInfoPaths["gpu_fan_rocm_smi"] = "true";
+            }
+
+            // If still no paths found, we'll fallback to sensors command
+            if (!_systemInfoPaths.ContainsKey("cpu_fan"))
+                _systemInfoPaths["cpu_fan_sensors"] = "sensors#fan1"; // Special marker for sensors command
+
+            if (!_systemInfoPaths.ContainsKey("gpu_fan"))
+                _systemInfoPaths["gpu_fan_sensors"] = "sensors#fan2"; // Special marker for sensors command
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error finding fan speed paths: {ex.Message}");
+            _fanPathsSearched = true;
+        }
     }
-    catch (Exception ex)
+
+    private (int cpuFan, int gpuFan) GetFanSpeeds()
     {
-        Console.WriteLine($"Error in GetFanSpeeds: {ex.Message}");
-        return (0, 0);
+        try
+        {
+            // If paths haven't been searched yet, find them
+            if (!_fanPathsSearched) FindFanSpeedPaths();
+
+            var cpuFanSpeed = 0;
+            var gpuFanSpeed = 0;
+
+            // Read CPU fan speed
+            if (_systemInfoPaths.ContainsKey("cpu_fan") && File.Exists(_systemInfoPaths["cpu_fan"]))
+            {
+                var content = File.ReadAllText(_systemInfoPaths["cpu_fan"]).Trim();
+                if (int.TryParse(content, out var speed))
+                    cpuFanSpeed = speed;
+            }
+            else if (_systemInfoPaths.ContainsKey("cpu_fan_special"))
+            {
+                // This is a special case where the file contains labeled values
+                var specialPath = _systemInfoPaths["cpu_fan_special"];
+                var actualPath = specialPath.Split('#')[0];
+                var content = File.ReadAllText(actualPath).Trim();
+                var match = Regex.Match(content, @"CPU:?\s*(\d+)");
+                if (match.Success) cpuFanSpeed = int.Parse(match.Groups[1].Value);
+            }
+            else if (_systemInfoPaths.ContainsKey("cpu_fan_sensors"))
+            {
+                // Use sensors command for fan readings
+                var sensorsOutput = RunCommand("sensors", "");
+
+                // Parse based on fan number
+                var fanPattern = _systemInfoPaths["cpu_fan_sensors"].EndsWith("fan1")
+                    ? @"fan1:\s+(\d+) RPM"
+                    : @"fan\d+:\s+(\d+) RPM";
+
+                var match = Regex.Match(sensorsOutput, fanPattern);
+                if (match.Success) cpuFanSpeed = int.Parse(match.Groups[1].Value);
+            }
+
+            // Read GPU fan speed
+            if (_systemInfoPaths.ContainsKey("gpu_fan") && File.Exists(_systemInfoPaths["gpu_fan"]))
+            {
+                var content = File.ReadAllText(_systemInfoPaths["gpu_fan"]).Trim();
+                if (int.TryParse(content, out var speed))
+                    gpuFanSpeed = speed;
+            }
+            else if (_systemInfoPaths.ContainsKey("gpu_fan_special"))
+            {
+                // This is a special case where the file contains labeled values
+                var specialPath = _systemInfoPaths["gpu_fan_special"];
+                var actualPath = specialPath.Split('#')[0];
+                var content = File.ReadAllText(actualPath).Trim();
+                var match = Regex.Match(content, @"GPU:?\s*(\d+)");
+                if (match.Success) gpuFanSpeed = int.Parse(match.Groups[1].Value);
+            }
+            else if (_systemInfoPaths.ContainsKey("gpu_fan_sensors"))
+            {
+                // Use sensors command for fan readings
+                var sensorsOutput = RunCommand("sensors", "");
+
+                // Parse based on fan number
+                var fanPattern = _systemInfoPaths["gpu_fan_sensors"].EndsWith("fan2")
+                    ? @"fan2:\s+(\d+) RPM"
+                    : @"fan\d+:\s+(\d+) RPM";
+
+                var matches = Regex.Matches(sensorsOutput, fanPattern);
+                if (matches.Count >= 2)
+                    gpuFanSpeed = int.Parse(matches[1].Groups[1].Value);
+                else if (matches.Count == 1 && _systemInfoPaths["gpu_fan_sensors"].EndsWith("fan2"))
+                    gpuFanSpeed = int.Parse(matches[0].Groups[1].Value);
+            }
+            else if (_systemInfoPaths.ContainsKey("gpu_fan_nvidia_smi"))
+            {
+                var nvidiaSmiOutput = RunCommand("nvidia-smi", "--query-gpu=fan.speed --format=csv,noheader");
+                if (!string.IsNullOrWhiteSpace(nvidiaSmiOutput))
+                {
+                    var match = Regex.Match(nvidiaSmiOutput, @"(\d+)\s*%");
+                    if (match.Success)
+                    {
+                        // Convert percentage to RPM (approximation)
+                        var percentage = int.Parse(match.Groups[1].Value);
+                        gpuFanSpeed = percentage * 60; // Rough approximation
+                    }
+                }
+            }
+            else if (_systemInfoPaths.ContainsKey("gpu_fan_rocm_smi"))
+            {
+                var rocmSmiOutput = RunCommand("rocm-smi", "--showfan");
+                if (!string.IsNullOrWhiteSpace(rocmSmiOutput))
+                {
+                    var match = Regex.Match(rocmSmiOutput, @"Fan Speed \(%\)\s*:\s*(\d+)");
+                    if (match.Success)
+                    {
+                        // Convert percentage to RPM (approximation)
+                        var percentage = int.Parse(match.Groups[1].Value);
+                        gpuFanSpeed = percentage * 60; // Rough approximation
+                    }
+                }
+            }
+
+            CpuFanSpeedRPM = cpuFanSpeed;
+            GpuFanSpeedRPM = gpuFanSpeed;
+            return (cpuFanSpeed, gpuFanSpeed);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in GetFanSpeeds: {ex.Message}");
+            return (0, 0);
+        }
     }
-}
 
     private void InitializeFanAnimations(MaterialIcon cpuFanIcon, MaterialIcon gpuFanIcon)
     {
