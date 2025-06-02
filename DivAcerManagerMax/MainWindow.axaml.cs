@@ -18,7 +18,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private readonly DAMXClient _client;
 
     private readonly string _effectColor = "#0078D7";
-    private readonly string ProjectVersion = "0.7.2";
+    private readonly string ProjectVersion = "0.7.4";
     private Button _applyKeyboardColorsButton;
     private RadioButton _autoFanSpeedRadioButton;
 
@@ -56,7 +56,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     // UI Controls
     private RadioButton _lowPowerProfileButton;
 
-    private RadioButton _manualFanSpeedRadioButton;
+    private RadioButton _manualFanSpeedRadioButton, _maxFanSpeedRadioButton;
 
     private TextBlock _modelNameText,
         _laptopTypeText,
@@ -157,6 +157,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         // Fan control controls
         _manualFanSpeedRadioButton = this.FindControl<RadioButton>("ManualFanSpeedRadioButton");
+        _maxFanSpeedRadioButton = this.FindControl<RadioButton>("MaxFanSpeedRadioButton");
         _cpuFanSlider = this.FindControl<Slider>("CpuFanSlider");
         _gpuFanSlider = this.FindControl<Slider>("GpuFanSlider");
         _cpuFanTextBlock = this.FindControl<TextBlock>("CpuFanTextBlock");
@@ -682,14 +683,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             await _client.SetFanSpeedAsync(0, 0); // Set to auto
             _isManualFanControl = false;
-            _manualFanSpeedRadioButton.IsChecked = false;
-            _autoFanSpeedRadioButton.IsChecked = true;
-            _manualFanSpeedRadioButton.IsEnabled = false;
+            if (!devMode)
+            {
+                _manualFanSpeedRadioButton.IsChecked = false;
+                _autoFanSpeedRadioButton.IsChecked = true;
+                _manualFanSpeedRadioButton.IsEnabled = false;
+                _maxFanSpeedRadioButton.IsEnabled = false;
+            }
+
             _thermalProfileInfoText.Text = "Minimizes noise, prioritizes low power and cooling.";
         }
         else
         {
             // Re-enable manual controls (if they were enabled before)
+            _maxFanSpeedRadioButton.IsEnabled = true;
             _manualFanSpeedRadioButton.IsEnabled = true;
         }
 
