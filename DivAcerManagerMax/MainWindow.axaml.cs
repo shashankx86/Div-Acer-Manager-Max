@@ -18,7 +18,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private readonly DAMXClient _client;
 
     private readonly string _effectColor = "#0078D7";
-    private readonly string ProjectVersion = "0.7.4";
+    private readonly string ProjectVersion = "0.7.9";
     private Button _applyKeyboardColorsButton;
     private RadioButton _autoFanSpeedRadioButton;
 
@@ -212,7 +212,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         _supportedFeaturesTextBlock = this.FindControl<TextBlock>("SupportedFeaturesTextBlock");
         _daemonVersionText = this.FindControl<TextBlock>("DaemonVersionText");
         _guiVersionTextBlock = this.FindControl<TextBlock>("ProjectVersionText");
-        _guiVersionTextBlock.Text = ProjectVersion;
+        _guiVersionTextBlock.Text = $"v{ProjectVersion}";
         _kernelInfoText = this.FindControl<TextBlock>("KernelInfoText");
 
         //Error Message
@@ -377,11 +377,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             if (_isConnected)
             {
                 await LoadSettingsAsync();
-                _daemonErrorGrid.IsVisible = false;
+                _daemonErrorGrid.IsVisible = true;
             }
             else
             {
-                await ShowErrorDialogAsync("Failed to connect to DAMX daemon. Make sure the service is running.");
+                await ShowErrorDialogAsync(
+                    "Failed to connect to DAMX daemon. The Daemon can ve initializing please wait.");
                 _daemonErrorGrid.IsVisible = true;
             }
         }
@@ -560,7 +561,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         _lightSpeedTextBlock.Text = _lightingSpeed.ToString();
 
         //Update System Info
-        _daemonVersionText.Text = _settings.Version;
+        _daemonVersionText.Text = $"v{_settings.Version}";
         _laptopTypeText.Text = _settings.LaptopType;
         _supportedFeaturesTextBlock.Text =
             _supportedFeaturesTextBlock.Text = string.Join(", ", _settings.AvailableFeatures);
@@ -639,6 +640,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         InitializeAsync();
     }
 
+
     private void UpdatesButton_OnClick(object? sender, RoutedEventArgs e)
     {
         Process.Start("xdg-open", "https://github.com/PXDiv/Div-Acer-Manager-Max/releases");
@@ -654,6 +656,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         Process.Start("xdg-open", "https://github.com/PXDiv/Div-Acer-Manager-Max/issues");
     }
 
+    private void InternalsMangerWindow_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var InternalsManagerWindow = new InternalsManger();
+        InternalsManagerWindow.Show(); // or ShowDialog(this) for modal
+    }
 
     #region Event Handlers
 

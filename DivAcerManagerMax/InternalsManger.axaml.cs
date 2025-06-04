@@ -1,6 +1,11 @@
+using Avalonia.Controls;
+
 namespace DivAcerManagerMax;
 
-public class InternalsManger_axaml
+public partial class InternalsManger : Window
 {
-    
+    public InternalsManger()
+    {
+        InitializeComponent();
+    }
 }

@@ -3,6 +3,7 @@
 # Compatible with Predator and Nitro laptops
 
 import os
+import subprocess
 import sys
 import json
 import time
@@ -16,11 +17,11 @@ import configparser
 import traceback
 from pathlib import Path
 from enum import Enum
-from PowerSourceDetection import PowerSourceDetector  # Assuming you named the new file power_source_detector.py
+from PowerSourceDetection import PowerSourceDetector 
 from typing import Dict, List, Tuple, Set
 
 # Constants
-VERSION = "0.2.9"
+VERSION = "0.3.2"
 SOCKET_PATH = "/var/run/DAMX.sock"
 LOG_PATH = "/var/log/DAMX_Daemon_Log.log"
 CONFIG_PATH = "/etc/DAMX_Daemon/config.ini"
@@ -55,6 +56,9 @@ class LaptopType(Enum):
 class DAMXManager:
     """Manages all the DAMX-Daemon features"""
 
+    MAX_RESTART_ATTEMPTS = 20
+    RESTART_COUNTER_FILE = "/tmp/damx_restart_attempts"
+
     def __init__(self):
         # Check if linuwu_sense is installed
         if not os.path.exists("/sys/module/linuwu_sense"):
@@ -63,6 +67,28 @@ class DAMXManager:
             log.info("linuwu_sense module found. Proceeding with initialization.")
         
         self.laptop_type = self._detect_laptop_type()
+        
+        # If unknown laptop type detected, try restarting drivers (with limit)
+        if self.laptop_type == LaptopType.UNKNOWN:
+            current_attempts = self._get_restart_attempts()
+            
+            if current_attempts < self.MAX_RESTART_ATTEMPTS:
+                attempts = self._increment_restart_attempts()
+                log.warning(f"Unknown laptop type detected, attempting driver restart (attempt {attempts}/{self.MAX_RESTART_ATTEMPTS})...")
+                
+                if self._restart_drivers_and_daemon():
+                    # The daemon will restart itself, so we should exit this instance
+                    log.info("Driver restart initiated, daemon will restart automatically")
+                    sys.exit(0)
+                else:
+                    log.error(f"Failed to restart drivers (attempt {attempts}), continuing with limited functionality")
+            else:
+                log.error(f"Maximum restart attempts ({self.MAX_RESTART_ATTEMPTS}) reached, giving up on driver restart")
+                log.info("Continuing with unknown laptop type and limited functionality")
+        else:
+            # Reset counter on successful detection
+            self._reset_restart_attempts()
+        
         self.base_path = self._get_base_path()
         self.has_four_zone_kb = self._check_four_zone_kb()
 
@@ -80,7 +106,68 @@ class DAMXManager:
             raise FileNotFoundError(f"Base path does not exist: {self.base_path}")
         
         self.power_monitor = None
+
+    def _get_restart_attempts(self) -> int:
+        """Get current restart attempt count"""
+        try:
+            if os.path.exists(self.RESTART_COUNTER_FILE):
+                with open(self.RESTART_COUNTER_FILE, 'r') as f:
+                    return int(f.read().strip())
+        except (ValueError, IOError):
+            pass
+        return 0
+
+    def _increment_restart_attempts(self) -> int:
+        """Increment and return restart attempt count"""
+        attempts = self._get_restart_attempts() + 1
+        try:
+            with open(self.RESTART_COUNTER_FILE, 'w') as f:
+                f.write(str(attempts))
+        except IOError as e:
+            log.error(f"Failed to write restart counter: {e}")
+        return attempts
+
+    def _reset_restart_attempts(self):
+        """Reset restart attempt counter"""
+        try:
+            if os.path.exists(self.RESTART_COUNTER_FILE):
+                os.unlink(self.RESTART_COUNTER_FILE)
+        except IOError as e:
+            log.error(f"Failed to reset restart counter: {e}")
+
+    def _restart_drivers_and_daemon(self):
+        """Restart linuwu-sense driver and DAMX daemon service"""
+        attempts = self._get_restart_attempts()
+        log.info(f"Attempting to restart drivers and daemon (attempt {attempts}/{self.MAX_RESTART_ATTEMPTS})...")
         
+        try:
+            # Remove the module
+            subprocess.run(['sudo', 'rmmod', 'linuwu-sense'], check=True)
+            log.info("Successfully removed linuwu-sense module")
+            
+            # Wait a moment
+            time.sleep(2)
+            
+            # Reload the module
+            subprocess.run(['sudo', 'modprobe', 'linuwu-sense'], check=True)
+            log.info("Successfully reloaded linuwu-sense module")
+            
+            # Wait a moment for module to initialize
+            time.sleep(3)
+            
+            # Restart the daemon service
+            subprocess.run(['sudo', 'systemctl', 'restart', 'damx-daemon.service'], check=True)
+            log.info("Successfully restarted DAMX daemon service")
+            
+            return True
+            
+        except subprocess.CalledProcessError as e:
+            log.error(f"Failed to restart drivers/daemon (attempt {attempts}): {e}")
+            return False
+        except Exception as e:
+            log.error(f"Unexpected error during restart (attempt {attempts}): {e}")
+            return False
+            
     def _detect_laptop_type(self) -> LaptopType:
         """Detect whether this is a Predator or Nitro laptop"""
         predator_path = "/sys/module/linuwu_sense/drivers/platform:acer-wmi/acer-wmi/predator_sense"
@@ -908,12 +995,14 @@ class DAMXDaemon:
             log.info(f"Detected features: {features_str}")
             self.power_monitor = PowerSourceDetector(self.manager)
 
+
             return True
         except Exception as e:
             log.error(f"Failed to set up daemon: {e}")
             log.error(traceback.format_exc())
             return False
-        
+    
+
 
     def run(self):
         """Run the daemon"""
@@ -1010,6 +1099,8 @@ def main():
     else:
         log.error("Failed to set up daemon, exiting...")
         sys.exit(1)
+
+    
 
 
 if __name__ == "__main__":

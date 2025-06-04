@@ -1,0 +1,9 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DivAcerManagerMax.InternalsManger"
+        Width="300" Height="200"
+        Title="Second Window">
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+        <TextBlock Text="Hello from the second window!" />
+    </StackPanel>
+</Window>

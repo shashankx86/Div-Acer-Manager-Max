@@ -588,6 +588,9 @@
                                                 Click="DeveloperMode_OnClick" />
                                         <Button x:Name="IssuePageButton" Content="Issue/Feedback" Margin="0 15 0 0"
                                                 Click="IssuePageButton_OnClick" />
+                                        <Button x:Name="InternalsManagerButton" Content="Internals Manager"
+                                                Margin="0 15 0 0"
+                                                Click="InternalsMangerWindow_OnClick" />
 
 
                                     </StackPanel>
@@ -608,7 +611,7 @@
                 CornerRadius="20"
                 Padding="30"
                 Width="400"
-                Height="250"
+                Height="280"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
                 <Border.Background>
@@ -620,14 +623,24 @@
 
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20">
                     <!-- Material Icon -->
-                    <material:MaterialIcon Kind="CloudOff" Foreground="#FF5A5F" Width="48" Height="48"
+                    <material:MaterialIcon Kind="Connection" Foreground="#FF5A5F" Width="48" Height="48"
                                            HorizontalAlignment="Center" />
+                    <StackPanel Spacing="0">
+                        <!-- Message -->
+                        <TextBlock Text="Daemon not connected"
+                                   Foreground="White"
+                                   FontSize="18"
+                                   HorizontalAlignment="Center"
+                                   Classes="SectionHeader"
+                                   Margin="0,12,0,0" />
 
-                    <!-- Message -->
-                    <TextBlock Text="Daemon not connected"
-                               Foreground="White"
-                               FontSize="18"
-                               HorizontalAlignment="Center" />
+                        <TextBlock
+                            Text="Daemon may be initializing. Please wait a minute. If issues persistx, check logs."
+                            Foreground="White"
+                            FontSize="13"
+                            TextWrapping="Wrap"
+                            HorizontalAlignment="Center" />
+                    </StackPanel>
 
                     <!-- Retry Button -->
                     <Button Content="Retry"
