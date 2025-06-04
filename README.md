@@ -76,7 +76,7 @@
 5. Choose the option 1 from the menu to install:
 
    * `1` → Install
-   * `1` → Install without Drivers
+   * `2` → Install without Drivers
    * `3` → Uninstall
    * `4` → Reinstall/Update
 
