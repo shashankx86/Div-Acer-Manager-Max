@@ -589,6 +589,7 @@
                                         <Button x:Name="IssuePageButton" Content="Issue/Feedback" Margin="0 15 0 0"
                                                 Click="IssuePageButton_OnClick" />
                                         <Button x:Name="InternalsManagerButton" Content="Internals Manager"
+                                                IsVisible="False"
                                                 Margin="0 15 0 0"
                                                 Click="InternalsMangerWindow_OnClick" />
 
