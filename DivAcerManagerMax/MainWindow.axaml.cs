@@ -18,7 +18,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private readonly DAMXClient _client;
 
     private readonly string _effectColor = "#0078D7";
-    private readonly string ProjectVersion = "0.7.9";
+    private readonly string ProjectVersion = "0.7.10";
     private Button _applyKeyboardColorsButton;
     private RadioButton _autoFanSpeedRadioButton;
 

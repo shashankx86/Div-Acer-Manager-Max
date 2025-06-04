@@ -8,11 +8,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="946eaab8-0dd2-4963-b8be-4ed6ac03a9a6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/DivAcerManagerMax/InternalsManager.axaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/DivAcerManagerMax/InternalsManger.axaml.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/DAMXClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/DAMXClient.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/DivAcerManagerMax.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/DivAcerManagerMax.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" afterDir="false" />
     </list>
@@ -75,7 +71,7 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected=".NET Project.DivAcerManagerMax">
+  <component name="RunManager" selected="Publish to folder.Publish">
     <configuration name="Publish" type="DotNetFolderPublish" factoryName="Publish to folder">
       <riderPublish configuration="Release" delete_existing_files="true" include_all_content_for_self_extract="true" include_native_libs_for_self_extract="true" platform="Any CPU" produce_single_file="true" runtime="linux-x64" self_contained="true" target_folder="$PROJECT_DIR$/publish" target_framework="net9.0" uuid_high="7341861591033859200" uuid_low="-5557819635835235413" />
       <method v="2" />
@@ -200,6 +196,7 @@
       <workItem from="1748996814617" duration="672000" />
       <workItem from="1748977704488" duration="270000" />
       <workItem from="1748978054405" duration="792000" />
+      <workItem from="1749038172727" duration="173000" />
     </task>
     <servers />
   </component>
