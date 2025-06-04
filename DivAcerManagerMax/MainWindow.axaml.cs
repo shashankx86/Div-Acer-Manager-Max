@@ -377,12 +377,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             if (_isConnected)
             {
                 await LoadSettingsAsync();
-                _daemonErrorGrid.IsVisible = true;
+                _daemonErrorGrid.IsVisible = false;
             }
             else
             {
                 await ShowErrorDialogAsync(
-                    "Failed to connect to DAMX daemon. The Daemon can ve initializing please wait.");
+                    "Failed to connect to DAMX daemon. The Daemon may be initializing please wait.");
                 _daemonErrorGrid.IsVisible = true;
             }
         }
