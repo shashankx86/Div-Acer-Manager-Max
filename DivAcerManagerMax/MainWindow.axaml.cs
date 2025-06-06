@@ -15,7 +15,7 @@ namespace DivAcerManagerMax;
 
 public partial class MainWindow : Window, INotifyPropertyChanged
 {
-    private readonly DAMXClient _client;
+    public readonly DAMXClient _client;
 
     private readonly string _effectColor = "#0078D7";
     private readonly string ProjectVersion = "0.7.10";
@@ -91,8 +91,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private ColorPicker _zone1ColorPicker, _zone2ColorPicker, _zone3ColorPicker, _zone4ColorPicker;
     private Border _zone2Border;
     private Border _zone3Border;
-
-    private bool devMode;
 
 
     public MainWindow()
@@ -279,10 +277,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         // Show/hide features based on availability
         if (thermalProfilePanel != null)
-            thermalProfilePanel.IsVisible = _client.IsFeatureAvailable("thermal_profile") || devMode;
+            thermalProfilePanel.IsVisible = _client.IsFeatureAvailable("thermal_profile") || AppState.DevMode;
 
         if (fanControlPanel != null)
-            fanControlPanel.IsVisible = _client.IsFeatureAvailable("fan_speed") || devMode;
+            fanControlPanel.IsVisible = _client.IsFeatureAvailable("fan_speed") || AppState.DevMode;
 
         if (batteryTab != null)
         {
@@ -295,10 +293,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             var limiterControls = this.FindControl<Border>("LimiterControls");
 
             if (calibrationControls != null)
-                calibrationControls.IsVisible = _client.IsFeatureAvailable("battery_calibration") || devMode;
+                calibrationControls.IsVisible = _client.IsFeatureAvailable("battery_calibration") || AppState.DevMode;
 
             if (limiterControls != null)
-                limiterControls.IsVisible = _client.IsFeatureAvailable("battery_limiter") || devMode;
+                limiterControls.IsVisible = _client.IsFeatureAvailable("battery_limiter") || AppState.DevMode;
         }
 
         // Handle keyboard lighting features
@@ -309,13 +307,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         keyboardLightingTab.IsVisible = hasKeyboardFeatures;
 
         if (zoneColorControlPanel != null)
-            keyboardLightingTab.IsVisible = _client.IsFeatureAvailable("per_zone_mode") || devMode;
+            keyboardLightingTab.IsVisible = _client.IsFeatureAvailable("per_zone_mode") || AppState.DevMode;
 
         if (keyboardEffectsPanel != null)
-            keyboardEffectsPanel.IsVisible = _client.IsFeatureAvailable("four_zone_mode") || devMode;
+            keyboardEffectsPanel.IsVisible = _client.IsFeatureAvailable("four_zone_mode") || AppState.DevMode;
 
         if (usbChargingPanel != null)
-            usbChargingPanel.IsVisible = _client.IsFeatureAvailable("usb_charging") || devMode;
+            usbChargingPanel.IsVisible = _client.IsFeatureAvailable("usb_charging") || AppState.DevMode;
 
         // Handle system settings
         if (systemSettingsTab != null)
@@ -331,13 +329,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             var bootSoundControls = this.FindControl<Border>("BootSoundControls");
 
             if (backlightControls != null)
-                backlightControls.IsVisible = _client.IsFeatureAvailable("backlight_timeout") || devMode;
+                backlightControls.IsVisible = _client.IsFeatureAvailable("backlight_timeout") || AppState.DevMode;
 
             if (lcdControls != null)
-                lcdControls.IsVisible = _client.IsFeatureAvailable("lcd_override") || devMode;
+                lcdControls.IsVisible = _client.IsFeatureAvailable("lcd_override") || AppState.DevMode;
 
             if (bootSoundControls != null)
-                bootSoundControls.IsVisible = _client.IsFeatureAvailable("boot_animation_sound") || devMode;
+                bootSoundControls.IsVisible = _client.IsFeatureAvailable("boot_animation_sound") || AppState.DevMode;
         }
     }
 
@@ -468,7 +466,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             {
                 var shouldShow = isPluggedIn ? config.showOnAC : config.showOnBattery;
                 config.button.IsEnabled = true;
-                config.button.IsVisible = shouldShow || devMode;
+                config.button.IsVisible = shouldShow || AppState.DevMode;
             }
         }
 
@@ -628,10 +626,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }.ShowDialog(this);
     }
 
-    private void DeveloperMode_OnClick(object? sender, RoutedEventArgs e)
+
+    public void DeveloperMode_OnClick(object? sender, RoutedEventArgs e)
     {
-        devMode = true;
-        _powerToggleSwitch.IsHitTestVisible = true;
+        EnableDevMode(true);
+    }
+
+    public void EnableDevMode(bool toEnable)
+    {
+        AppState.DevMode = toEnable;
+        _powerToggleSwitch.IsHitTestVisible = toEnable;
         ApplySettingsToUI();
     }
 
@@ -658,8 +662,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void InternalsMangerWindow_OnClick(object? sender, RoutedEventArgs e)
     {
-        var InternalsManagerWindow = new InternalsManger();
+        var InternalsManagerWindow = new InternalsManger(this);
         InternalsManagerWindow.Show(); // or ShowDialog(this) for modal
+    }
+
+    public static class AppState
+    {
+        public static bool DevMode { get; set; }
     }
 
     #region Event Handlers
@@ -690,7 +699,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             await _client.SetFanSpeedAsync(0, 0); // Set to auto
             _isManualFanControl = false;
-            if (!devMode)
+            if (!AppState.DevMode)
             {
                 _manualFanSpeedRadioButton.IsChecked = false;
                 _autoFanSpeedRadioButton.IsChecked = true;
@@ -883,7 +892,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private async void LightingEffectsApplyButton_Click(object sender, RoutedEventArgs e)
     {
-        if ((_isConnected && _settings.HasFourZoneKb) || devMode)
+        if ((_isConnected && _settings.HasFourZoneKb) || AppState.DevMode)
         {
             var mode = _lightingModeComboBox.SelectedIndex;
             var direction = _leftToRightRadioButton.IsChecked == true ? 1 : 2;
