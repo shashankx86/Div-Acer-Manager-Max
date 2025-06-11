@@ -35,7 +35,6 @@
 
 * 🎨 **Keyboard Backlight Timeout Control**
   Customize the keyboard backlight timeout
-  *(Color picker coming soon)*
 
 * 🔊 **Boot Animation and Sound Toggle**
   Enable/disable Acer's startup animations and sounds
