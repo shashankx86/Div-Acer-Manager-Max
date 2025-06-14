@@ -29,7 +29,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Needed for git reset
+          fetch-depth: 0
 
       - name: Optionally reset to specified commit
         if: ${{ github.event.inputs.git_commit != '' }}
@@ -42,7 +42,17 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Publish application
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install PyInstaller
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+
+      - name: Publish .NET GUI application
         run: |
           dotnet publish \
             -c Release \
@@ -55,32 +65,47 @@ jobs:
             /p:DeleteExistingFiles=true \
             -o ./publish
 
-      - name: Copy icons to publish directory
+      - name: Build DAMX-Daemon Python binary
         run: |
-          cp DivAcerManagerMax/icon.png ./publish/
-          cp DivAcerManagerMax/iconTransparent.png ./publish/
+          pyinstaller --onefile --distpath ./DaemonPublish/ --clean DAMM-Daemon/DAMX-Daemon.py
 
-      - name: Prepare compressed archives
+      - name: Prepare release folder structure
         run: |
-          # Find main binary
+          mkdir -p ./release/DAMX-GUI
+          mkdir -p ./release/DAMX-Daemon
+
+          # GUI: Copy main binary and icons
           BIN=$(find ./publish -maxdepth 1 -type f -executable -name 'DivAcerManagerMax*' ! -name '*.pdb' | head -n1)
-          # Create DAMX-GUI.tar.xz with icon.png, iconTransparent.png, and main binary
-          tar -C ./publish -cf DAMX-GUI.tar \
-            $(basename "$BIN") \
-            icon.png \
-            iconTransparent.png
-          xz -9e --threads=0 DAMX-GUI.tar
-          # Create DivAcerManagerMax.pdb.tar.xz for PDB
+          cp "$BIN" ./release/DAMX-GUI/
+          cp DivAcerManagerMax/icon.png ./release/DAMX-GUI/
+          cp DivAcerManagerMax/iconTransparent.png ./release/DAMX-GUI/
+
+          # Daemon: Copy only the pyinstaller binary
+          DAEMON_BIN=$(find ./DaemonPublish -maxdepth 1 -type f -executable -name 'DAMX-Daemon*' ! -name '*.py' | head -n1)
+          cp "$DAEMON_BIN" ./release/DAMX-Daemon/
+
+          # PDB: If present, copy for separate archive
           if [ -f ./publish/DivAcerManagerMax.pdb ]; then
-            tar -C ./publish -cf DivAcerManagerMax.pdb.tar DivAcerManagerMax.pdb
+            cp ./publish/DivAcerManagerMax.pdb ./release/
+          fi
+
+      - name: Package release archive (GUI + Daemon)
+        run: |
+          tar -C ./release -cf DAMX-${{ github.event.inputs.tag }}.tar DAMX-GUI DAMX-Daemon
+          xz -9e --threads=0 DAMX-${{ github.event.inputs.tag }}.tar
+
+      - name: Package PDB (if present)
+        run: |
+          if [ -f ./release/DivAcerManagerMax.pdb ]; then
+            tar -C ./release -cf DivAcerManagerMax.pdb.tar DivAcerManagerMax.pdb
             xz -9e --threads=0 DivAcerManagerMax.pdb.tar
           fi
 
-      - name: Upload DAMX-GUI archive
+      - name: Upload DAMX archive
         uses: actions/upload-artifact@v4
         with:
-          name: DAMX-GUI
-          path: DAMX-GUI.tar.xz
+          name: DAMX-archive
+          path: DAMX-${{ github.event.inputs.tag }}.tar.xz
 
       - name: Upload PDB archive (if present)
         if: ${{ hashFiles('DivAcerManagerMax.pdb.tar.xz') != '' }}
@@ -93,10 +118,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Download DAMX-GUI archive
+      - name: Download DAMX archive
         uses: actions/download-artifact@v4
         with:
-          name: DAMX-GUI
+          name: DAMX-archive
 
       - name: Download PDB archive
         if: always()
@@ -111,5 +136,5 @@ jobs:
           tag_name: ${{ github.event.inputs.tag }}
           prerelease: ${{ github.event.inputs.prerelease }}
           files: |
-            DAMX-GUI.tar.xz
+            DAMX-${{ github.event.inputs.tag }}.tar.xz
             DivAcerManagerMax.pdb.tar.xz
