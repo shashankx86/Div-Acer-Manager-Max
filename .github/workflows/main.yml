@@ -113,6 +113,3 @@ jobs:
           files: |
             DAMX-GUI.tar.xz
             DivAcerManagerMax.pdb.tar.xz
-          files: |
-            DAMX-GUI.tar.xz
-            DivAcerManagerMax.pdb.tar.xz
