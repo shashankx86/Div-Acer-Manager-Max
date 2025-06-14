@@ -13,10 +13,20 @@
 
         <Button x:Name="DaemonLogsButton" Content="Daemon Logs" Click="DaemonLogsButton_OnClick" />
 
-        <Button x:Name="ForceNitroButton" Content="Load Drivers with Nitro_v4 parameters"
+        <Button x:Name="ForceNitroButton" Content="Load Drivers with nitro_v4 parameters"
                 Click="ForceNitroButton_OnClick" />
 
+        <Button x:Name="ForcePredatorButton" Content="Load Drivers with predator_v4 parameters"
+                Click="ForcePredatorButton_OnClick" />
+
         <Button x:Name="RestartSuiteButton" Content="Restart Drivers and Daemon" Click="RestartSuiteButton_OnClick" />
+
+        <ComboBox x:Name="ForceModelPermanently" SelectedIndex="0" Width="300" PlaceholderText="Hi"
+                  HorizontalAlignment="Left" Margin="0 10">
+            <ComboBoxItem Content="Disabled" />
+            <ComboBoxItem Content="Force Predator Model" />
+            <ComboBoxItem Content="Force Nitro Model" />
+        </ComboBox>
     </StackPanel>
 
 </Window>

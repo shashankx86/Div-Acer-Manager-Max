@@ -1,6 +1,6 @@
 using System;
 using System.Diagnostics;
-using System.Reflection;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 
@@ -21,13 +21,39 @@ public partial class InternalsManger : Window
         _mainWindow.EnableDevMode(DevModeToggleSwitch.IsChecked == true);
     }
 
+    public void ReinitializeGUI()
+    {
+        _mainWindow.InitializeAsync();
+    }
+
     private void DaemonLogsButton_OnClick(object? sender, RoutedEventArgs e)
     {
+    }
+
+    private async void RestartSuiteButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (_mainWindow._client.IsConnected) _mainWindow._client.SendCommandAsync("restart_drivers_and_daemon");
+        Console.WriteLine("Restart suite command sent");
+        await Task.Delay(1000);
+
+        ReinitializeGUI();
+    }
+
+
+    private async void ForcePredatorButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (_mainWindow._client.IsConnected) _mainWindow._client.SendCommandAsync("force_predator_model");
+        Console.WriteLine("Force Predator Model Command Sent");
+        await Task.Delay(1000);
+        ReinitializeGUI();
     }
 
     private async void ForceNitroButton_OnClick(object? sender, RoutedEventArgs e)
     {
         if (_mainWindow._client.IsConnected) _mainWindow._client.SendCommandAsync("force_nitro_model");
+        Console.WriteLine("Force Nitro Model Command Sent");
+        await Task.Delay(1000);
+        ReinitializeGUI();
     }
 
     private async void UnloadLinuwuDriver()
@@ -82,20 +108,5 @@ public partial class InternalsManger : Window
         {
             Console.WriteLine($"Error: {ex.Message}");
         }
-    }
-
-    private async void RestartSuiteButton_OnClick(object? sender, RoutedEventArgs e)
-    {
-    }
-
-    public static void RestartApp()
-    {
-        var exePath = Assembly.GetExecutingAssembly().Location;
-        Process.Start(new ProcessStartInfo
-        {
-            FileName = exePath,
-            UseShellExecute = true
-        });
-        Environment.Exit(0);
     }
 }

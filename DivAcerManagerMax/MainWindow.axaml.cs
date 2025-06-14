@@ -18,7 +18,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public readonly DAMXClient _client;
 
     private readonly string _effectColor = "#0078D7";
-    private readonly string ProjectVersion = "0.7.10";
+    private readonly string ProjectVersion = "0.8.2";
     private Button _applyKeyboardColorsButton;
     private RadioButton _autoFanSpeedRadioButton;
 
@@ -111,7 +111,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     }
 
 
-    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    public void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
         // Find all the UI controls
         FindControls();
@@ -367,7 +367,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             _balancedProfileButton.IsChecked = true;
     }
 
-    private async void InitializeAsync()
+    public async void InitializeAsync()
     {
         try
         {
