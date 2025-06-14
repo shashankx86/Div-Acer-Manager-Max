@@ -1,0 +1,70 @@
+name: Build and Publish Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_name:
+        description: 'Release name'
+        required: true
+        default: 'My Release'
+      tag:
+        description: 'Tag (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+      prerelease:
+        description: 'Is this a prerelease?'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Publish application
+        run: |
+          dotnet publish \
+            -c Release \
+            -f net9.0 \
+            -r linux-x64 \
+            --self-contained true \
+            /p:PublishSingleFile=true \
+            /p:IncludeNativeLibrariesForSelfExtract=true \
+            /p:IncludeAllContentForSelfExtract=true \
+            /p:DeleteExistingFiles=true \
+            -o ./publish
+
+      - name: Upload published artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DivAcerManagerMax-linux-x64
+          path: ./publish
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download published artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: DivAcerManagerMax-linux-x64
+          path: ./publish
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.event.inputs.release_name }}
+          tag_name: ${{ github.event.inputs.tag }}
+          prerelease: ${{ github.event.inputs.prerelease }}
+          files: ./publish/*
