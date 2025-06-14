@@ -6,11 +6,9 @@ on:
       release_name:
         description: 'Release name'
         required: true
-        default: 'My Release'
       tag:
         description: 'Tag (e.g., v1.0.0)'
         required: true
-        default: 'v1.0.0'
       prerelease:
         description: 'Is this a prerelease?'
         required: true
@@ -19,6 +17,10 @@ on:
         options:
           - 'false'
           - 'true'
+      git_commit:
+        description: 'Git commit SHA to reset to (optional)'
+        required: false
+        default: ''
 
 jobs:
   build:
@@ -26,6 +28,14 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Needed for git reset
+
+      - name: Optionally reset to specified commit
+        if: ${{ github.event.inputs.git_commit != '' }}
+        run: |
+          git reset --hard ${{ github.event.inputs.git_commit }}
+          git clean -fdx
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
