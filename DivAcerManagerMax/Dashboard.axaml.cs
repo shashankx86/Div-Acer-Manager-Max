@@ -931,19 +931,24 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
         try
         {
             // First check for hwmon6 directory and collect all temp input files
-            var hwmon6Path = "/sys/class/hwmon/hwmon6";
-            if (Directory.Exists(hwmon6Path))
-            {
-                var tempFiles = Directory.GetFiles(hwmon6Path, "temp*_input");
-                if (tempFiles.Length > 0)
+            string[] hwmonPaths =
+            [
+                "/sys/class/hwmon/hwmon5", "/sys/class/hwmon/hwmon6", "/sys/class/hwmon/hwmon7",
+                "/sys/class/hwmon/hwmon8"
+            ];
+            foreach (var hwmonPath in hwmonPaths)
+                if (Directory.Exists(hwmonPath))
                 {
-                    // Store all temperature files in a list
-                    _systemInfoPaths["cpu_temp_files"] = string.Join(",", tempFiles);
-                    Console.WriteLine(
-                        $"Found CPU Reporting Temps at {_systemInfoPaths["cpu_temp_files"].Split(',').Length} Cores, using their Avg");
-                    return;
+                    var tempFiles = Directory.GetFiles(hwmonPath, "temp*_input");
+                    if (tempFiles.Length > 3)
+                    {
+                        // Store all temperature files in a list
+                        _systemInfoPaths["cpu_temp_files"] = string.Join(",", tempFiles);
+                        Console.WriteLine(
+                            $"Found CPU Reporting Temps at {_systemInfoPaths["cpu_temp_files"].Split(',').Length} Cores, using their Avg ({hwmonPath})");
+                        return;
+                    }
                 }
-            }
 
             // Fallback to other possible paths if hwmon6 doesn't have temperature files
             string[] possibleCpuTempPaths =
@@ -952,6 +957,7 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
                 "/sys/class/thermal/thermal_zone0/temp",
                 "/sys/devices/platform/coretemp.0/hwmon/hwmon1/temp1_input"
             };
+
 
             foreach (var pathPattern in possibleCpuTempPaths)
                 if (Directory.Exists(Path.GetDirectoryName(pathPattern) ?? string.Empty))
@@ -964,6 +970,9 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
                         break;
                     }
                 }
+
+            Console.WriteLine(
+                $"Found CPU Reporting Temp at {_systemInfoPaths["cpu_temp"].Split(',').Length} Core");
 
             // Find fan speed paths
             FindFanSpeedPaths();

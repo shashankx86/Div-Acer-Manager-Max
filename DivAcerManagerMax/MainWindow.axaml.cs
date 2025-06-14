@@ -534,7 +534,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             _cpuFanSpeed = cpuSpeed;
             _cpuFanSlider.Value = cpuSpeed;
-            _cpuFanTextBlock.Text = $"{cpuSpeed}%";
+            if (_cpuFanSlider.Value != 0)
+                _cpuFanTextBlock.Text = $"{cpuSpeed}%";
+            else
+                _cpuFanTextBlock.Text = "Auto";
         }
 
         if (int.TryParse(_settings.FanSpeed?.Gpu ?? "0", out var gpuSpeed))
@@ -542,6 +545,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             _gpuFanSpeed = gpuSpeed;
             _gpuFanSlider.Value = gpuSpeed;
             _gpuFanTextBlock.Text = $"{gpuSpeed}%";
+
+            if (_gpuFanSlider.Value == 0)
+                _gpuFanTextBlock.Text = "Auto";
         }
 
         // Determine manual/auto mode based on current fan speeds
@@ -744,6 +750,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             // Properly convert double to int
             _cpuFanSpeed = Convert.ToInt32(e.NewValue);
             _cpuFanTextBlock.Text = $"{_cpuFanSpeed}%";
+            if (_cpuFanSlider.Value == 0)
+                _cpuFanTextBlock.Text = "Auto";
         }
     }
 
@@ -754,6 +762,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             // Properly convert double to int
             _gpuFanSpeed = Convert.ToInt32(e.NewValue);
             _gpuFanTextBlock.Text = $"{_gpuFanSpeed}%";
+            if (_gpuFanSlider.Value == 0)
+                _gpuFanTextBlock.Text = "Auto";
         }
     }
 
