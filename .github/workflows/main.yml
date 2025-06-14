@@ -83,7 +83,7 @@ jobs:
           path: DAMX-GUI.tar.xz
 
       - name: Upload PDB archive (if present)
-        if: exists('DivAcerManagerMax.pdb.tar.xz')
+        if: ${{ hashFiles('DivAcerManagerMax.pdb.tar.xz') != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: DivAcerManagerMax-pdb
@@ -99,10 +99,10 @@ jobs:
           name: DAMX-GUI
 
       - name: Download PDB archive
+        if: always()
         uses: actions/download-artifact@v4
         with:
           name: DivAcerManagerMax-pdb
-          # will not error if not present
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -110,6 +110,9 @@ jobs:
           name: ${{ github.event.inputs.release_name }}
           tag_name: ${{ github.event.inputs.tag }}
           prerelease: ${{ github.event.inputs.prerelease }}
+          files: |
+            DAMX-GUI.tar.xz
+            DivAcerManagerMax.pdb.tar.xz
           files: |
             DAMX-GUI.tar.xz
             DivAcerManagerMax.pdb.tar.xz
