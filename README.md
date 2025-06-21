@@ -60,20 +60,20 @@
 
 ## 🖥️ Installation
 
-1. Open a terminal 
-2. Run:
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/PXDiv/Div-Acer-Manager-Max/refs/heads/main/scripts/setup.sh)
-```
+1. Download the Latest release package from the Release section
+   
+2. Extract the Package and set the setup script to be executable
+   
+3. Open the setup script with a termial (Right click the setup file to run it as a Program or in Terminal)
 
-3. Choose the option 1 from the menu to install:
+4. Choose the option 1 from the menu to install:
 
    * `1` → Install
    * `2` → Install without Drivers
    * `3` → Uninstall
    * `4` → Reinstall/Update
 
-4. And a Reboot
+5. And a Reboot
 
 That’s it!
 
