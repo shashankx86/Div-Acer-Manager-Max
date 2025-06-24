@@ -22,6 +22,14 @@ public partial class InternalsManger : Window
     public void InitializeUiComponents()
     {
         DevModeToggleSwitch.IsChecked = MainWindow.AppState.DevMode;
+
+        ForceParameterPermanentlyComboBox.SelectedIndex = _mainWindow._settings.ModprobeParameter switch
+        {
+            "predator_v4" => 1,
+            "nitro_v4" => 2,
+            "enable_all" => 3,
+            _ => 0 // Default to "No Parameter" for empty string or unknown values
+        };
     }
 
     private void DevModeSwitch_OnClick(object? sender, RoutedEventArgs e)
@@ -85,7 +93,7 @@ public partial class InternalsManger : Window
             "Restarting Daemon refreshing GUI, please wait");
     }
 
-    private async void ShowMessagebox(string title, string message)
+    private async Task ShowMessagebox(string title, string message)
     {
         var box = MessageBoxManager
             .GetMessageBoxStandard(title, message);
@@ -102,5 +110,38 @@ public partial class InternalsManger : Window
         ShowMessagebox("Forcing All Features",
             "Initializing Drivers with enable_all parameter. Restarting daemon and refreshing GUI, please wait");
         ReinitializeDamxGUI();
+    }
+
+    private void ForceParameterPermanently_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        // Check if the combo box exists and has a selected item
+        if (ForceParameterPermanentlyComboBox == null || ForceParameterPermanentlyComboBox.SelectedIndex == -1)
+            return;
+        try
+        {
+            switch (ForceParameterPermanentlyComboBox.SelectedIndex)
+            {
+                case 0:
+                    SendCommand("remove_modprobe_parameter");
+                    return;
+                case 1:
+                    SendCommand("set_modprobe_parameter_predator");
+                    return;
+                case 2:
+                    SendCommand("set_modprobe_parameter_nitro");
+                    return;
+                case 3:
+                    SendCommand("set_modprobe_parameter_enable_all");
+                    return;
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    public async void SendCommand(string? command)
+    {
+        if (_mainWindow._client.IsConnected) _mainWindow._client.SendCommandAsync(command);
     }
 }

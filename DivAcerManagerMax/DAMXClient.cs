@@ -522,6 +522,9 @@ public class DAMXSettings
     [JsonPropertyName("per_zone_mode")] public string PerZoneMode { get; set; } = "";
 
     [JsonPropertyName("four_zone_mode")] public string FourZoneMode { get; set; } = "";
+
+    [JsonPropertyName("modprobe_parameter")]
+    public string ModprobeParameter { get; set; } = "";
 }
 
 public class ThermalProfileSettings

@@ -76,7 +76,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private RadioButton _quietProfileButton;
     private RadioButton _rightToLeftRadioButton;
     private Button _setManualSpeedButton;
-    private DAMXSettings _settings;
+    public DAMXSettings _settings;
 
     private Button _startCalibrationButton;
     private Button _stopCalibrationButton;
