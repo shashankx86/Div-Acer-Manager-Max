@@ -10,7 +10,6 @@
     <list default="true" id="946eaab8-0dd2-4963-b8be-4ed6ac03a9a6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DivAcerManagerMax/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DAMM-Daemon/DAMX-Daemon.py" beforeDir="false" afterPath="$PROJECT_DIR$/DAMM-Daemon/DAMX-Daemon.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/DivAcerManagerMax.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/DivAcerManagerMax.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/InternalsManager.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/InternalsManager.axaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/InternalsManger.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/InternalsManger.axaml.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DivAcerManagerMax/MainWindow.axaml.cs" afterDir="false" />
@@ -40,7 +39,7 @@
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="SWEA" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
@@ -209,7 +208,8 @@
       <workItem from="1749891773733" duration="797000" />
       <workItem from="1750676516890" duration="1214000" />
       <workItem from="1750692100968" duration="4019000" />
-      <workItem from="1750744751461" duration="2398000" />
+      <workItem from="1750744751461" duration="3657000" />
+      <workItem from="1750751427114" duration="1925000" />
     </task>
     <servers />
   </component>

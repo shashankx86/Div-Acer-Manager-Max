@@ -10,6 +10,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using MsBox.Avalonia;
 
 namespace DivAcerManagerMax;
 
@@ -18,7 +19,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public readonly DAMXClient _client;
 
     private readonly string _effectColor = "#0078D7";
-    private readonly string ProjectVersion = "0.8.5";
+    private readonly string ProjectVersion = "0.8.6";
     private Button _applyKeyboardColorsButton;
     private RadioButton _autoFanSpeedRadioButton;
 
@@ -379,14 +380,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             }
             else
             {
-                await ShowErrorDialogAsync(
+                await ShowMessageBox(
+                    "Error Connecting to Daemon",
                     "Failed to connect to DAMX daemon. The Daemon may be initializing please wait.");
                 _daemonErrorGrid.IsVisible = true;
             }
         }
         catch (Exception ex)
         {
-            await ShowErrorDialogAsync($"Error initializing: {ex.Message}");
+            await ShowMessageBox("Error while initializing", $"Error initializing: {ex.Message}");
             _daemonErrorGrid.IsVisible = true;
         }
     }
@@ -410,7 +412,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         catch (Exception ex)
         {
             Console.WriteLine($"Exception in LoadSettingsAsync: {ex}");
-            await ShowErrorDialogAsync($"Error loading settings: {ex.Message}");
+            await ShowMessageBox("Error while loading settings", $"Error loading settings: {ex.Message}");
 
             // Create default settings if loading fails
             _settings = new DAMXSettings();
@@ -620,16 +622,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
     }
 
-    private async Task ShowErrorDialogAsync(string message)
+    private async Task ShowMessageBox(string title, string message)
     {
-        await new Window
-        {
-            Title = "Error",
-            Content = new TextBlock { Text = message, Margin = new Thickness(20), TextWrapping = TextWrapping.Wrap },
-            Width = 400,
-            Height = 100,
-            WindowStartupLocation = WindowStartupLocation.CenterOwner
-        }.ShowDialog(this);
+        var box = MessageBoxManager
+            .GetMessageBoxStandard(title, message);
+
+        var result = await box.ShowWindowDialogAsync(this);
     }
 
 
@@ -669,7 +667,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void InternalsMangerWindow_OnClick(object? sender, RoutedEventArgs e)
     {
         var InternalsManagerWindow = new InternalsManger(this);
-        InternalsManagerWindow.Show(); // or ShowDialog(this) for modal
+        InternalsManagerWindow.ShowDialog(this); // or ShowDialog(this) for modal
     }
 
     public static class AppState

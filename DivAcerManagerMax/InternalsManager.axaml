@@ -13,11 +13,14 @@
 
         <Button x:Name="DaemonLogsButton" Content="Daemon Logs" Click="DaemonLogsButton_OnClick" />
 
-        <Button x:Name="ForceNitroButton" Content="Load Drivers with nitro_v4 parameters"
+        <Button x:Name="ForceNitroButton" Content="Load Drivers with nitro_v4 parameter"
                 Click="ForceNitroButton_OnClick" />
 
-        <Button x:Name="ForcePredatorButton" Content="Load Drivers with predator_v4 parameters"
+        <Button x:Name="ForcePredatorButton" Content="Load Drivers with predator_v4 parameter"
                 Click="ForcePredatorButton_OnClick" />
+
+        <Button x:Name="ForceEnableAll" Content="Load Drivers with enable_all parameter"
+                Click="ForceEnableAll_OnClick" />
 
         <Button x:Name="RestartSuiteButton" Content="Restart Drivers and Daemon" Click="RestartSuiteButton_OnClick" />
         <Button x:Name="RestartDaemon" Content="Restart Daemon Alone" Click="RestartDaemon_OnClick" />

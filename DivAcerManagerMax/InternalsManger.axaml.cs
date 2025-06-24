@@ -14,6 +14,12 @@ public partial class InternalsManger : Window
     {
         InitializeComponent();
         _mainWindow = mainWindow;
+        InitializeUiComponents();
+    }
+
+    public void InitializeUiComponents()
+    {
+        DevModeToggleSwitch.IsChecked = MainWindow.AppState.DevMode;
     }
 
     private void DevModeSwitch_OnClick(object? sender, RoutedEventArgs e)
@@ -49,6 +55,8 @@ public partial class InternalsManger : Window
         Console.WriteLine("Force Predator Model Command Sent");
         await Task.Delay(1000);
         ReinitializeDamxGUI();
+        ShowMessagebox("Forcing Predator Model",
+            "Restarting Drivers with predator_v4 parameter with daemon and refreshing GUI, please wait");
     }
 
     private async void ForceNitroButton_OnClick(object? sender, RoutedEventArgs e)
@@ -56,14 +64,22 @@ public partial class InternalsManger : Window
         if (_mainWindow._client.IsConnected) _mainWindow._client.SendCommandAsync("force_nitro_model");
         Console.WriteLine("Force Nitro Model Command Sent");
         await Task.Delay(1000);
-
+        ShowMessagebox("Forcing Nitro Model",
+            "Restarting Drivers with nitro_v4 parameter with daemon and refreshing GUI, please wait");
         ReinitializeDamxGUI();
     }
 
 
-    private void RestartDaemon_OnClick(object? sender, RoutedEventArgs e)
+    private async void RestartDaemon_OnClick(object? sender, RoutedEventArgs e)
     {
         if (_mainWindow._client.IsConnected) _mainWindow._client.SendCommandAsync("restart_daemon");
+        Console.WriteLine("restart_daemon Command Sent");
+
+        await Task.Delay(1000);
+        ReinitializeDamxGUI();
+
+        ShowMessagebox("Restarting Daemon",
+            "Restarting Daemon refreshing GUI, please wait");
     }
 
     private async void ShowMessagebox(string title, string message)
@@ -71,6 +87,17 @@ public partial class InternalsManger : Window
         var box = MessageBoxManager
             .GetMessageBoxStandard(title, message);
 
-        var result = await box.ShowAsync();
+
+        var result = await box.ShowWindowDialogAsync(this);
+    }
+
+    private async void ForceEnableAll_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (_mainWindow._client.IsConnected) _mainWindow._client.SendCommandAsync("force_enable_all");
+        Console.WriteLine("Force Enable All Features Command Sent");
+        await Task.Delay(1000);
+        ShowMessagebox("Forcing All Features",
+            "Initializing Drivers with enable_all parameter. Restarting daemon and refreshing GUI, please wait");
+        ReinitializeDamxGUI();
     }
 }

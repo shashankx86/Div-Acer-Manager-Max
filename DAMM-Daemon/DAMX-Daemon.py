@@ -21,7 +21,7 @@ from PowerSourceDetection import PowerSourceDetector
 from typing import Dict, List, Tuple, Set
 
 # Constants
-VERSION = "0.3.7"
+VERSION = "0.3.8"
 SOCKET_PATH = "/var/run/DAMX.sock"
 LOG_PATH = "/var/log/DAMX_Daemon_Log.log"
 CONFIG_PATH = "/etc/DAMX_Daemon/config.ini"
@@ -192,6 +192,35 @@ class DAMXManager:
         
         except Exception as e:
             log.error(f"Unexpected error while Forcing Nitro Model: {e}")
+            return False
+    
+    def _force_enable_all(self):
+        """Restart linuwu-sense driver and DAMX daemon service with enable_all parameter"""
+        log.info("Forcing all features by restarting daemon and drivers with parameter enable_all")
+
+        try:
+            # Remove the module
+            subprocess.run(['sudo', 'rmmod', 'linuwu-sense'], check=True)
+            log.info("Successfully removed linuwu-sense module")
+            
+            # Wait a moment
+            time.sleep(2)
+            
+            # Reload the module
+            subprocess.run(['sudo', 'modprobe', 'linuwu-sense', 'enable_all'], check=True)
+            log.info("Successfully reloaded linuwu-sense module with enable_all parameter")
+            
+            # Wait a moment for module to initialize
+            time.sleep(3)
+            
+            # Restart the daemon service
+            log.info("Restarting DAMX daemon service (may produce an error)")
+            subprocess.run(['sudo', 'systemctl', 'restart', 'damx-daemon.service'], check=True)
+            
+            return True
+        
+        except Exception as e:
+            log.error(f"Unexpected error while Forcing All Features: {e}")
             return False
         
     def _restart_daemon(self):
@@ -995,6 +1024,7 @@ class DaemonServer:
                         "version": VERSION
                     }
                 }
+            
             elif command == "force_nitro_model":
                 # Force Nitro model into driver
                 success = self.manager._force_model_nitro()
@@ -1010,7 +1040,7 @@ class DaemonServer:
                     }
                 
             elif command == "force_predator_model":
-                # Force Nitro model into driver
+                # Force Predator model into driver
                 success = self.manager._force_model_predator()
                 if success:
                     return {
@@ -1021,6 +1051,20 @@ class DaemonServer:
                     return {
                         "success": False,
                         "error": "Failed to force Predator model into driver (Model may not support it)"
+                    }
+
+            elif command == "force_enable_all":
+                # Force Enable All Features into driver
+                success = self.manager._force_enable_all()
+                if success:
+                    return {
+                        "success": True,
+                        "message": "Successfully forced all features into driver"
+                    }
+                else:
+                    return {
+                        "success": False,
+                        "error": "Failed to force all features into driver (Model may not support it)"
                     }
             
             elif command == "restart_daemon":
@@ -1184,7 +1228,6 @@ class DAMXDaemon:
         self.running = False
         if self.server:
             self.server.running = False
-
 
 def parse_args():
     """Parse command line arguments"""
