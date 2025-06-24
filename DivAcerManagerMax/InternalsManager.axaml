@@ -81,7 +81,7 @@
                             <TextBlock Text="Force a specific model permanently for unsupported or problematic devices"
                                        Opacity="0.7" Margin="0,0,0,15" />
 
-                            <ComboBox x:Name="ForceModelPermanently"
+                            <ComboBox x:Name="ForceParameterPermanentlyComboBox"
                                       SelectedIndex="0"
                                       HorizontalAlignment="Left"
                                       MinWidth="280">
