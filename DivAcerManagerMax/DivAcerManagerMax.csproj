@@ -47,7 +47,7 @@
         <Compile Update="Dashboard.axaml.cs">
             <DependentUpon>Dashboard.axaml</DependentUpon>
         </Compile>
-        <Compile Update="InternalsManger.axaml.cs">
+        <Compile Update="InternalsManager.axaml.cs">
             <DependentUpon>InternalsManager.axaml</DependentUpon>
         </Compile>
     </ItemGroup>

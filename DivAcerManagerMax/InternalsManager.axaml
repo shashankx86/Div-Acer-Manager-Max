@@ -1,6 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        x:Class="DivAcerManagerMax.InternalsManger"
+        x:Class="DivAcerManagerMax.InternalsManager"
         Width="600" Height="700"
         Title="DAMX Internals Manager"
         Icon="iconTransparent.png"

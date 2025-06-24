@@ -7,12 +7,12 @@ using MsBox.Avalonia;
 
 namespace DivAcerManagerMax;
 
-public partial class InternalsManger : Window
+public partial class InternalsManager : Window
 {
     private const string logPath = "/var/log/DAMX_Daemon_Log.log";
     private readonly MainWindow _mainWindow;
 
-    public InternalsManger(MainWindow mainWindow)
+    public InternalsManager(MainWindow mainWindow)
     {
         InitializeComponent();
         _mainWindow = mainWindow;

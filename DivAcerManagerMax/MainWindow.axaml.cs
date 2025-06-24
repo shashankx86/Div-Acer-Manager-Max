@@ -666,7 +666,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void InternalsMangerWindow_OnClick(object? sender, RoutedEventArgs e)
     {
-        var InternalsManagerWindow = new InternalsManger(this);
+        var InternalsManagerWindow = new InternalsManager(this);
         InternalsManagerWindow.ShowDialog(this); // or ShowDialog(this) for modal
     }
 
