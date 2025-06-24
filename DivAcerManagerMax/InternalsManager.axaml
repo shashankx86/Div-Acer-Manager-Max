@@ -26,11 +26,14 @@
         <Button x:Name="RestartDaemon" Content="Restart Daemon Alone" Click="RestartDaemon_OnClick" />
 
 
-        <ComboBox x:Name="ForceModelPermanently" SelectedIndex="0" Width="300" PlaceholderText="Hi"
-                  HorizontalAlignment="Left" Margin="0 10">
+        <ComboBox x:Name="ForceParameterPermanentlyComboBox" SelectedIndex="0" Width="300" PlaceholderText="Hi"
+                  HorizontalAlignment="Left" Margin="0 10"
+                  SelectionChanged="ForceParameterPermanently_OnSelectionChanged">
             <ComboBoxItem Content="Disabled" />
             <ComboBoxItem Content="Force Predator Model" />
             <ComboBoxItem Content="Force Nitro Model" />
+            <ComboBoxItem Content="Force enable_all Parameter" />
+
         </ComboBox>
     </StackPanel>
 

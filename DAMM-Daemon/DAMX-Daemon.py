@@ -21,11 +21,12 @@ from PowerSourceDetection import PowerSourceDetector
 from typing import Dict, List, Tuple, Set
 
 # Constants
-VERSION = "0.3.8"
+VERSION = "0.4.1"
 SOCKET_PATH = "/var/run/DAMX.sock"
 LOG_PATH = "/var/log/DAMX_Daemon_Log.log"
 CONFIG_PATH = "/etc/DAMX_Daemon/config.ini"
 PID_FILE = "/var/run/DAMX-Daemon.pid"
+MODPROBE_CONFIG_PATH = "/etc/modprobe.d/linuwu-sense.conf"
 
 # Check if running as root
 if os.geteuid() != 0:
@@ -91,6 +92,7 @@ class DAMXManager:
         
         self.base_path = self._get_base_path()
         self.has_four_zone_kb = self._check_four_zone_kb()
+        self.current_modprobe_param = self._detect_current_modprobe_param()
 
         # Available features set
         self.available_features = self._detect_available_features()
@@ -222,6 +224,73 @@ class DAMXManager:
         except Exception as e:
             log.error(f"Unexpected error while Forcing All Features: {e}")
             return False
+        
+    def _detect_current_modprobe_param(self) -> str:
+        """Detect which modprobe parameter is currently set"""
+        try:
+            if os.path.exists(MODPROBE_CONFIG_PATH):
+                with open(MODPROBE_CONFIG_PATH, 'r') as f:
+                    content = f.read().strip().lower()
+                    if "nitro_v4" in content:
+                        return "nitro_v4"
+                    elif "predator_v4" in content:
+                        return "predator_v4"
+                    elif "enable_all" in content:
+                        return "enable_all"
+        except Exception as e:
+            log.error(f"Failed to read modprobe config: {e}")
+        return ""
+
+    def _set_modprobe_parameter(self, param: str) -> bool:
+        """Set modprobe parameter in config file"""
+        try:
+            # Create directory if it doesn't exist
+            os.makedirs(os.path.dirname(MODPROBE_CONFIG_PATH), exist_ok=True)
+            
+            # Write the config file
+            with open(MODPROBE_CONFIG_PATH, 'w') as f:
+                f.write(f"options linuwu_sense {param}=1\n")
+            
+            log.info(f"Set modprobe parameter: {param}")
+            self.current_modprobe_param = param
+            return True
+        except Exception as e:
+            log.error(f"Failed to set modprobe parameter: {e}")
+            return False
+
+    def _remove_modprobe_parameter(self) -> bool:
+        """Remove modprobe parameter config file"""
+        try:
+            if os.path.exists(MODPROBE_CONFIG_PATH):
+                os.unlink(MODPROBE_CONFIG_PATH)
+                log.info("Removed modprobe parameter config")
+            self.current_modprobe_param = ""
+            return True
+        except Exception as e:
+            log.error(f"Failed to remove modprobe parameter: {e}")
+            return False
+
+    def get_modprobe_parameter(self) -> str:
+        """Get current modprobe parameter"""
+        return self.current_modprobe_param
+
+    def set_modprobe_parameter(self, param: str) -> bool:
+        """Set modprobe parameter and restart drivers"""
+        if param not in ["nitro_v4", "predator_v4", "enable_all", ""]:
+            log.error(f"Invalid modprobe parameter: {param}")
+            return False
+        
+        if param == "":
+            # Remove parameter
+            if not self._remove_modprobe_parameter():
+                return False
+        else:
+            # Set parameter
+            if not self._set_modprobe_parameter(param):
+                return False
+        
+        # Restart drivers and daemon
+        return self._restart_drivers_and_daemon()
         
     def _restart_daemon(self):
         """Restart DAMX daemon service alone"""
@@ -614,7 +683,8 @@ class DAMXManager:
             "laptop_type": self.laptop_type.name,
             "has_four_zone_kb": self.has_four_zone_kb,
             "available_features": list(self.available_features),
-            "version": VERSION
+            "version": VERSION,
+            "modprobe_parameter": self.current_modprobe_param
         }
 
         # Only include thermal profile if available
@@ -1025,6 +1095,7 @@ class DaemonServer:
                     }
                 }
             
+            # Force Models and Features
             elif command == "force_nitro_model":
                 # Force Nitro model into driver
                 success = self.manager._force_model_nitro()
@@ -1066,6 +1137,50 @@ class DaemonServer:
                         "success": False,
                         "error": "Failed to force all features into driver (Model may not support it)"
                     }
+                
+            elif command == "get_modprobe_parameter":
+                print (self.manager.get_modprobe_parameter())
+                return {
+                    "success": True,
+                    "data": {
+                        "parameter": self.manager.get_modprobe_parameter()
+                    }
+                }
+
+            # Force Model and Parameters Permanantly
+            elif command == "set_modprobe_parameter_nitro":
+                success = self.manager.set_modprobe_parameter("nitro_v4")
+                return {
+                    "success": success,
+                    "data": {"parameter": param} if success else None,
+                    "error": "Failed to set modprobe parameter" if not success else None
+                }
+            
+            elif command == "set_modprobe_parameter_predator":
+                param = params.get("parameter", "")
+                success = self.manager.set_modprobe_parameter("predator_v4")
+                return {
+                    "success": success,
+                    "data": {"parameter": param} if success else None,
+                    "error": "Failed to set modprobe parameter" if not success else None
+                }
+            
+            elif command == "set_modprobe_parameter_enable_all":
+                param = params.get("parameter", "")
+                success = self.manager.set_modprobe_parameter("enable_all")
+                return {
+                    "success": success,
+                    "data": {"parameter": param} if success else None,
+                    "error": "Failed to set modprobe parameter" if not success else None
+                }
+
+            elif command == "remove_modprobe_parameter":
+                success = self.manager._remove_modprobe_parameter()
+                return {
+                    "success": success,
+                    "message": "Successfully removed modprobe parameter" if success else None,
+                    "error": "Failed to remove modprobe parameter" if not success else None
+                }
             
             elif command == "restart_daemon":
                 # Force Nitro model into driver
