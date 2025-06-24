@@ -10,15 +10,16 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using MsBox.Avalonia;
 
 namespace DivAcerManagerMax;
 
 public partial class MainWindow : Window, INotifyPropertyChanged
 {
-    private readonly DAMXClient _client;
+    public readonly DAMXClient _client;
 
     private readonly string _effectColor = "#0078D7";
-    private readonly string ProjectVersion = "0.7.10";
+    private readonly string ProjectVersion = "0.8.7";
     private Button _applyKeyboardColorsButton;
     private RadioButton _autoFanSpeedRadioButton;
 
@@ -92,8 +93,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private Border _zone2Border;
     private Border _zone3Border;
 
-    private bool devMode;
-
 
     public MainWindow()
     {
@@ -113,7 +112,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     }
 
 
-    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    public void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
         // Find all the UI controls
         FindControls();
@@ -279,10 +278,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         // Show/hide features based on availability
         if (thermalProfilePanel != null)
-            thermalProfilePanel.IsVisible = _client.IsFeatureAvailable("thermal_profile") || devMode;
+            thermalProfilePanel.IsVisible = _client.IsFeatureAvailable("thermal_profile") || AppState.DevMode;
 
         if (fanControlPanel != null)
-            fanControlPanel.IsVisible = _client.IsFeatureAvailable("fan_speed") || devMode;
+            fanControlPanel.IsVisible = _client.IsFeatureAvailable("fan_speed") || AppState.DevMode;
 
         if (batteryTab != null)
         {
@@ -295,10 +294,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             var limiterControls = this.FindControl<Border>("LimiterControls");
 
             if (calibrationControls != null)
-                calibrationControls.IsVisible = _client.IsFeatureAvailable("battery_calibration") || devMode;
+                calibrationControls.IsVisible = _client.IsFeatureAvailable("battery_calibration") || AppState.DevMode;
 
             if (limiterControls != null)
-                limiterControls.IsVisible = _client.IsFeatureAvailable("battery_limiter") || devMode;
+                limiterControls.IsVisible = _client.IsFeatureAvailable("battery_limiter") || AppState.DevMode;
         }
 
         // Handle keyboard lighting features
@@ -309,13 +308,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         keyboardLightingTab.IsVisible = hasKeyboardFeatures;
 
         if (zoneColorControlPanel != null)
-            keyboardLightingTab.IsVisible = _client.IsFeatureAvailable("per_zone_mode") || devMode;
+            keyboardLightingTab.IsVisible = _client.IsFeatureAvailable("per_zone_mode") || AppState.DevMode;
 
         if (keyboardEffectsPanel != null)
-            keyboardEffectsPanel.IsVisible = _client.IsFeatureAvailable("four_zone_mode") || devMode;
+            keyboardEffectsPanel.IsVisible = _client.IsFeatureAvailable("four_zone_mode") || AppState.DevMode;
 
         if (usbChargingPanel != null)
-            usbChargingPanel.IsVisible = _client.IsFeatureAvailable("usb_charging") || devMode;
+            usbChargingPanel.IsVisible = _client.IsFeatureAvailable("usb_charging") || AppState.DevMode;
 
         // Handle system settings
         if (systemSettingsTab != null)
@@ -331,13 +330,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             var bootSoundControls = this.FindControl<Border>("BootSoundControls");
 
             if (backlightControls != null)
-                backlightControls.IsVisible = _client.IsFeatureAvailable("backlight_timeout") || devMode;
+                backlightControls.IsVisible = _client.IsFeatureAvailable("backlight_timeout") || AppState.DevMode;
 
             if (lcdControls != null)
-                lcdControls.IsVisible = _client.IsFeatureAvailable("lcd_override") || devMode;
+                lcdControls.IsVisible = _client.IsFeatureAvailable("lcd_override") || AppState.DevMode;
 
             if (bootSoundControls != null)
-                bootSoundControls.IsVisible = _client.IsFeatureAvailable("boot_animation_sound") || devMode;
+                bootSoundControls.IsVisible = _client.IsFeatureAvailable("boot_animation_sound") || AppState.DevMode;
         }
     }
 
@@ -369,7 +368,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             _balancedProfileButton.IsChecked = true;
     }
 
-    private async void InitializeAsync()
+    public async void InitializeAsync()
     {
         try
         {
@@ -381,14 +380,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             }
             else
             {
-                await ShowErrorDialogAsync(
+                await ShowMessageBox(
+                    "Error Connecting to Daemon",
                     "Failed to connect to DAMX daemon. The Daemon may be initializing please wait.");
                 _daemonErrorGrid.IsVisible = true;
             }
         }
         catch (Exception ex)
         {
-            await ShowErrorDialogAsync($"Error initializing: {ex.Message}");
+            await ShowMessageBox("Error while initializing", $"Error initializing: {ex.Message}");
             _daemonErrorGrid.IsVisible = true;
         }
     }
@@ -412,7 +412,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         catch (Exception ex)
         {
             Console.WriteLine($"Exception in LoadSettingsAsync: {ex}");
-            await ShowErrorDialogAsync($"Error loading settings: {ex.Message}");
+            await ShowMessageBox("Error while loading settings", $"Error loading settings: {ex.Message}");
 
             // Create default settings if loading fails
             _settings = new DAMXSettings();
@@ -468,7 +468,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             {
                 var shouldShow = isPluggedIn ? config.showOnAC : config.showOnBattery;
                 config.button.IsEnabled = true;
-                config.button.IsVisible = shouldShow || devMode;
+                config.button.IsVisible = shouldShow || AppState.DevMode;
             }
         }
 
@@ -536,7 +536,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             _cpuFanSpeed = cpuSpeed;
             _cpuFanSlider.Value = cpuSpeed;
-            _cpuFanTextBlock.Text = $"{cpuSpeed}%";
+            if (_cpuFanSlider.Value != 0)
+                _cpuFanTextBlock.Text = $"{cpuSpeed}%";
+            else
+                _cpuFanTextBlock.Text = "Auto";
         }
 
         if (int.TryParse(_settings.FanSpeed?.Gpu ?? "0", out var gpuSpeed))
@@ -544,6 +547,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             _gpuFanSpeed = gpuSpeed;
             _gpuFanSlider.Value = gpuSpeed;
             _gpuFanTextBlock.Text = $"{gpuSpeed}%";
+
+            if (_gpuFanSlider.Value == 0)
+                _gpuFanTextBlock.Text = "Auto";
         }
 
         // Determine manual/auto mode based on current fan speeds
@@ -616,22 +622,24 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
     }
 
-    private async Task ShowErrorDialogAsync(string message)
+    private async Task ShowMessageBox(string title, string message)
     {
-        await new Window
-        {
-            Title = "Error",
-            Content = new TextBlock { Text = message, Margin = new Thickness(20), TextWrapping = TextWrapping.Wrap },
-            Width = 400,
-            Height = 100,
-            WindowStartupLocation = WindowStartupLocation.CenterOwner
-        }.ShowDialog(this);
+        var box = MessageBoxManager
+            .GetMessageBoxStandard(title, message);
+
+        var result = await box.ShowWindowDialogAsync(this);
     }
 
-    private void DeveloperMode_OnClick(object? sender, RoutedEventArgs e)
+
+    public void DeveloperMode_OnClick(object? sender, RoutedEventArgs e)
     {
-        devMode = true;
-        _powerToggleSwitch.IsHitTestVisible = true;
+        EnableDevMode(true);
+    }
+
+    public void EnableDevMode(bool toEnable)
+    {
+        AppState.DevMode = toEnable;
+        _powerToggleSwitch.IsHitTestVisible = toEnable;
         ApplySettingsToUI();
     }
 
@@ -658,8 +666,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void InternalsMangerWindow_OnClick(object? sender, RoutedEventArgs e)
     {
-        var InternalsManagerWindow = new InternalsManger();
-        InternalsManagerWindow.Show(); // or ShowDialog(this) for modal
+        var InternalsManagerWindow = new InternalsManger(this);
+        InternalsManagerWindow.ShowDialog(this); // or ShowDialog(this) for modal
+    }
+
+    public static class AppState
+    {
+        public static bool DevMode { get; set; }
     }
 
     #region Event Handlers
@@ -690,7 +703,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             await _client.SetFanSpeedAsync(0, 0); // Set to auto
             _isManualFanControl = false;
-            if (!devMode)
+            if (!AppState.DevMode)
             {
                 _manualFanSpeedRadioButton.IsChecked = false;
                 _autoFanSpeedRadioButton.IsChecked = true;
@@ -735,6 +748,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             // Properly convert double to int
             _cpuFanSpeed = Convert.ToInt32(e.NewValue);
             _cpuFanTextBlock.Text = $"{_cpuFanSpeed}%";
+            if (_cpuFanSlider.Value == 0)
+                _cpuFanTextBlock.Text = "Auto";
         }
     }
 
@@ -745,6 +760,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             // Properly convert double to int
             _gpuFanSpeed = Convert.ToInt32(e.NewValue);
             _gpuFanTextBlock.Text = $"{_gpuFanSpeed}%";
+            if (_gpuFanSlider.Value == 0)
+                _gpuFanTextBlock.Text = "Auto";
         }
     }
 
@@ -883,7 +900,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private async void LightingEffectsApplyButton_Click(object sender, RoutedEventArgs e)
     {
-        if ((_isConnected && _settings.HasFourZoneKb) || devMode)
+        if ((_isConnected && _settings.HasFourZoneKb) || AppState.DevMode)
         {
             var mode = _lightingModeComboBox.SelectedIndex;
             var direction = _leftToRightRadioButton.IsChecked == true ? 1 : 2;

@@ -21,7 +21,7 @@ from PowerSourceDetection import PowerSourceDetector
 from typing import Dict, List, Tuple, Set
 
 # Constants
-VERSION = "0.3.2"
+VERSION = "0.3.8"
 SOCKET_PATH = "/var/run/DAMX.sock"
 LOG_PATH = "/var/log/DAMX_Daemon_Log.log"
 CONFIG_PATH = "/etc/DAMX_Daemon/config.ini"
@@ -135,6 +135,111 @@ class DAMXManager:
         except IOError as e:
             log.error(f"Failed to reset restart counter: {e}")
 
+    def _force_model_nitro(self):
+        """Restart linuwu-sense driver and DAMX daemon service with nitro_v4 parameter"""
+        log.info("Forcing model detection to Nitro by restarting drivers and daemon")
+
+        try:
+            # Remove the module
+            subprocess.run(['sudo', 'rmmod', 'linuwu-sense'], check=True)
+            log.info("Successfully removed linuwu-sense module")
+            
+            # Wait a moment
+            time.sleep(2)
+            
+            # Reload the module
+            subprocess.run(['sudo', 'modprobe', 'linuwu-sense', 'nitro_v4'], check=True)
+            log.info("Successfully reloaded linuwu-sense module")
+            
+            # Wait a moment for module to initialize
+            time.sleep(3)
+            
+            # Restart the daemon service
+            log.info("Restarting DAMX daemon service (may produce an error)")
+            subprocess.run(['sudo', 'systemctl', 'restart', 'damx-daemon.service'], check=True)
+            
+            return True
+        
+        except Exception as e:
+            log.error(f"Unexpected error while Forcing Nitro Model: {e}")
+            return False
+        
+
+    def _force_model_predator(self):
+        """Restart linuwu-sense driver and DAMX daemon service with nitro_v4 parameter"""
+        log.info("Forcing model detection to Nitro by restarting drivers and daemon")
+
+        try:
+            # Remove the module
+            subprocess.run(['sudo', 'rmmod', 'linuwu-sense'], check=True)
+            log.info("Successfully removed linuwu-sense module")
+            
+            # Wait a moment
+            time.sleep(2)
+            
+            # Reload the module
+            subprocess.run(['sudo', 'modprobe', 'linuwu-sense', 'predator_v4'], check=True)
+            log.info("Successfully reloaded linuwu-sense module")
+            
+            # Wait a moment for module to initialize
+            time.sleep(3)
+            
+            # Restart the daemon service
+            log.info("Restarting DAMX daemon service (may produce an error)")
+            subprocess.run(['sudo', 'systemctl', 'restart', 'damx-daemon.service'], check=True)
+            
+            return True
+        
+        except Exception as e:
+            log.error(f"Unexpected error while Forcing Nitro Model: {e}")
+            return False
+    
+    def _force_enable_all(self):
+        """Restart linuwu-sense driver and DAMX daemon service with enable_all parameter"""
+        log.info("Forcing all features by restarting daemon and drivers with parameter enable_all")
+
+        try:
+            # Remove the module
+            subprocess.run(['sudo', 'rmmod', 'linuwu-sense'], check=True)
+            log.info("Successfully removed linuwu-sense module")
+            
+            # Wait a moment
+            time.sleep(2)
+            
+            # Reload the module
+            subprocess.run(['sudo', 'modprobe', 'linuwu-sense', 'enable_all'], check=True)
+            log.info("Successfully reloaded linuwu-sense module with enable_all parameter")
+            
+            # Wait a moment for module to initialize
+            time.sleep(3)
+            
+            # Restart the daemon service
+            log.info("Restarting DAMX daemon service (may produce an error)")
+            subprocess.run(['sudo', 'systemctl', 'restart', 'damx-daemon.service'], check=True)
+            
+            return True
+        
+        except Exception as e:
+            log.error(f"Unexpected error while Forcing All Features: {e}")
+            return False
+        
+    def _restart_daemon(self):
+        """Restart DAMX daemon service alone"""
+        attempts = self._get_restart_attempts()
+        log.info(f"Attempting to restart daemon")
+        
+        try:
+            # Restart the daemon service
+            log.info("Restarting DAMX daemon service (may produce an error)")
+            subprocess.run(['sudo', 'systemctl', 'restart', 'damx-daemon.service'], check=True)
+            
+            return True
+            
+        except Exception as e:
+            log.error(f"Unexpected error during restart (attempt {attempts}): {e}")
+            return False
+            
+
     def _restart_drivers_and_daemon(self):
         """Restart linuwu-sense driver and DAMX daemon service"""
         attempts = self._get_restart_attempts()
@@ -156,14 +261,11 @@ class DAMXManager:
             time.sleep(3)
             
             # Restart the daemon service
+            log.info("Restarting DAMX daemon service (may produce an error)")
             subprocess.run(['sudo', 'systemctl', 'restart', 'damx-daemon.service'], check=True)
-            log.info("Successfully restarted DAMX daemon service")
             
             return True
             
-        except subprocess.CalledProcessError as e:
-            log.error(f"Failed to restart drivers/daemon (attempt {attempts}): {e}")
-            return False
         except Exception as e:
             log.error(f"Unexpected error during restart (attempt {attempts}): {e}")
             return False
@@ -377,6 +479,7 @@ class DAMXManager:
             os.path.join(self.base_path, "fan_speed"),
             f"{cpu},{gpu}"
         )
+
 
     def get_lcd_override(self) -> str:
         """Get LCD override status"""
@@ -921,7 +1024,76 @@ class DaemonServer:
                         "version": VERSION
                     }
                 }
+            
+            elif command == "force_nitro_model":
+                # Force Nitro model into driver
+                success = self.manager._force_model_nitro()
+                if success:
+                    return {
+                        "success": True,
+                        "message": "Successfully forced Nitro model into driver"
+                    }
+                else:
+                    return {
+                        "success": False,
+                        "error": "Failed to force Nitro model into driver"
+                    }
+                
+            elif command == "force_predator_model":
+                # Force Predator model into driver
+                success = self.manager._force_model_predator()
+                if success:
+                    return {
+                        "success": True,
+                        "message": "Successfully forced Predator model into driver"
+                    }
+                else:
+                    return {
+                        "success": False,
+                        "error": "Failed to force Predator model into driver (Model may not support it)"
+                    }
 
+            elif command == "force_enable_all":
+                # Force Enable All Features into driver
+                success = self.manager._force_enable_all()
+                if success:
+                    return {
+                        "success": True,
+                        "message": "Successfully forced all features into driver"
+                    }
+                else:
+                    return {
+                        "success": False,
+                        "error": "Failed to force all features into driver (Model may not support it)"
+                    }
+            
+            elif command == "restart_daemon":
+                # Force Nitro model into driver
+                success = self.manager._restart_daemon()
+                if success:
+                    return {
+                        "success": True,
+                        "message": "Successfully restarted DAMX daemon"
+                    }
+                else:
+                    return {
+                        "success": False,
+                        "error": "Failed to Restart DAMX daemon (Check logs for details)"
+                    }           
+
+            elif command == "restart_drivers_and_daemon":
+                # Restart linuwu-sense driver and DAMX daemon service
+                success = self.manager._restart_drivers_and_daemon()
+                if success:
+                    return {
+                        "success": True,
+                        "message": "Successfully restarted drivers and daemon"
+                    }
+                else:
+                    return {
+                        "success": False,
+                        "error": "Failed to restart drivers and daemon"
+                    }
             else:
                 return {
                     "success": False,
@@ -1056,7 +1228,6 @@ class DAMXDaemon:
         self.running = False
         if self.server:
             self.server.running = False
-
 
 def parse_args():
     """Parse command line arguments"""

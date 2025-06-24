@@ -585,11 +585,11 @@
                                         <Button x:Name="UpdatesButton" Content="Check for Updates" Margin="0 15 0 0"
                                                 Click="UpdatesButton_OnClick" />
                                         <Button x:Name="DeveloperModeButton" Content="Developer Mode" Margin="0 15 0 0"
+                                                IsVisible="False"
                                                 Click="DeveloperMode_OnClick" />
                                         <Button x:Name="IssuePageButton" Content="Issue/Feedback" Margin="0 15 0 0"
                                                 Click="IssuePageButton_OnClick" />
                                         <Button x:Name="InternalsManagerButton" Content="Internals Manager"
-                                                IsVisible="False"
                                                 Margin="0 15 0 0"
                                                 Click="InternalsMangerWindow_OnClick" />
 
