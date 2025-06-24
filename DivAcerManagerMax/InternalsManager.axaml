@@ -20,6 +20,8 @@
                 Click="ForcePredatorButton_OnClick" />
 
         <Button x:Name="RestartSuiteButton" Content="Restart Drivers and Daemon" Click="RestartSuiteButton_OnClick" />
+        <Button x:Name="RestartDaemon" Content="Restart Daemon Alone" Click="RestartDaemon_OnClick" />
+
 
         <ComboBox x:Name="ForceModelPermanently" SelectedIndex="0" Width="300" PlaceholderText="Hi"
                   HorizontalAlignment="Left" Margin="0 10">

@@ -1,8 +1,8 @@
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using MsBox.Avalonia;
 
 namespace DivAcerManagerMax;
 
@@ -21,7 +21,7 @@ public partial class InternalsManger : Window
         _mainWindow.EnableDevMode(DevModeToggleSwitch.IsChecked == true);
     }
 
-    public void ReinitializeGUI()
+    public void ReinitializeDamxGUI()
     {
         _mainWindow.InitializeAsync();
     }
@@ -30,13 +30,16 @@ public partial class InternalsManger : Window
     {
     }
 
+
     private async void RestartSuiteButton_OnClick(object? sender, RoutedEventArgs e)
     {
         if (_mainWindow._client.IsConnected) _mainWindow._client.SendCommandAsync("restart_drivers_and_daemon");
         Console.WriteLine("Restart suite command sent");
         await Task.Delay(1000);
 
-        ReinitializeGUI();
+        ReinitializeDamxGUI();
+
+        ShowMessagebox("Restarting Suite", "Restarting Suite and refreshing GUI, please wait");
     }
 
 
@@ -45,7 +48,7 @@ public partial class InternalsManger : Window
         if (_mainWindow._client.IsConnected) _mainWindow._client.SendCommandAsync("force_predator_model");
         Console.WriteLine("Force Predator Model Command Sent");
         await Task.Delay(1000);
-        ReinitializeGUI();
+        ReinitializeDamxGUI();
     }
 
     private async void ForceNitroButton_OnClick(object? sender, RoutedEventArgs e)
@@ -53,60 +56,21 @@ public partial class InternalsManger : Window
         if (_mainWindow._client.IsConnected) _mainWindow._client.SendCommandAsync("force_nitro_model");
         Console.WriteLine("Force Nitro Model Command Sent");
         await Task.Delay(1000);
-        ReinitializeGUI();
+
+        ReinitializeDamxGUI();
     }
 
-    private async void UnloadLinuwuDriver()
+
+    private void RestartDaemon_OnClick(object? sender, RoutedEventArgs e)
     {
-        Console.WriteLine("Unloading driver");
-        RunCommand("pkexec", "rmmod linuwu-sense");
-        Console.WriteLine("Unload command sent");
+        if (_mainWindow._client.IsConnected) _mainWindow._client.SendCommandAsync("restart_daemon");
     }
 
-    private async void LoadLinuwuDriver()
+    private async void ShowMessagebox(string title, string message)
     {
-        Console.WriteLine("Loading driver");
-        RunCommand("pkexec", "modprobe linuwu-sense");
-        Console.WriteLine("Load command sent");
-    }
+        var box = MessageBoxManager
+            .GetMessageBoxStandard(title, message);
 
-    private async void LoadLinuwuDriver(string arguments)
-    {
-        Console.WriteLine($"Loading driver with params: {arguments}");
-        RunCommand("pkexec", $"modprobe linuwu-sense {arguments}");
-        Console.WriteLine("Load with params command sent");
-    }
-
-    private async void RestartDaemon()
-    {
-        Console.WriteLine("Restarting daemon");
-        RunCommand("pkexec", "systemctl restart damx-daemon");
-        Console.WriteLine("Restart daemon command sent");
-    }
-
-    private void RunCommand(string command, string args)
-    {
-        try
-        {
-            Console.WriteLine($"Running: {command} {args}");
-
-            // Launch through x-terminal-emulator or gnome-terminal
-            var terminalCommand =
-                $"x-terminal-emulator -e '{command} {args}' || gnome-terminal -- {command} {args} || xterm -e '{command} {args}'";
-
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = "sh",
-                Arguments = $"-c \"{terminalCommand}\"",
-                UseShellExecute = false,
-                CreateNoWindow = false
-            });
-
-            Console.WriteLine("Command started in terminal");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error: {ex.Message}");
-        }
+        var result = await box.ShowAsync();
     }
 }

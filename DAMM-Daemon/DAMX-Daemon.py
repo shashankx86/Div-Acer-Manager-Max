@@ -21,7 +21,7 @@ from PowerSourceDetection import PowerSourceDetector
 from typing import Dict, List, Tuple, Set
 
 # Constants
-VERSION = "0.3.6"
+VERSION = "0.3.7"
 SOCKET_PATH = "/var/run/DAMX.sock"
 LOG_PATH = "/var/log/DAMX_Daemon_Log.log"
 CONFIG_PATH = "/etc/DAMX_Daemon/config.ini"
@@ -192,6 +192,22 @@ class DAMXManager:
         
         except Exception as e:
             log.error(f"Unexpected error while Forcing Nitro Model: {e}")
+            return False
+        
+    def _restart_daemon(self):
+        """Restart DAMX daemon service alone"""
+        attempts = self._get_restart_attempts()
+        log.info(f"Attempting to restart daemon")
+        
+        try:
+            # Restart the daemon service
+            log.info("Restarting DAMX daemon service (may produce an error)")
+            subprocess.run(['sudo', 'systemctl', 'restart', 'damx-daemon.service'], check=True)
+            
+            return True
+            
+        except Exception as e:
+            log.error(f"Unexpected error during restart (attempt {attempts}): {e}")
             return False
             
 
@@ -1007,6 +1023,20 @@ class DaemonServer:
                         "error": "Failed to force Predator model into driver (Model may not support it)"
                     }
             
+            elif command == "restart_daemon":
+                # Force Nitro model into driver
+                success = self.manager._restart_daemon()
+                if success:
+                    return {
+                        "success": True,
+                        "message": "Successfully restarted DAMX daemon"
+                    }
+                else:
+                    return {
+                        "success": False,
+                        "error": "Failed to Restart DAMX daemon (Check logs for details)"
+                    }           
+
             elif command == "restart_drivers_and_daemon":
                 # Restart linuwu-sense driver and DAMX daemon service
                 success = self.manager._restart_drivers_and_daemon()
