@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -8,6 +9,7 @@ namespace DivAcerManagerMax;
 
 public partial class InternalsManger : Window
 {
+    private const string logPath = "/var/log/DAMX_Daemon_Log.log";
     private readonly MainWindow _mainWindow;
 
     public InternalsManger(MainWindow mainWindow)
@@ -34,6 +36,7 @@ public partial class InternalsManger : Window
 
     private void DaemonLogsButton_OnClick(object? sender, RoutedEventArgs e)
     {
+        Process.Start("xdg-open", logPath);
     }
 
 
