@@ -138,3 +138,5 @@ jobs:
           files: |
             DAMX-${{ github.event.inputs.tag }}.tar.xz
             DivAcerManagerMax.pdb.tar.xz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT_RELEASE }}
