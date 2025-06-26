@@ -551,7 +551,7 @@
                                 <StackPanel>
                                     <TextBlock Text="System Information" Classes="SubHeader" />
 
-                                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+                                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
                                           Margin="0 10">
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Model:" FontWeight="SemiBold"
                                                    Width="120" Margin="0 10 0 0" />
@@ -568,15 +568,20 @@
                                         <TextBlock x:Name="SupportedFeaturesTextBlock" Grid.Row="2" Grid.Column="1"
                                                    Text="UNKNOWN" Margin="5 10 0 0" TextWrapping="Wrap" />
 
-                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Project Version:"
+                                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Project Version:"
                                                    FontWeight="SemiBold" Width="120" Margin="0 10 0 0" />
-                                        <TextBlock x:Name="ProjectVersionText" Grid.Row="4" Grid.Column="1"
+                                        <TextBlock x:Name="ProjectVersionText" Grid.Row="5" Grid.Column="1"
                                                    Text="UNKNOWN" Margin="5 10 0 0" />
 
 
                                         <TextBlock Grid.Row="3" Grid.Column="0" Text="Daemon Version:"
                                                    FontWeight="SemiBold" Width="120" Margin="0 10 0 0" />
                                         <TextBlock x:Name="DaemonVersionText" Grid.Row="3" Grid.Column="1"
+                                                   Text="UNKNOWN" Margin="5 10 0 0" />
+
+                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Driver Version:"
+                                                   FontWeight="SemiBold" Width="120" Margin="0 10 0 0" />
+                                        <TextBlock x:Name="DriverVersionText" Grid.Row="4" Grid.Column="1"
                                                    Text="UNKNOWN" Margin="5 10 0 0" />
 
                                     </Grid>

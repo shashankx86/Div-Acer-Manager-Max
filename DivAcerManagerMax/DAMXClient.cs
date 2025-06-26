@@ -499,6 +499,8 @@ public class DAMXSettings
     public List<string> AvailableFeatures { get; set; } = new();
 
     [JsonPropertyName("version")] public string Version { get; set; } = "NOT CONNECTED PROPERLY";
+    [JsonPropertyName("driver_version")] public string DriverVersion { get; set; } = "DRIVER VERSION NOT FOUND";
+
 
     [JsonPropertyName("thermal_profile")] public ThermalProfileSettings ThermalProfile { get; set; } = new();
 

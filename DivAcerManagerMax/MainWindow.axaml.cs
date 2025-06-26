@@ -19,7 +19,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public readonly DAMXClient _client;
 
     private readonly string _effectColor = "#0078D7";
-    private readonly string ProjectVersion = "0.8.7";
+    private readonly string ProjectVersion = "0.8.8";
     private Button _applyKeyboardColorsButton;
     private RadioButton _autoFanSpeedRadioButton;
 
@@ -62,7 +62,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private TextBlock _modelNameText,
         _laptopTypeText,
         _daemonVersionText,
-        _kernelInfoText,
+        _driverVersionText,
         _supportedFeaturesTextBlock,
         _guiVersionTextBlock;
 
@@ -210,9 +210,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         _laptopTypeText = this.FindControl<TextBlock>("LaptopTypeText");
         _supportedFeaturesTextBlock = this.FindControl<TextBlock>("SupportedFeaturesTextBlock");
         _daemonVersionText = this.FindControl<TextBlock>("DaemonVersionText");
+        _driverVersionText = this.FindControl<TextBlock>("DriverVersionText");
+
         _guiVersionTextBlock = this.FindControl<TextBlock>("ProjectVersionText");
         _guiVersionTextBlock.Text = $"v{ProjectVersion}";
-        _kernelInfoText = this.FindControl<TextBlock>("KernelInfoText");
+        //_kernelInfoText = this.FindControl<TextBlock>("KernelInfoText");
 
         //Error Message
         _daemonErrorGrid = this.FindControl<Grid>("DaemonErrorGrid");
@@ -568,6 +570,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         //Update System Info
         _daemonVersionText.Text = $"v{_settings.Version}";
+        Console.WriteLine("Driver Version: " + _settings.DriverVersion);
+        _driverVersionText.Text = $"v{_settings.DriverVersion}";
+
         _laptopTypeText.Text = _settings.LaptopType;
         _supportedFeaturesTextBlock.Text =
             _supportedFeaturesTextBlock.Text = string.Join(", ", _settings.AvailableFeatures);

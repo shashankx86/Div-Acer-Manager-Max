@@ -21,7 +21,7 @@ from PowerSourceDetection import PowerSourceDetector
 from typing import Dict, List, Tuple, Set
 
 # Constants
-VERSION = "0.4.1"
+VERSION = "0.4.2"
 SOCKET_PATH = "/var/run/DAMX.sock"
 LOG_PATH = "/var/log/DAMX_Daemon_Log.log"
 CONFIG_PATH = "/etc/DAMX_Daemon/config.ini"
@@ -360,6 +360,19 @@ class DAMXManager:
         else:
             return ""
 
+    def get_driver_version(self) -> str:
+        """Get Driver version"""
+        version_file = os.path.join(self.base_path, "version")
+        if not os.path.isfile(version_file):
+            return "Unknown Version"
+        
+        try:
+            with open(version_file, "r") as f:
+                return f.read().strip() or "Unknown Version"
+        except (OSError, IOError):
+            return "Unknown Version"
+    
+
     def _detect_available_features(self) -> Set[str]:
         """Detect which features are available on the current laptop"""
         available = set()
@@ -377,7 +390,7 @@ class DAMXManager:
                 ("boot_animation_sound", "boot_animation_sound"),
                 ("fan_speed", "fan_speed"),
                 ("lcd_override", "lcd_override"),
-                ("usb_charging", "usb_charging")
+                ("usb_charging", "usb_charging"),
             ]
 
             for feature_name, file_name in feature_files:
@@ -684,6 +697,7 @@ class DAMXManager:
             "has_four_zone_kb": self.has_four_zone_kb,
             "available_features": list(self.available_features),
             "version": VERSION,
+            "driver_version": self.get_driver_version(),
             "modprobe_parameter": self.current_modprobe_param
         }
 
@@ -1367,7 +1381,7 @@ def main():
     """Main function"""
     args = parse_args()
     
-    
+    log.info(f"Driver Version: {DAMXManager().get_driver_version()}")
 
     # Set log level based on verbosity
     if args.verbose:
