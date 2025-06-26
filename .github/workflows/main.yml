@@ -5,22 +5,27 @@ on:
     inputs:
       release_name:
         description: 'Release name'
-        required: true
+        required: false
       tag:
         description: 'Tag (e.g., v1.0.0)'
-        required: true
+        required: false
       prerelease:
         description: 'Is this a prerelease?'
-        required: true
+        required: false
         default: 'false'
         type: choice
-        options:
-          - 'false'
-          - 'true'
+        options: [ 'false', 'true' ]
       git_commit:
         description: 'Git commit SHA to reset to (optional)'
         required: false
         default: ''
+      publish_release:
+        description: 'Publish GitHub Release?'
+        required: true
+        default: 'false'
+        type: choice
+        options: [ 'false', 'true' ]
+
 
 jobs:
   build:
@@ -116,6 +121,7 @@ jobs:
 
   release:
     needs: build
+    if: ${{ github.event.inputs.publish_release == 'true' }} 
     runs-on: ubuntu-latest
     steps:
       - name: Download DAMX archive
@@ -138,3 +144,6 @@ jobs:
           files: |
             DAMX-${{ github.event.inputs.tag }}.tar.xz
             DivAcerManagerMax.pdb.tar.xz
+          token: ${{ secrets.GH_PAT_RELEASE }}
+
+
