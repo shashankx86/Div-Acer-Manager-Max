@@ -6,9 +6,11 @@ DAMX is primarily built for modern Acer laptops (2022 and newer) that use WMI pr
 ✅ Officially tested distributions: Ubuntu 25+ and Kubuntu 25+
 ✅ Minimum required kernel version: Linux 6.13+
 
-Note: This compatibility list simply reflects devices where the DAMX Suite has been confirmed to work.
+> Note: This compatibility list simply reflects devices where the DAMX Suite has been confirmed to work.
+>
+>If your Acer laptop is not listed but works correctly or partially with DAMX, please help improve the project by filing an issue with your model details — so others can benefit from your discovery.
 
-If your Acer laptop is not listed but works correctly or partially with DAMX, please help improve the project by filing an issue with your model details — so others can benefit from your discovery.
+
 
 | Model               | Status                 | Notes                                                            |
 | ------------------- | ---------------------- | ---------------------------------------------------------------- |
