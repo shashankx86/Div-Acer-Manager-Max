@@ -57,6 +57,10 @@
   * Dynamic UI hides unsupported features
   * Real-time feedback from daemon
 
+## 🧭 Compatibilty
+Check your deviced compatibility here: [Compatibility List](https://github.com/PXDiv/Div-Acer-Manager-Max/blob/main/Compatibility.md)
+
+> Even if not here, DAMX will still work on most devices. Be sure to put a issue to request your model to be added in the compatiblity list if working.
 
 ## 🖥️ Installation
 
@@ -94,7 +98,7 @@ Please file a Issue in the issue corner and include the logs to get support and 
 
 ## ❤️ Powered by Linuwu
 
-This project is built entirely on top of the [Linuwu Sense](https://github.com/0x7375646F/Linuwu-Sense) drivers — huge thanks to their developers for enabling hardware-level access on Acer laptops.
+The custom drivers for this project [Div-Linuwu Sense project](https://github.com/PXDiv/Div-Linuwu-Sense) is built entirely on top of the [Linuwu Sense](https://github.com/0x7375646F/Linuwu-Sense) drivers — huge thanks to their developers for enabling hardware-level access on Acer laptops.
 
 ## 🤝 Contributing
 
