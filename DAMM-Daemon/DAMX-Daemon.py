@@ -22,7 +22,7 @@ from typing import Dict, List, Tuple, Set
 from KeyboardMonitor import KeyboardMonitor
 
 # Constants
-VERSION = "0.4.4"
+VERSION = "0.4.5"
 SOCKET_PATH = "/var/run/DAMX.sock"
 LOG_PATH = "/var/log/DAMX_Daemon_Log.log"
 CONFIG_PATH = "/etc/DAMX_Daemon/config.ini"
@@ -62,7 +62,10 @@ class DAMXManager:
     RESTART_COUNTER_FILE = "/tmp/damx_restart_attempts"
 
     def __init__(self):
+        '''The initial init (i know very nice description)'''
         # Check if linuwu_sense is installed
+        log.info(f"** Starting DAMX-Daemon v{VERSION} **")
+
         if not os.path.exists("/sys/module/linuwu_sense"):
             log.error("linuwu_sense module not found. Please install the linuwu_sense driver first.")
         else:
@@ -1315,8 +1318,6 @@ class DAMXDaemon:
 
     def run(self):
         """Run the daemon"""
-        log.info(f"Starting DAMX-Daemon v{VERSION}")
-
         # Write PID file
         with open(PID_FILE, 'w') as f:
             f.write(str(os.getpid()))
