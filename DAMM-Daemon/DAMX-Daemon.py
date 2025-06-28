@@ -19,9 +19,10 @@ from pathlib import Path
 from enum import Enum
 from PowerSourceDetection import PowerSourceDetector 
 from typing import Dict, List, Tuple, Set
+from KeyboardMonitor import KeyboardMonitor
 
 # Constants
-VERSION = "0.4.2"
+VERSION = "0.4.4"
 SOCKET_PATH = "/var/run/DAMX.sock"
 LOG_PATH = "/var/log/DAMX_Daemon_Log.log"
 CONFIG_PATH = "/etc/DAMX_Daemon/config.ini"
@@ -68,7 +69,8 @@ class DAMXManager:
             log.info("linuwu_sense module found. Proceeding with initialization.")
         
         self.laptop_type = self._detect_laptop_type()
-        
+        self.keyboard_monitor = None
+
         # If unknown laptop type detected, try restarting drivers (with limit)
         if self.laptop_type == LaptopType.UNKNOWN:
             current_attempts = self._get_restart_attempts()
@@ -1296,6 +1298,12 @@ class DAMXDaemon:
             log.info(f"Detected features: {features_str}")
             self.power_monitor = PowerSourceDetector(self.manager)
 
+            # Initialize keyboard monitor
+            self.keyboard_monitor = KeyboardMonitor(
+                target_keycode=425, 
+                command_to_run="DAMX"  # or whatever command you want to run
+            )
+            log.info("Mapping Nitro Button")
 
             return True
         except Exception as e:
@@ -1317,12 +1325,20 @@ class DAMXDaemon:
         signal.signal(signal.SIGTERM, self.signal_handler)
         signal.signal(signal.SIGINT, self.signal_handler)
 
+        if self.keyboard_monitor:
+            success = self.keyboard_monitor.start_monitoring()
+            if success:
+                log.info("Keyboard monitoring started successfully")
+            else:
+                log.warning("Failed to start keyboard monitoring")
+
         # Set up and run the server
         try:
             self.running = True
             self.server = DaemonServer(self.manager)
             self.power_monitor.start_monitoring()
             self.server.start()
+            # Start keyboard monitoring
             
         except Exception as e:
             log.error(f"Error running daemon: {e}")
@@ -1338,6 +1354,10 @@ class DAMXDaemon:
         if self.server:
             self.server.stop()
             self.server.cleanup_socket()  # Additional cleanup
+            # Stop keyboard monitoring
+        if hasattr(self, 'keyboard_monitor') and self.keyboard_monitor:
+            self.keyboard_monitor.stop_monitoring()
+            log.info("Keyboard monitoring stopped")
     
         if self.power_monitor:
             self.power_monitor.stop_monitoring()
