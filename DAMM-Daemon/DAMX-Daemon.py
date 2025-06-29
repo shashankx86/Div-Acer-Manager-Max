@@ -22,7 +22,7 @@ from typing import Dict, List, Tuple, Set
 from KeyboardMonitor import KeyboardMonitor
 
 # Constants
-VERSION = "0.4.5"
+VERSION = "0.4.6"
 SOCKET_PATH = "/var/run/DAMX.sock"
 LOG_PATH = "/var/log/DAMX_Daemon_Log.log"
 CONFIG_PATH = "/etc/DAMX_Daemon/config.ini"
@@ -63,9 +63,9 @@ class DAMXManager:
 
     def __init__(self):
         '''The initial init (i know very nice description)'''
-        # Check if linuwu_sense is installed
         log.info(f"** Starting DAMX-Daemon v{VERSION} **")
 
+        # Check if linuwu_sense is installed
         if not os.path.exists("/sys/module/linuwu_sense"):
             log.error("linuwu_sense module not found. Please install the linuwu_sense driver first.")
         else:
@@ -73,6 +73,9 @@ class DAMXManager:
         
         self.laptop_type = self._detect_laptop_type()
         self.keyboard_monitor = None
+
+        #added a delay so that driver sets up properly first
+        time.sleep(0.2)
 
         # If unknown laptop type detected, try restarting drivers (with limit)
         if self.laptop_type == LaptopType.UNKNOWN:
