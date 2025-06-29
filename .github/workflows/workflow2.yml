@@ -1,4 +1,4 @@
-name: Build and Publish Release
+name: Build and Publish Release with a local setup.
 
 on:
   workflow_dispatch:
