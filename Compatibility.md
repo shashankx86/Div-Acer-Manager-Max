@@ -23,6 +23,7 @@ DAMX is primarily built for modern Acer laptops (2022 and newer) that use WMI pr
 | PH16-71             | ✅ Supported            | Uses universal Predator V4 quirk.                                |
 | PH18-71             | ✅ Supported            | Uses universal Predator V4 quirk.                                |
 | PH315-53            | ✅ Supported            | Known stable, uses dedicated quirk.                              |
+| AN515-44            | 🟠 Partially Supported  | Need to force nitro_v4 using Internals Manager                   |
 | AN517-54            | ⚪ Not Yet Verified     | No reports yet — hardware support unconfirmed.                   |
 | AN517-55            | ⚪ Not Yet Verified     | No reports yet — hardware support unconfirmed.                   |
 | Aspire 1360         | ✅ Supported            | Legacy model — uses Aspire 1520 quirk.                           |
