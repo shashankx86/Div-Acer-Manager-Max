@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-KeyboardMonitor - Monitor keyboard events for specific keycode and trigger actions
-Simple and efficient implementation using native Python libraries
+KeyboardMonitor - Simple keyboard monitor that launches GUI as regular user
 """
 
 import os
@@ -10,15 +9,8 @@ import select
 import subprocess
 import threading
 import logging
+import time
 from pathlib import Path
-
-# Event structure format (from linux/input.h)
-# struct input_event {
-#     struct timeval time;  // 8 bytes on 32-bit, 16 bytes on 64-bit
-#     __u16 type;           // 2 bytes
-#     __u16 code;           // 2 bytes  
-#     __s32 value;          // 4 bytes
-# }
 
 # Determine if we're on 64-bit system
 import platform
@@ -28,30 +20,28 @@ EVENT_SIZE = 24 if IS_64BIT else 16
 # Event types and codes
 EV_KEY = 1
 KEY_PRESS = 1
-TARGET_KEYCODE = 425  # The keycode we're monitoring for
+TARGET_KEYCODE = 425
 
 class KeyboardMonitor:
-    def __init__(self, target_keycode=TARGET_KEYCODE, command_to_run="DAMX"):
+    def __init__(self, target_keycode=TARGET_KEYCODE, command_to_run="/opt/damx/gui/DivAcerManagerMax", logger=None):
         self.target_keycode = target_keycode
         self.command_to_run = command_to_run
         self.running = False
         self.device_path = None
         self.monitor_thread = None
-        self.log = logging.getLogger("KeyboardMonitor")
+        self.log = logger or logging.getLogger("KeyboardMonitor")
         
     def find_keyboard_device(self):
         """Find the keyboard input device"""
-        devices_path = Path("/proc/bus/input/devices")
-        
-        if not devices_path.exists():
-            self.log.error("Cannot access /proc/bus/input/devices")
-            return None
-            
         try:
+            devices_path = Path("/proc/bus/input/devices")
+            if not devices_path.exists():
+                self.log.error("Cannot access /proc/bus/input/devices")
+                return None
+                
             with open(devices_path, 'r') as f:
                 content = f.read()
                 
-            # Parse the devices file
             devices = content.split('\n\n')
             
             for device in devices:
@@ -59,18 +49,14 @@ class KeyboardMonitor:
                 if not lines:
                     continue
                     
-                # Look for keyboard devices
                 is_keyboard = False
                 event_num = None
                 
                 for line in lines:
                     line = line.strip()
-                    # Check if it's a keyboard
-                    if 'keyboard' in line.lower() or 'Keyboard' in line:
+                    if 'keyboard' in line.lower():
                         is_keyboard = True
-                    # Extract event number
                     elif line.startswith('H:') and 'event' in line:
-                        # Extract event number from handler line
                         import re
                         match = re.search(r'event(\d+)', line)
                         if match:
@@ -88,12 +74,61 @@ class KeyboardMonitor:
         return None
     
     def execute_command(self):
-        """Execute the target command"""
+        """Execute the GUI command using systemd-run for proper user context"""
         try:
-            subprocess.Popen(self.command_to_run, shell=True)
-            self.log.info(f"Executed command: {self.command_to_run}")
+            # Get the current desktop user (most reliable method)
+            user = os.environ.get('SUDO_USER') or self.get_console_user()
+            if not user:
+                self.log.error("Could not determine user to run command")
+                return False
+
+            # Get the user's environment
+            env = os.environ.copy()
+            
+            # Add essential environment variables
+            env.update({
+                'DISPLAY': ':0',
+                'XAUTHORITY': f'/home/{user}/.Xauthority',
+                'DBUS_SESSION_BUS_ADDRESS': f'unix:path=/run/user/{os.getuid()}/bus'
+            })
+
+            # Try running as the user with proper environment
+            cmd = [
+                'sudo', '-u', user,
+                'env',
+                f'DISPLAY={env["DISPLAY"]}',
+                f'XAUTHORITY={env["XAUTHORITY"]}',
+                f'DBUS_SESSION_BUS_ADDRESS={env["DBUS_SESSION_BUS_ADDRESS"]}',
+                self.command_to_run
+            ]
+            
+            subprocess.Popen(cmd, 
+                            stdout=subprocess.DEVNULL, 
+                            stderr=subprocess.DEVNULL,
+                            start_new_session=True)
+            self.log.info(f"Executed as user {user}: {self.command_to_run}")
+            return True
+            
         except Exception as e:
-            self.log.error(f"Failed to execute command '{self.command_to_run}': {e}")
+            self.log.error(f"Failed to execute command: {e}")
+            return False
+    
+    def get_console_user(self):
+        """Get the user currently logged into the console"""
+        try:
+            # Check who is on the console
+            result = subprocess.run(['who'], capture_output=True, text=True)
+            for line in result.stdout.splitlines():
+                if 'console' in line or ':0' in line:
+                    return line.split()[0]
+            
+            # Fallback to first user in who output
+            if result.stdout.strip():
+                return result.stdout.splitlines()[0].split()[0]
+                
+        except:
+            pass
+        return None
     
     def monitor_events(self):
         """Monitor keyboard events"""
@@ -106,26 +141,20 @@ class KeyboardMonitor:
                 self.log.info(f"Monitoring {self.device_path} for keycode {self.target_keycode}")
                 
                 while self.running:
-                    # Use select to avoid blocking reads
                     ready, _, _ = select.select([device], [], [], 1.0)
                     
                     if not ready:
                         continue
                         
-                    # Read event data
                     data = device.read(EVENT_SIZE)
                     if len(data) != EVENT_SIZE:
                         continue
                     
-                    # Unpack event structure
                     if IS_64BIT:
-                        # 64-bit: sec(8) + usec(8) + type(2) + code(2) + value(4) + padding(0)
                         _, _, event_type, code, value = struct.unpack('QQHHi', data)
                     else:
-                        # 32-bit: sec(4) + usec(4) + type(2) + code(2) + value(4)
                         _, _, event_type, code, value = struct.unpack('IIHHi', data)
                     
-                    # Check if this is our target key press
                     if (event_type == EV_KEY and 
                         code == self.target_keycode and 
                         value == KEY_PRESS):
@@ -134,22 +163,17 @@ class KeyboardMonitor:
                         self.execute_command()
                         
         except PermissionError:
-            self.log.error(f"Permission denied accessing {self.device_path}. Run as root or add user to input group.")
-        except FileNotFoundError:
-            self.log.error(f"Device {self.device_path} not found")
+            self.log.error(f"Permission denied accessing {self.device_path}. Run as root.")
         except Exception as e:
             self.log.error(f"Error monitoring events: {e}")
     
     def start_monitoring(self):
-        """Start monitoring in a background thread"""
+        """Start monitoring"""
         if self.running:
-            self.log.warning("Monitor is already running")
             return False
             
-        # Find keyboard device
         self.device_path = self.find_keyboard_device()
         if not self.device_path:
-            self.log.error("Could not find keyboard device")
             return False
             
         self.running = True
@@ -161,37 +185,22 @@ class KeyboardMonitor:
     
     def stop_monitoring(self):
         """Stop monitoring"""
-        if not self.running:
-            return
-            
         self.running = False
-        if self.monitor_thread and self.monitor_thread.is_alive():
+        if self.monitor_thread:
             self.monitor_thread.join(timeout=2.0)
-            
-        self.log.info("Keyboard monitoring stopped")
 
 
-# Example usage
 if __name__ == "__main__":
-    import time
+    logging.basicConfig(level=logging.INFO, 
+                       format='%(asctime)s - %(levelname)s - %(message)s')
     
-    # Set up logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
+    monitor = KeyboardMonitor()
     
-    # Create monitor instance
-    monitor = KeyboardMonitor(target_keycode=425, command_to_run="echo 'Key 425 pressed!'")
-    
-    # Start monitoring
     if monitor.start_monitoring():
         try:
-            # Keep the main thread alive
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:
-            print("\nStopping monitor...")
             monitor.stop_monitoring()
     else:
         print("Failed to start monitoring")

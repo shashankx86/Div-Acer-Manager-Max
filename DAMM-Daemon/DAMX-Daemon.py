@@ -19,10 +19,10 @@ from pathlib import Path
 from enum import Enum
 from PowerSourceDetection import PowerSourceDetector 
 from typing import Dict, List, Tuple, Set
-from KeyboardMonitor import KeyboardMonitor
+# from KeyboardMonitor import KeyboardMonitor
 
 # Constants
-VERSION = "0.4.6"
+VERSION = "0.4.7"
 SOCKET_PATH = "/var/run/DAMX.sock"
 LOG_PATH = "/var/log/DAMX_Daemon_Log.log"
 CONFIG_PATH = "/etc/DAMX_Daemon/config.ini"
@@ -72,7 +72,7 @@ class DAMXManager:
             log.info("linuwu_sense module found. Proceeding with initialization.")
         
         self.laptop_type = self._detect_laptop_type()
-        self.keyboard_monitor = None
+        # self.keyboard_monitor = None
 
         #added a delay so that driver sets up properly first
         time.sleep(0.2)
@@ -1292,24 +1292,32 @@ class DAMXDaemon:
 
     def setup(self):
         """Set up the daemon"""
-        # Load configuration
+        # Load configuration first
         self.load_config()
 
         try:
             # Initialize DAMXManager
             self.manager = DAMXManager()
 
+            # Initialize keyboard monitor early
+            # self.keyboard_monitor = KeyboardMonitor(
+            #     target_keycode=425, 
+            #     command_to_run="DAMX",  # Updated command
+            #     logger=log
+            # )
+            # kb_success = self.keyboard_monitor.start_monitoring()
+            
+            # if not kb_success:
+            #     log.error("Failed to start keyboard monitoring")
+            #     # Don't return False here - continue with reduced functionality
+
+            # Initialize power monitor
+            self.power_monitor = PowerSourceDetector(self.manager)
+            self.power_monitor.start_monitoring()
+
             # Log detected features
             features_str = ", ".join(sorted(self.manager.available_features))
             log.info(f"Detected features: {features_str}")
-            self.power_monitor = PowerSourceDetector(self.manager)
-
-            # Initialize keyboard monitor
-            self.keyboard_monitor = KeyboardMonitor(
-                target_keycode=425, 
-                command_to_run="DAMX"  # or whatever command you want to run
-            )
-            log.info("Mapping Nitro Button")
 
             return True
         except Exception as e:
@@ -1329,12 +1337,12 @@ class DAMXDaemon:
         signal.signal(signal.SIGTERM, self.signal_handler)
         signal.signal(signal.SIGINT, self.signal_handler)
 
-        if self.keyboard_monitor:
-            success = self.keyboard_monitor.start_monitoring()
-            if success:
-                log.info("Keyboard monitoring started successfully")
-            else:
-                log.warning("Failed to start keyboard monitoring")
+        # if self.keyboard_monitor:
+        #     success = self.keyboard_monitor.start_monitoring()
+        #     if success:
+        #         log.info("Keyboard monitoring started successfully")
+        #     else:
+        #         log.warning("Failed to start keyboard monitoring")
 
         # Set up and run the server
         try:
@@ -1359,9 +1367,9 @@ class DAMXDaemon:
             self.server.stop()
             self.server.cleanup_socket()  # Additional cleanup
             # Stop keyboard monitoring
-        if hasattr(self, 'keyboard_monitor') and self.keyboard_monitor:
-            self.keyboard_monitor.stop_monitoring()
-            log.info("Keyboard monitoring stopped")
+        # if hasattr(self, 'keyboard_monitor') and self.keyboard_monitor:
+        #     self.keyboard_monitor.stop_monitoring()
+        #     log.info("Keyboard monitoring stopped")
     
         if self.power_monitor:
             self.power_monitor.stop_monitoring()
