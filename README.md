@@ -84,12 +84,14 @@ That’s it!
 ## 🖥️ Troubleshooting
 You can check the logs at /var/log/DAMX_Daemon_Log.log
 
-If you get UNKNOWN as Laptop type, try restarting (it happens somethings)
+If you get UNKNOWN as Laptop type, try restarting (it happens somethings) 
 But if it still happenes that might mean the Drivers Installation failed, Make sure you have the approprite kernel headers to compile the drivers.
 
-Please file a Issue in the issue corner and include the logs to get support and help the project grow
+Also, check out the [FAQ page](https://github.com/PXDiv/Div-Acer-Manager-Max/blob/main/FAQ.md) before opening any issues.
 
-## Screenshots
+Please open a new issue or discussion and include the logs to get support and help the project grow if you need any info, report a bug or just give ideas for the future versions of DAMX
+
+## Screenshots 
 ![image](https://github.com/user-attachments/assets/10d44e8c-14e4-4441-b60c-538af1840cf6)
 ![image](https://github.com/user-attachments/assets/89217b26-b94c-4c78-8fe8-3de2b22a7095)
 ![image](https://github.com/user-attachments/assets/72a7b944-5efc-4520-83b6-88069fc05723)
