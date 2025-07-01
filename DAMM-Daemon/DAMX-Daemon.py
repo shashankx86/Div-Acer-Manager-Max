@@ -22,7 +22,7 @@ from typing import Dict, List, Tuple, Set
 # from KeyboardMonitor import KeyboardMonitor
 
 # Constants
-VERSION = "0.4.7"
+VERSION = "0.4.6"
 SOCKET_PATH = "/var/run/DAMX.sock"
 LOG_PATH = "/var/log/DAMX_Daemon_Log.log"
 CONFIG_PATH = "/etc/DAMX_Daemon/config.ini"
