@@ -46,7 +46,7 @@ No worries! Your device might still be supported unofficially.
 
    * `nitro_v4` or `predator_v4`
    * Optional: Add `enable_all` to unlock all features (RGB control, LCD override, etc.)
-3. If this works, you can **make the parameter persistent** using the GUI or config file.
+3. If this works, you can **make the parameter persistent** using the Internals Manager.
 
 Want native support?
 
