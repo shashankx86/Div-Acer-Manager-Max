@@ -9,6 +9,8 @@ DAMX is primarily built for modern Acer laptops (2022 and newer) that use WMI pr
 > Note: This compatibility list simply reflects devices where the DAMX Suite has been confirmed to work.
 >
 >If your Acer laptop is not listed but works correctly or partially with DAMX, please help improve the project by filing an issue with your model details — so others can benefit from your discovery.
+>
+> Please also check out the [FAQ Page](https://github.com/PXDiv/Div-Acer-Manager-Max/blob/main/FAQ.md) to know how to get your model to work even though it's not supported, and you can even help others by creating a quirk config and for your model and creating a merge request. 
 
 
 
