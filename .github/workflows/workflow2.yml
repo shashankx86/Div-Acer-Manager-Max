@@ -148,12 +148,12 @@ jobs:
     
     - name: Copy and Update Setup Script
       run: |
-        if [ -f "Setup.sh" ]; then
-          cp "Setup.sh" "${{ env.package_dir }}/setup.sh"
-        elif [ -f "Div-Acer-Manager-Max/Setup.sh" ]; then
-          cp "Div-Acer-Manager-Max/Setup.sh" "${{ env.package_dir }}/setup.sh"
+        if [ -f "Div-Acer-Manager-Max/scripts/local-setup.sh" ]; then
+          cp "Div-Acer-Manager-Max/scripts/local-setup.sh" "${{ env.package_dir }}/setup.sh"
+        elif [ -f "scripts/local-setup.sh" ]; then
+          cp "scripts/local-setup.sh" "${{ env.package_dir }}/setup.sh"
         else
-          echo "Warning: Setup.sh not found, creating a basic one"
+          echo "Warning: local-setup.sh not found, creating a basic one"
           cat > "${{ env.package_dir }}/setup.sh" << 'EOF'
         #!/bin/bash
         # DAMX Installation Script
