@@ -50,7 +50,7 @@ No worries! Your device might still be supported unofficially.
 
 Want native support?
 
-* Head over to the [Div-Linuwu Sense project] and **submit your device’s quirk configuration in the driver itself** to help others in the community.
+* Head over to the Div-Linuwu Sense project and **submit your device’s quirk configuration in the driver itself** to help others in the community.
 
 ---
 
@@ -180,7 +180,3 @@ Remember to always keep a backup of your working kernel/driver before making cha
 
 Have more questions or need help?
 👉 Feel free to [open an issue](#issues) or join the discussions.
-
----
-
-Would you like this FAQ in Markdown format, ready to drop into your GitHub repo (`FAQ.md`)?
