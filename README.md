@@ -62,24 +62,68 @@ Check your deviced compatibility here: [Compatibility List](https://github.com/P
 
 > Even if not here, DAMX will still work on most devices. Be sure to put a issue to request your model to be added in the compatiblity list if working.
 
-## 🖥️ Installation
+Sure! Here's a cleaner and more polished rewrite of your installation instructions:
 
-1. Download the Latest release package from the Release section
-   
-2. Extract the Package and set the setup script to be executable
-   
-3. Open the setup script with a termial (Right click the setup file to run it as a Program or in Terminal)
+---
 
-4. Choose the option 1 from the menu to install:
+## 🖥️ DAMX Installation Guide
+
+You can install DAMX using either of the following methods:
+
+---
+
+### 🔗 Remote Installation
+
+1. Open a terminal window.
+
+2. Run the following command:
+
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/PXDiv/Div-Acer-Manager-Max/refs/heads/main/scripts/remoteSetup.sh -o /tmp/setup.sh && sudo bash /tmp/setup.sh
+   ```
+
+3. Follow the on-screen prompts.
+
+4. Done!
+
+---
+
+### 📦 Local Installation (Alternative Method)
+
+If the remote installation fails for some reason or you've gone offline, follow these steps:
+
+1. Download the latest release from the **Releases** section.
+
+2. Extract the downloaded package.
+
+3. Make the `setup.sh` script executable:
+
+   ```bash
+   chmod +x setup.sh
+   ```
+
+4. Run the script:
+
+   * Right-click the setup file and choose **“Run in Terminal”**,
+     or open a terminal in the folder and run:
+
+     ```bash
+     ./setup.sh
+     ```
+
+5. When prompted, choose an option from the menu:
 
    * `1` → Install
    * `2` → Install without Drivers
    * `3` → Uninstall
    * `4` → Reinstall/Update
 
-5. And a Reboot
+6. Reboot your system after the installation completes.
 
-That’s it!
+---
+
+✅ That’s it—you’re all set!
+
 
 ## 🖥️ Troubleshooting
 You can check the logs at /var/log/DAMX_Daemon_Log.log
