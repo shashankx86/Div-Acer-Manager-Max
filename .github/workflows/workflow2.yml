@@ -164,7 +164,7 @@ jobs:
     
     - name: Copy Drivers
       run: |
-        cp -r Div-Linuwu-Sense/* "${{ env.package_dir }}/Linuwu-Sense/"
+        cp -r drivers-temp/* "${{ env.package_dir }}/Linuwu-Sense/"
         echo "✓ Drivers copied"
     
     - name: Copy and Update Setup Script
