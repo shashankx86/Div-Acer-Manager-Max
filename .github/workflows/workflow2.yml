@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Release tag (e.g., v0.9.1)'
+        description: 'Release tag (e.g., v0.8.8)'
         required: true
         type: string
       is_prerelease:
@@ -239,46 +239,76 @@ jobs:
         echo "Size: $(du -h ${{ env.package_dir }}.tar.xz | cut -f1)"
         echo "Checksum: $(cat ${{ env.package_dir }}.tar.xz.sha256)"
     
-    - name: Create GitHub Release and Upload Assets
+    - name: Upload Package as Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.package_dir }}
+        path: |
+          ${{ env.package_dir }}.tar.xz
+          ${{ env.package_dir }}.tar.xz.sha256
+        retention-days: 30
+    
+    - name: Create GitHub Release
       if: ${{ inputs.publish_release }}
+      uses: actions/create-release@v1
+      id: create_release
       env:
         GITHUB_TOKEN: ${{ secrets.GH_PAT_RELEASE }}
-      run: |
-        # Create release using GitHub CLI
-        gh release create "${{ inputs.tag }}" \
-          --title "DAMX ${{ inputs.tag }}" \
-          --notes "# DAMX Release ${{ inputs.tag }}
-        
-        ## Version Information
-        - **Project Version**: ${{ steps.versions.outputs.gui_version }}
-        - **Daemon Version**: ${{ steps.versions.outputs.daemon_version }}
-        - **Drivers Version**: ${{ steps.versions.outputs.drivers_version }}
-        - **Drivers Type**: ${{ steps.versions.outputs.drivers_type }}
-        
-        ## Components
-        - **DAMX-Daemon**: Python daemon compiled with PyInstaller
-        - **DAMX-GUI**: .NET 9.0 GUI application (self-contained, linux-x64)
-        - **Linuwu-Sense**: Hardware drivers (${{ steps.versions.outputs.drivers_type }})
-        - **setup.sh**: Installation script
-        
-        ## Installation
-        1. Download the \`${{ env.package_dir }}.tar.xz\` file
-        2. Extract: \`tar -xJf ${{ env.package_dir }}.tar.xz\`
-        3. Run: \`cd ${{ env.package_dir }} && ./setup.sh\`
-        
-        ## Checksums
-        \`\`\`
-        $(cat ${{ env.package_dir }}.tar.xz.sha256)
-        \`\`\`
-        
-        ---
-        Built on: $(date)  
-        Commit: ${{ github.sha }}" \
-          ${{ inputs.is_prerelease == true && '--prerelease' || '' }} \
-          "${{ env.package_dir }}.tar.xz" \
-          "${{ env.package_dir }}.tar.xz.sha256"
-        
-        echo "✓ Release created and assets uploaded successfully"
+      with:
+        tag_name: ${{ inputs.tag }}
+        release_name: DAMX ${{ inputs.tag }}
+        body: |
+          # DAMX Release ${{ inputs.tag }}
+          
+          ## Version Information
+          - **Project Version**: ${{ steps.versions.outputs.gui_version }}
+          - **Daemon Version**: ${{ steps.versions.outputs.daemon_version }}
+          - **Drivers Version**: ${{ steps.versions.outputs.drivers_version }}
+          - **Drivers Type**: ${{ steps.versions.outputs.drivers_type }}
+          
+          ## Components
+          - **DAMX-Daemon**: Python daemon compiled with PyInstaller
+          - **DAMX-GUI**: .NET 9.0 GUI application (self-contained, linux-x64)
+          - **Linuwu-Sense**: Hardware drivers (${{ steps.versions.outputs.drivers_type }})
+          - **setup.sh**: Installation script
+          
+          ## Installation
+          1. Download the `${{ env.package_dir }}.tar.xz` file
+          2. Extract: `tar -xJf ${{ env.package_dir }}.tar.xz`
+          3. Run: `cd ${{ env.package_dir }} && ./setup.sh`
+          
+          ## Checksums
+          ```
+          $(cat ${{ env.package_dir }}.tar.xz.sha256)
+          ```
+          
+          ---
+          Built on: $(date)  
+          Commit: ${{ github.sha }}
+        draft: false
+        prerelease: ${{ inputs.is_prerelease }}
+    
+    - name: Upload Release Asset
+      if: ${{ inputs.publish_release }}
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_PAT_RELEASE }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./${{ env.package_dir }}.tar.xz
+        asset_name: ${{ env.package_dir }}.tar.xz
+        asset_content_type: application/x-xz
+    
+    - name: Upload Checksum File
+      if: ${{ inputs.publish_release }}
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_PAT_RELEASE }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./${{ env.package_dir }}.tar.xz.sha256
+        asset_name: ${{ env.package_dir }}.tar.xz.sha256
+        asset_content_type: text/plain
     
     - name: Build Summary
       run: |
@@ -293,5 +323,5 @@ jobs:
         echo "- Size: $(du -h ${{ env.package_dir }}.tar.xz | cut -f1)"
         
         if [ "${{ inputs.publish_release }}" == "true" ]; then
-          echo "- Release created with assets uploaded"
+          echo "- Release URL: ${{ steps.create_release.outputs.html_url }}"
         fi
