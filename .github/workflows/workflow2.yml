@@ -17,6 +17,14 @@ on:
         required: true
         type: boolean
         default: true
+      drivers_version:
+        description: 'Drivers version to use'
+        required: true
+        type: choice
+        default: 'div-linuwu-sense'
+        options:
+        - 'div-linuwu-sense'
+        - 'linuwu-sense'
 
 jobs:
   build-and-package:
@@ -28,11 +36,11 @@ jobs:
       with:
         path: Div-Acer-Manager-Max
     
-    - name: Checkout Div-Linuwu-Sense repository
+    - name: Checkout Drivers repository
       uses: actions/checkout@v4
       with:
-        repository: ${{ github.repository_owner }}/Div-Linuwu-Sense
-        path: Div-Linuwu-Sense
+        repository: ${{ inputs.drivers_version == 'linuwu-sense' && '0x7375646F/Linuwu-Sense' || 'PXDiv/Div-Linuwu-Sense' }}
+        path: Linuwu-Sense
         token: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Setup Python
@@ -60,14 +68,19 @@ jobs:
         DAEMON_VERSION=$(grep -oP 'VERSION\s*=\s*"\K[\d.]+' Div-Acer-Manager-Max/DAMM-Daemon/DAMX-Daemon.py || echo "unknown")
         echo "daemon_version=$DAEMON_VERSION" >> $GITHUB_OUTPUT
         
-        # Detect drivers version
-        DRIVERS_VERSION=$(grep -oP '#define\s+DRIVER_VERSION\s+"\K[\d.]+' Div-Linuwu-Sense/src/linuwu_sense.c || echo "unknown")
+        # Detect drivers version based on selected drivers
+        if [ "${{ inputs.drivers_version }}" == "linuwu-sense" ]; then
+          DRIVERS_VERSION=$(grep -oP '#define\s+DRIVER_VERSION\s+"\K[\d.]+' Linuwu-Sense/src/linuwu_sense.c || echo "unknown")
+        else
+          DRIVERS_VERSION=$(grep -oP '#define\s+DRIVER_VERSION\s+"\K[\d.]+' Linuwu-Sense/src/linuwu_sense.c || echo "unknown")
+        fi
         echo "drivers_version=$DRIVERS_VERSION" >> $GITHUB_OUTPUT
+        echo "drivers_type=${{ inputs.drivers_version }}" >> $GITHUB_OUTPUT
         
         echo "Detected versions:"
         echo "  GUI: $GUI_VERSION"
         echo "  Daemon: $DAEMON_VERSION" 
-        echo "  Drivers: $DRIVERS_VERSION"
+        echo "  Drivers: $DRIVERS_VERSION (${{ inputs.drivers_version }})"
     
     - name: Build Python Daemon
       run: |
@@ -243,11 +256,12 @@ jobs:
           - **Project Version**: ${{ steps.versions.outputs.gui_version }}
           - **Daemon Version**: ${{ steps.versions.outputs.daemon_version }}
           - **Drivers Version**: ${{ steps.versions.outputs.drivers_version }}
+          - **Drivers Type**: ${{ steps.versions.outputs.drivers_type }}
           
           ## Components
           - **DAMX-Daemon**: Python daemon compiled with PyInstaller
           - **DAMX-GUI**: .NET 9.0 GUI application (self-contained, linux-x64)
-          - **Linuwu-Sense**: Hardware drivers
+          - **Linuwu-Sense**: Hardware drivers (${{ steps.versions.outputs.drivers_type }})
           - **setup.sh**: Installation script
           
           ## Installation
@@ -296,6 +310,7 @@ jobs:
         echo "- Tag: ${{ inputs.tag }}"
         echo "- Pre-release: ${{ inputs.is_prerelease }}"
         echo "- Published: ${{ inputs.publish_release }}"
+        echo "- Drivers: ${{ inputs.drivers_version }}"
         echo "- Package: ${{ env.package_dir }}.tar.xz"
         echo "- Size: $(du -h ${{ env.package_dir }}.tar.xz | cut -f1)"
         
