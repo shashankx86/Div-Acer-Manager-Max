@@ -64,13 +64,11 @@ Check your deviced compatibility here: [Compatibility List](https://github.com/P
 
 Sure! Here's a cleaner and more polished rewrite of your installation instructions:
 
----
 
 ## 🖥️ DAMX Installation Guide
 
 You can install DAMX using either of the following methods:
 
----
 
 ### 🔗 Remote Installation
 
@@ -86,7 +84,7 @@ You can install DAMX using either of the following methods:
 
 4. Done!
 
----
+
 
 ### 📦 Local Installation (Alternative Method)
 
@@ -120,7 +118,6 @@ If the remote installation fails for some reason or you've gone offline, follow 
 
 6. Reboot your system after the installation completes.
 
----
 
 ✅ That’s it—you’re all set!
 
