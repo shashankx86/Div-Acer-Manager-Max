@@ -480,19 +480,44 @@ uninstall() {
 check_system() {
   echo -e "${BLUE}Checking system compatibility...${NC}"
 
-  # Check if systemd is available
+  # Check if systemd is available (hard requirement)
   if ! command -v systemctl &> /dev/null; then
     echo -e "${RED}Error: systemd is required but not found on this system.${NC}"
     return 1
   fi
+  echo -e "${GREEN}✓ systemd found${NC}"
 
-  # Check if we're on a supported distribution
+  # Check kernel version (warning only)
+  local kernel_version=$(uname -r | cut -d. -f1,2)
+  local kernel_major=$(echo $kernel_version | cut -d. -f1)
+  local kernel_minor=$(echo $kernel_version | cut -d. -f2)
+  
+  echo "Kernel version: $(uname -r)"
+  
+  # Check if kernel is less than 6.13
+  if [ "$kernel_major" -lt 6 ] || ([ "$kernel_major" -eq 6 ] && [ "$kernel_minor" -lt 13 ]); then
+    echo -e "${YELLOW}Warning: Kernel version $kernel_version is lower than 6.13. Installation may fail.${NC}"
+    echo -e "${YELLOW}Recommended kernel version: 6.13 or higher${NC}"
+  else
+    echo -e "${GREEN}✓ Kernel version $kernel_version is supported${NC}"
+  fi
+
+  # Check distribution (informational only)
   if [ -f /etc/os-release ]; then
     . /etc/os-release
     echo "Detected OS: $PRETTY_NAME"
+    
+    # Check if it's Ubuntu (officially supported)
+    if echo "$ID" | grep -q "ubuntu"; then
+      echo -e "${GREEN}✓ Ubuntu detected (officially supported)${NC}"
+    else
+      echo -e "${YELLOW}Note: Only Ubuntu is officially supported. Other distributions may work but are not guaranteed.${NC}"
+    fi
+  else
+    echo -e "${YELLOW}Note: Could not detect distribution. Only Ubuntu is officially supported.${NC}"
   fi
 
-  echo -e "${GREEN}System compatibility check passed.${NC}"
+  echo -e "${GREEN}System compatibility check completed.${NC}"
   return 0
 }
 
@@ -516,7 +541,7 @@ main() {
 
   # Perform initial system check
   if ! check_system; then
-    echo -e "${RED}System compatibility check failed. Exiting.${NC}"
+    echo -e "${RED}Critical system compatibility check failed. Exiting.${NC}"
     exit 1
   fi
 
