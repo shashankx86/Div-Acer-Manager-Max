@@ -36,12 +36,20 @@ jobs:
       with:
         path: Div-Acer-Manager-Max
     
-    - name: Checkout Drivers repository
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ inputs.drivers_version == 'linuwu-sense' && '0x7375646F/Linuwu-Sense' || 'PXDiv/Div-Linuwu-Sense' }}
-        path: Linuwu-Sense
-        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Download and Setup Drivers
+      run: |
+        echo "Setting up drivers: ${{ inputs.drivers_version }}"
+        
+        if [ "${{ inputs.drivers_version }}" == "linuwu-sense" ]; then
+          echo "Downloading original Linuwu-Sense drivers..."
+          git clone https://github.com/0x7375646F/Linuwu-Sense.git drivers-temp
+        else
+          echo "Downloading Div-Linuwu-Sense drivers..."
+          git clone https://github.com/PXDiv/Div-Linuwu-Sense.git drivers-temp
+        fi
+        
+        echo "✓ Drivers repository cloned successfully"
+        ls -la drivers-temp/
     
     - name: Setup Python
       uses: actions/setup-python@v4
@@ -70,9 +78,9 @@ jobs:
         
         # Detect drivers version based on selected drivers
         if [ "${{ inputs.drivers_version }}" == "linuwu-sense" ]; then
-          DRIVERS_VERSION=$(grep -oP '#define\s+DRIVER_VERSION\s+"\K[\d.]+' Linuwu-Sense/src/linuwu_sense.c || echo "unknown")
+          DRIVERS_VERSION=$(grep -oP '#define\s+DRIVER_VERSION\s+"\K[\d.]+' drivers-temp/src/linuwu_sense.c || echo "unknown")
         else
-          DRIVERS_VERSION=$(grep -oP '#define\s+DRIVER_VERSION\s+"\K[\d.]+' Linuwu-Sense/src/linuwu_sense.c || echo "unknown")
+          DRIVERS_VERSION=$(grep -oP '#define\s+DRIVER_VERSION\s+"\K[\d.]+' drivers-temp/src/linuwu_sense.c || echo "unknown")
         fi
         echo "drivers_version=$DRIVERS_VERSION" >> $GITHUB_OUTPUT
         echo "drivers_type=${{ inputs.drivers_version }}" >> $GITHUB_OUTPUT
