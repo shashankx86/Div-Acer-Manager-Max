@@ -68,7 +68,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private TextBlock _supportedFeaturesTextBlock;
     private TextBlock _thermalProfileInfoText;
     private RadioButton _turboProfileButton;
-    private Button _usbChargeButton;
     private ComboBox _usbChargingComboBox;
     private ColorPicker _zone1ColorPicker;
     private ColorPicker _zone2ColorPicker;
@@ -131,7 +130,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         // USB charging controls
         _usbChargingComboBox = nameScope.Find<ComboBox>("UsbChargingComboBox");
-        _usbChargeButton = nameScope.Find<Button>("UsbChargeButton");
 
         // Keyboard lighting zone controls
         _zone1ColorPicker = nameScope.Find<ColorPicker>("Zone1ColorPicker");
@@ -202,8 +200,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (_stopCalibrationButton != null) _stopCalibrationButton.Click += StopCalibrationButton_Click;
         if (_batteryLimitCheckBox != null) _batteryLimitCheckBox.Click += BatteryLimitCheckBox_Click;
 
-        // USB charging handler
-        if (_usbChargeButton != null) _usbChargeButton.Click += UsbChargeButton_Click;
 
         // Keyboard lighting handlers
         if (_keyBrightnessSlider != null) _keyBrightnessSlider.PropertyChanged += KeyboardBrightnessSlider_ValueChanged;
@@ -725,21 +721,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             await _client.SetBatteryLimiterAsync(checkBox.IsChecked ?? false);
     }
 
-    private async void UsbChargeButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (_isConnected && _usbChargingComboBox != null)
-        {
-            var level = _usbChargingComboBox.SelectedIndex switch
-            {
-                1 => 10,
-                2 => 20,
-                3 => 30,
-                _ => 0
-            };
-            await _client.SetUsbChargingAsync(level);
-        }
-    }
-
     private void KeyboardBrightnessSlider_ValueChanged(object sender, AvaloniaPropertyChangedEventArgs e)
     {
         if (e.Property == Slider.ValueProperty)
@@ -808,6 +789,21 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         if (_isConnected && sender is CheckBox checkBox)
             await _client.SetBootAnimationSoundAsync(checkBox.IsChecked ?? false);
+    }
+
+    private async void UsbChargingComboBox_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_isConnected && _usbChargingComboBox != null)
+        {
+            var level = _usbChargingComboBox.SelectedIndex switch
+            {
+                1 => 10,
+                2 => 20,
+                3 => 30,
+                _ => 0
+            };
+            await _client.SetUsbChargingAsync(level);
+        }
     }
 
     public static class AppState
