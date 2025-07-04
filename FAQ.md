@@ -91,15 +91,17 @@ Here's a user-friendly process to add support for a new Acer laptop model to the
    - Add a new entry in the quirks section following this format:
      ```c
      static struct quirk_entry quirk_acer_YOUR_MODEL = {
-         .wireless = 1,                // If has special wireless handling
-         .brightness = -1,              // If has brightness control
-         .turbo = 1,                   // If has turbo mode
-         .cpu_fans = 1,                // Number of CPU fans
-         .gpu_fans = 1,                // Number of GPU fans
-         .predator_v4 = 1,             // If uses Predator Sense v4
-         .nitro_v4 = 1,                // If uses Nitro Sense v4
-         .nitro_sense = 1,             // If uses older Nitro Sense
-         .four_zone_kb = 1             // If has 4-zone RGB keyboard
+        .predator_v4 = 1,             // If uses Predator Sense v4
+        .nitro_v4 = 1,                // If uses Nitro Sense v4
+        .nitro_sense = 1,             // If it does'nt support LCD Override and Boot Animation Sound use nitro_sense
+        .four_zone_kb = 1             // If has 4-zone RGB keyboard
+     
+        //special quirks (only add these if you know what you are doing and your hardware supports it)
+        .wireless = 1,                // If has special wireless handling
+        .brightness = -1,              // If has brightness control
+        .turbo = 1,                   // If has turbo mode (turbo mode is detected by driver itself, you don't explicitly need to enable it, is only needed in specific scenarios and models)
+        .cpu_fans = 1,                // Number of CPU fans
+        .gpu_fans = 1,                // Number of GPU fans
      };
      ```
 
