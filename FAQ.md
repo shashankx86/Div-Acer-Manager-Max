@@ -137,9 +137,51 @@ Here's a user-friendly process to add support for a new Acer laptop model to the
    - Commit your changes with a descriptive message
    - Create a pull request to the original repository
 
-### Example for a New Model
+### Example for a New Model 
 
-For an "Acer Predator PHN16-73" with all features:
+*If your model does not require much config and does not have special features like Four zone RGB kayboard you can just add:*
+```c
+/* Add to acer_quirks array (Starting around line 570): */
+
+   {
+         .callback = dmi_matched,
+         .ident = "Acer Nitro ANV15-51",
+         .matches = {
+             DMI_MATCH(DMI_SYS_VENDOR, "Acer"),
+             DMI_MATCH(DMI_PRODUCT_NAME, "Nitro ANV15-51"),
+         },
+            .driver_data = &quirk_acer_nitro, //This line here tells which quirk list (struct) to use, since we want the default nitro_sense quirk, it'll initialize with just the default config 
+     },
+```
+This will just enable the base quirk with defaults of nitro_sense
+
+Here are the default structs:
+- For predator_v4 use `.driver_data =  &quirk_acer_predator_v4` // Enables Base Predator_v4, use in predator models. <br>
+- For nitro_v4 use `.driver_data =  &quirk_acer_nitro_v4` // Enables Base Nitro_v4, use in nitro models. <br>
+- For nitro_sense use `.driver_data = &quirk_acer_nitro` //Used in nitro models without special features like lcd override and boot sound (like ANV15-51). <br>
+
+
+*For an "Acer Predator AN515-58" with all features:*
+
+```c
+ static struct quirk_entry quirk_acer_nitro_an515_58 = {
+    .nitro_v4 = 1,
+    .four_zone_kb = 1,
+ };
+
+/* Then add to acer_quirks array: */
+   {
+        .callback = dmi_matched,
+        .ident = "Acer Nitro AN515-58",
+        .matches = {
+            DMI_MATCH(DMI_SYS_VENDOR, "Acer"),
+            DMI_MATCH(DMI_PRODUCT_NAME, "Nitro AN515-58"),
+        },
+        .driver_data = &quirk_acer_nitro_an515_58,
+    },
+```
+
+*For an "Acer Predator PHN16-73" with all special features:*
 
 ```c
 static struct quirk_entry quirk_acer_predator_phn16_73 = {
