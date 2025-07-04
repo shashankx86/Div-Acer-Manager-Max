@@ -22,12 +22,13 @@ Please also check out the [FAQ Page](https://github.com/PXDiv/Div-Acer-Manager-M
 | ANV15-41            | ✅ Supported            | Stable with all features working.                                |
 | AN16-41             | ✅ Supported            | Fully functional on supported kernels.                           |
 | AN16-43             | ✅ Supported            | Fully functional on supported kernels.                           |
-| **PHN16-71**        | 🟠 Partially Supported |  Per Key Keyboard lighting maybe not working properly.                 |
+| **PHN16-71**        | ✅ Supported |  Per Key Keyboard lighting maybe not working properly.                 |
 | PHN16-72            | ✅ Supported            | Uses same quirk profile as PHN16-71 but no known lighting issue. |
 | PH16-71             | ✅ Supported            | Uses universal Predator V4 quirk.                                |
 | PH18-71             | ✅ Supported            | Uses universal Predator V4 quirk.                                |
 | PH315-53            | ✅ Supported            | Known stable, uses dedicated quirk.                              |
-| AN515-44            | 🟠 Partially Supported  | Need to force nitro_v4 using Internals Manager                   |
+| AN515-44            | 🟠 Partially Supported  | Need to force parameters using Internals Manager (`nitro_v4` or `enable all`)|
+| AN515-58            | ✅ Supported <br> (See Notes)| Has Inbuilt support, <br> To use LCD Override use `nitro_v4` or `enable all` parameter|
 | AN517-54            | ⚪ Not Yet Verified     | No reports yet — hardware support unconfirmed.                   |
 | AN517-55            | ⚪ Not Yet Verified     | No reports yet — hardware support unconfirmed.                   |
 | Aspire 1360         | ✅ Supported            | Legacy model — uses Aspire 1520 quirk.                           |
