@@ -62,8 +62,6 @@ Check your deviced compatibility here: [Compatibility List](https://github.com/P
 
 > Even if not here, DAMX will still work on most devices. Be sure to put a issue to request your model to be added in the compatiblity list if working.
 
-Sure! Here's a cleaner and more polished rewrite of your installation instructions:
-
 
 ## 🖥️ DAMX Installation Guide
 
