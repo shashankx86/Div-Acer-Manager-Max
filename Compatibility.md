@@ -27,7 +27,8 @@ Please also check out the [FAQ Page](https://github.com/PXDiv/Div-Acer-Manager-M
 | PH16-71             | ✅ Supported            | Uses universal Predator V4 quirk.                                |
 | PH18-71             | ✅ Supported            | Uses universal Predator V4 quirk.                                |
 | PH315-53            | ✅ Supported            | Known stable, uses dedicated quirk.                              |
-| AN515-44            | 🟠 Partially Supported  | Need to force parameters using Internals Manager (`nitro_v4` or `enable all`)|
+| AN515-44            | ✅ Supported <br> (See Notes)  | Need to force parameters <br> using Internals Manager (`nitro_v4`)|
+| AN515-47            | ✅ Supported <br> (See Notes)  | Need to force parameters <br> using Internals Manager (`nitro_v4`)|
 | AN515-58            | ✅ Supported <br> (See Notes)| Has Inbuilt support, <br> To use LCD Override use `nitro_v4` or `enable all` parameter|
 | AN517-54            | ⚪ Not Yet Verified     | No reports yet — hardware support unconfirmed.                   |
 | AN517-55            | ⚪ Not Yet Verified     | No reports yet — hardware support unconfirmed.                   |
