@@ -62,34 +62,75 @@ Check your deviced compatibility here: [Compatibility List](https://github.com/P
 
 > Even if not here, DAMX will still work on most devices. Be sure to put a issue to request your model to be added in the compatiblity list if working.
 
-## 🖥️ Installation
 
-1. Download the Latest release package from the Release section
-   
-2. Extract the Package and set the setup script to be executable
-   
-3. Open the setup script with a termial (Right click the setup file to run it as a Program or in Terminal)
+## 🖥️ DAMX Installation Guide
 
-4. Choose the option 1 from the menu to install:
+You can install DAMX using either of the following methods:
+
+
+### 🔗 Remote Installation
+
+1. Open a terminal window.
+
+2. Run the following command:
+
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/PXDiv/Div-Acer-Manager-Max/refs/heads/main/scripts/remoteSetup.sh -o /tmp/setup.sh && sudo bash /tmp/setup.sh
+   ```
+
+3. Follow the on-screen prompts.
+
+4. Done!
+
+
+
+### 📦 Local Installation (Alternative Method)
+
+If the remote installation fails for some reason or you've gone offline, follow these steps:
+
+1. Download the latest release from the **Releases** section.
+
+2. Extract the downloaded package.
+
+3. Make the `setup.sh` script executable:
+
+   ```bash
+   chmod +x setup.sh
+   ```
+
+4. Run the script:
+
+   * Right-click the setup file and choose **“Run in Terminal”**,
+     or open a terminal in the folder and run:
+
+     ```bash
+     ./setup.sh
+     ```
+
+5. When prompted, choose an option from the menu:
 
    * `1` → Install
    * `2` → Install without Drivers
    * `3` → Uninstall
    * `4` → Reinstall/Update
 
-5. And a Reboot
+6. Reboot your system after the installation completes.
 
-That’s it!
+
+✅ That’s it—you’re all set!
+
 
 ## 🖥️ Troubleshooting
 You can check the logs at /var/log/DAMX_Daemon_Log.log
 
-If you get UNKNOWN as Laptop type, try restarting (it happens somethings)
+If you get UNKNOWN as Laptop type, try restarting (it happens somethings) 
 But if it still happenes that might mean the Drivers Installation failed, Make sure you have the approprite kernel headers to compile the drivers.
 
-Please file a Issue in the issue corner and include the logs to get support and help the project grow
+Also, check out the [FAQ page](https://github.com/PXDiv/Div-Acer-Manager-Max/blob/main/FAQ.md) before opening any issues.
 
-## Screenshots
+Please open a new issue or discussion and include the logs to get support and help the project grow if you need any info, report a bug or just give ideas for the future versions of DAMX
+
+## Screenshots 
 ![image](https://github.com/user-attachments/assets/10d44e8c-14e4-4441-b60c-538af1840cf6)
 ![image](https://github.com/user-attachments/assets/89217b26-b94c-4c78-8fe8-3de2b22a7095)
 ![image](https://github.com/user-attachments/assets/72a7b944-5efc-4520-83b6-88069fc05723)
