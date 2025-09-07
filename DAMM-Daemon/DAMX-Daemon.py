@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# DAMX-Daemon - Manage Acer laptop features as root service communicating with Linuwu-sense drivers
+# DAMX-Daemon - Manage Acer laptop features as root service communicating with acer-sense drivers
 # Compatible with Predator and Nitro laptops
 
 import os
@@ -27,7 +27,7 @@ SOCKET_PATH = "/var/run/DAMX.sock"
 LOG_PATH = "/var/log/DAMX_Daemon_Log.log"
 CONFIG_PATH = "/etc/DAMX_Daemon/config.ini"
 PID_FILE = "/var/run/DAMX-Daemon.pid"
-MODPROBE_CONFIG_PATH = "/etc/modprobe.d/linuwu-sense.conf"
+MODPROBE_CONFIG_PATH = "/etc/modprobe.d/acer-sense.conf"
 
 # Check if running as root
 if os.geteuid() != 0:
@@ -146,20 +146,20 @@ class DAMXManager:
             log.error(f"Failed to reset restart counter: {e}")
 
     def _force_model_nitro(self):
-        """Restart linuwu-sense driver and DAMX daemon service with nitro_v4 parameter"""
+        """Restart acer-sense driver and DAMX daemon service with nitro_v4 parameter"""
         log.info("Forcing model detection to Nitro by restarting drivers and daemon")
 
         try:
             # Remove the module
-            subprocess.run(['sudo', 'rmmod', 'linuwu-sense'], check=True)
-            log.info("Successfully removed linuwu-sense module")
+            subprocess.run(['sudo', 'rmmod', 'acer-sense'], check=True)
+            log.info("Successfully removed acer-sense module")
             
             # Wait a moment
             time.sleep(2)
             
             # Reload the module
-            subprocess.run(['sudo', 'modprobe', 'linuwu-sense', 'nitro_v4'], check=True)
-            log.info("Successfully reloaded linuwu-sense module")
+            subprocess.run(['sudo', 'modprobe', 'acer-sense', 'nitro_v4'], check=True)
+            log.info("Successfully reloaded acer-sense module")
             
             # Wait a moment for module to initialize
             time.sleep(3)
@@ -176,20 +176,20 @@ class DAMXManager:
         
 
     def _force_model_predator(self):
-        """Restart linuwu-sense driver and DAMX daemon service with nitro_v4 parameter"""
+        """Restart acer-sense driver and DAMX daemon service with nitro_v4 parameter"""
         log.info("Forcing model detection to Nitro by restarting drivers and daemon")
 
         try:
             # Remove the module
-            subprocess.run(['sudo', 'rmmod', 'linuwu-sense'], check=True)
-            log.info("Successfully removed linuwu-sense module")
+            subprocess.run(['sudo', 'rmmod', 'acer-sense'], check=True)
+            log.info("Successfully removed acer-sense module")
             
             # Wait a moment
             time.sleep(2)
             
             # Reload the module
-            subprocess.run(['sudo', 'modprobe', 'linuwu-sense', 'predator_v4'], check=True)
-            log.info("Successfully reloaded linuwu-sense module")
+            subprocess.run(['sudo', 'modprobe', 'acer-sense', 'predator_v4'], check=True)
+            log.info("Successfully reloaded acer-sense module")
             
             # Wait a moment for module to initialize
             time.sleep(3)
@@ -205,20 +205,20 @@ class DAMXManager:
             return False
     
     def _force_enable_all(self):
-        """Restart linuwu-sense driver and DAMX daemon service with enable_all parameter"""
+        """Restart acer-sense driver and DAMX daemon service with enable_all parameter"""
         log.info("Forcing all features by restarting daemon and drivers with parameter enable_all")
 
         try:
             # Remove the module
-            subprocess.run(['sudo', 'rmmod', 'linuwu-sense'], check=True)
-            log.info("Successfully removed linuwu-sense module")
+            subprocess.run(['sudo', 'rmmod', 'acer-sense'], check=True)
+            log.info("Successfully removed acer-sense module")
             
             # Wait a moment
             time.sleep(2)
             
             # Reload the module
-            subprocess.run(['sudo', 'modprobe', 'linuwu-sense', 'enable_all'], check=True)
-            log.info("Successfully reloaded linuwu-sense module with enable_all parameter")
+            subprocess.run(['sudo', 'modprobe', 'acer-sense', 'enable_all'], check=True)
+            log.info("Successfully reloaded acer-sense module with enable_all parameter")
             
             # Wait a moment for module to initialize
             time.sleep(3)
@@ -318,21 +318,21 @@ class DAMXManager:
             
 
     def _restart_drivers_and_daemon(self):
-        """Restart linuwu-sense driver and DAMX daemon service"""
+        """Restart acer-sense driver and DAMX daemon service"""
         attempts = self._get_restart_attempts()
         log.info(f"Attempting to restart drivers and daemon (attempt {attempts}/{self.MAX_RESTART_ATTEMPTS})...")
         
         try:
             # Remove the module
-            subprocess.run(['sudo', 'rmmod', 'linuwu-sense'], check=True)
-            log.info("Successfully removed linuwu-sense module")
+            subprocess.run(['sudo', 'rmmod', 'acer-sense'], check=True)
+            log.info("Successfully removed acer-sense module")
             
             # Wait a moment
             time.sleep(2)
             
             # Reload the module
-            subprocess.run(['sudo', 'modprobe', 'linuwu-sense'], check=True)
-            log.info("Successfully reloaded linuwu-sense module")
+            subprocess.run(['sudo', 'modprobe', 'acer-sense'], check=True)
+            log.info("Successfully reloaded acer-sense module")
             
             # Wait a moment for module to initialize
             time.sleep(3)
@@ -1219,7 +1219,7 @@ class DaemonServer:
                     }           
 
             elif command == "restart_drivers_and_daemon":
-                # Restart linuwu-sense driver and DAMX daemon service
+                # Restart acer-sense driver and DAMX daemon service
                 success = self.manager._restart_drivers_and_daemon()
                 if success:
                     return {
